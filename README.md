@@ -7,7 +7,7 @@
 5. Clara Uenike Meylan Langi | 10241018
 
 ### Cara Instalasi
-1. 
+1. tes
 
 ### Jobdesk
 | Anggota | Tugasnya |
