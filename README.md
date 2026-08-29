@@ -14,7 +14,7 @@
 4. Setup ketiganya satu per satu.
 5. Selanjutnya buka folder "laragon" > "bin" > "php", lalu copy file PHP yang sudah didownload tadi ke folder "php" tersebut.
 6. Buka aplikasi "Laragon" > klik kanan > pilih menu PHP kemudian select versi file PHP yang baru didownload.
-7. Lakukan juga untuk file Nodejs yang tadi didownload, tapi lakukan pada folder "nodejs" seperti pada gambar.
+7. Lakukan juga untuk file Nodejs yang tadi didownload, tapi lakukan di folder "nodejs" seperti pada gambar.
 8. Selanjutnya bisa mendownload Composer melalui: https://getcomposer.org/download/ pilih bagian "Composer-Setup.exe"
 9. Kemudian kembali ke aplikasi Laragon > klik kanan > PHP > Extensions.
 10. Lalu aktifkan:
