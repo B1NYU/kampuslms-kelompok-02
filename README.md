@@ -21,8 +21,7 @@
 - pdo_sqlite
 - sqlite3
 - zip
-(untuk mengekstrak di laravel versi 12 nanti)
-
+(ini untuk mengekstrak di laravel nanti)
 11. Jalankan laragon dengan klik "Start All" lalu klik kanan > Quick App > Laravel dan berikan nama project Laravelnya.
 12. Setelah itu Laravel akan langsung dibuat dan memakan waktu cukup lama tergantung device pengguna masing masing.
 13. Kembali ke menu Laragon dan klik "Root" kemudian akan diarahkan ke folder "www" yang berisi file Laravel yang sudah dibuat sebelumnya.
