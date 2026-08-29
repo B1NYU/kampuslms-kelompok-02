@@ -4,7 +4,7 @@
 2. Desta Rifqi Aunur Rahman | 10241020
 3. Calvin Hidayat Winatajaya | 10241016
 4. Devina Dian Saputri | 10241022
-5. Clara Uenike Meylan Langi | 10241018
+5. Clara Uenike Meylan Langi | 102410
 
 ### Cara Instalasi
 1. 
