@@ -59,14 +59,14 @@ Kode tersebut merupakan bagian yang mengurus Exception (Error Handling). Blok ko
 3.Buka routes/web.php. Temukan route yang menghasilkan halaman selamat datang. Ubah teksnya, muat ulang browser, pastikan berubah.
 
 _Jawaban:_ 
-<img src="JAWABAN NO3.png">
+<img src="image\DestaW1J3.png">
 
 4.Jalankan php artisan route:list. Cocokkan keluarannya dengan isi routes/web.php.
 
 _Jawaban:_ 
 
 php artisan route:list
-<img src="NO4.png">
+<img src="image\DestaW1J4.png">
 
 
 routes/web.php
