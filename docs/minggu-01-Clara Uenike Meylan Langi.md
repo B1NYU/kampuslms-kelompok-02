@@ -1,4 +1,4 @@
-# 1.3 Read → Break → Fix → Build
+# 1.3 Read
 
 ## 1. READ — Bedah instalasi
 ### 1) Fungsi `public/index.php`  
