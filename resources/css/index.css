@@ -1,0 +1,360 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: #120306;
+    background-image:
+        radial-gradient(circle at 50% 0%, rgba(225, 60, 100, 0.22) 0%, transparent 55%),
+        linear-gradient(to bottom, #120306 0%, #080102 100%);
+    color: #FCEDD8;
+    height: 100vh;
+    width: 100vw;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    margin: 0;
+}
+
+/* =========================================
+   BACKGROUND DECORATIVE GLOW (selaras halaman lain)
+   ========================================= */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(60px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(255, 212, 100, 0.35) 0%, transparent 70%);
+    top: -140px;
+    right: -100px;
+}
+
+.bg-shape-2 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(226, 60, 100, 0.3) 0%, transparent 70%);
+    bottom: -120px;
+    left: -100px;
+}
+
+/* =========================================
+   MAIN APP CONTAINER (Tablet/Canvas Frame)
+   ========================================= */
+.app-window {
+    width: 100%;
+    max-width: 1380px;
+    height: calc(100vh - 40px);
+    background: #17040a;
+    border-radius: 28px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55),
+                0 0 60px rgba(226, 60, 100, 0.12);
+    display: flex;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border: 1px solid rgba(255, 212, 100, 0.18);
+}
+
+/* =========================================
+   MAIN CONTENT MATA KULIAH
+   ========================================= */
+.courses-content {
+    flex: 1;
+    padding: 32px 36px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background:
+        radial-gradient(circle at 85% -10%, rgba(226, 60, 100, 0.15) 0%, transparent 55%);
+}
+
+/* ---------- Topbar (sama seperti dashboard) ---------- */
+.dash-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-hamburger {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 212, 100, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-hamburger:hover {
+    background: rgba(255, 212, 100, 0.1);
+    border-color: rgba(255, 212, 100, 0.45);
+    transform: translateY(-2px);
+}
+
+.btn-hamburger span {
+    width: 18px;
+    height: 2.5px;
+    background: #FFD464;
+    border-radius: 4px;
+}
+
+.page-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    color: #FFD464;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(255, 212, 100, 0.3);
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(176, 24, 61, 0.25), rgba(226, 60, 100, 0.12));
+}
+
+.page-eyebrow-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #FFD464;
+    box-shadow: 0 0 6px rgba(255, 212, 100, 0.9);
+    flex-shrink: 0;
+}
+
+.page-title h1 {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    background: linear-gradient(180deg, #FFF6E9 0%, #FCEDD8 60%, #FFD464 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Tombol Kembali ---------- */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    color: #FCEDD8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    padding: 0.6rem 1.15rem 0.6rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 212, 100, 0.3);
+    background: linear-gradient(90deg, rgba(176, 24, 61, 0.25), rgba(226, 60, 100, 0.1));
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.btn-back:hover {
+    color: #FFD464;
+    border-color: rgba(255, 212, 100, 0.6);
+    background: linear-gradient(90deg, rgba(176, 24, 61, 0.4), rgba(226, 60, 100, 0.2));
+    transform: translateX(-3px);
+    box-shadow: 0 6px 20px rgba(226, 60, 100, 0.25);
+}
+
+.btn-back-icon {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.btn-back:hover .btn-back-icon {
+    transform: translateX(-2px);
+}
+
+/* =========================================
+   GRID KARTU MATA KULIAH
+   ========================================= */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.course-card {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(160deg, #1c060c 0%, #150409 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 212, 100, 0.18);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.course-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 212, 100, 0.45);
+    box-shadow: 0 20px 40px rgba(226, 60, 100, 0.25);
+}
+
+/* Banner warna-warni di atas kartu */
+.course-banner {
+    position: relative;
+    height: 96px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px;
+    background-image:
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 12px, transparent 12px 24px);
+}
+
+.banner-violet { background-color: #6C3ED9; background-image: linear-gradient(135deg, #7311D4, #B0183D), repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 12px, transparent 12px 24px); }
+.banner-gold   { background-color: #C98A1F; background-image: linear-gradient(135deg, #FFD464, #E23C64), repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 12px, transparent 12px 24px); }
+.banner-rose   { background-color: #C23A5E; background-image: linear-gradient(135deg, #E23C64, #B0183D), repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 12px, transparent 12px 24px); }
+.banner-teal   { background-color: #1E9E8C; background-image: linear-gradient(135deg, #2FD3B8, #1B6E9E), repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 12px, transparent 12px 24px); }
+.banner-blue   { background-color: #2E63C9; background-image: linear-gradient(135deg, #4C8DFF, #7311D4), repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 12px, transparent 12px 24px); }
+.banner-plum   { background-color: #8A2F6B; background-image: linear-gradient(135deg, #B0183D, #7311D4), repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 12px, transparent 12px 24px); }
+
+.course-tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #FCEDD8;
+    background: rgba(0, 0, 0, 0.28);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.course-go {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FCEDD8;
+    transition: all 0.25s ease;
+}
+
+.course-card:hover .course-go {
+    background: #FFD464;
+    color: #17040a;
+    border-color: #FFD464;
+    transform: translateX(2px);
+}
+
+/* Isi kartu */
+.course-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px 20px;
+}
+
+.course-code {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #FFD464;
+}
+
+.course-name {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #FCEDD8;
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+
+.course-dosen {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: rgba(252, 237, 216, 0.5);
+    margin-bottom: 10px;
+}
+
+.course-progress-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 212, 100, 0.12);
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.course-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #FFD464, #E23C64);
+}
+
+.course-progress-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(252, 237, 216, 0.6);
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 1100px) {
+    .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        padding: 12px;
+        height: auto;
+        overflow: auto;
+    }
+    .app-window {
+        flex-direction: column;
+        border-radius: 20px;
+        height: auto;
+    }
+    .courses-content {
+        padding: 20px;
+    }
+    .courses-grid {
+        grid-template-columns: 1fr;
+    }
+}

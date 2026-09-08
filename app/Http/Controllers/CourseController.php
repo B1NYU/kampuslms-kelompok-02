@@ -6,7 +6,6 @@ use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-
     private function data(): array
     {
         return [
@@ -41,7 +40,8 @@ class CourseController extends Controller
     {
         $matakuliah = array_values($this->data());
 
-        return view('mata-kuliah.index', [
+        // Sesuaikan folder 'courses.index' karena file ada di resources/views/courses/index.blade.php
+        return view('courses.index', [
             'matakuliah' => $matakuliah,
         ]);
     }
@@ -52,7 +52,8 @@ class CourseController extends Controller
 
         abort_if(!isset($data[$mata_kuliah]), 404);
 
-        return view('mata-kuliah.show', [
+        // Sesuaikan folder 'courses.show'
+        return view('courses.show', [
             'mataKuliah' => $data[$mata_kuliah],
         ]);
     }
