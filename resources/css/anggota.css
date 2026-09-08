@@ -1,0 +1,349 @@
+html, body.poster-page {
+    height: 100vh;
+    overflow: hidden;
+    background-color: #120306;
+    background-image:
+        radial-gradient(circle at 50% 20%, rgba(225, 60, 100, 0.25) 0%, transparent 60%),
+        linear-gradient(to bottom, #120306 0%, #080102 100%);
+    font-family: ethnocentric, sans-serif;
+    color: #FCEDD8;
+    margin: 1;
+    padding: 0.5rem 1rem 1rem 1rem; 
+}
+
+/* ---------- Header ---------- */
+.poster-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 3.5rem;
+}
+
+.poster-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #FFD464;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.4rem;
+    border: 1px solid rgba(255, 212, 100, 0.35);
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(176, 24, 61, 0.25), rgba(226, 60, 100, 0.15));
+    box-shadow: 0 0 25px rgba(226, 60, 100, 0.25);
+    margin-bottom: 1.4rem;
+}
+
+.poster-badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #FFD464;
+    box-shadow: 0 0 8px rgba(255, 212, 100, 0.9);
+    flex-shrink: 0;
+}
+
+.poster-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #FCEDD8;
+    margin: 0;
+    line-height: 1.1;
+    background: linear-gradient(180deg, #FFF6E9 0%, #FCEDD8 55%, #FFD464 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 6px 18px rgba(176, 24, 61, 0.55))
+            drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.poster-title-line {
+    width: clamp(24px, 6vw, 64px);
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, #FF5E5E, #FFD464);
+    flex-shrink: 0;
+}
+
+.poster-title-line:last-child {
+    background: linear-gradient(90deg, #FFD464, #FF5E5E, transparent);
+}
+
+.poster-subtitle {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    color: rgba(252, 237, 216, 0.55);
+    text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+    .poster-title {
+        gap: 0.6rem;
+    }
+    .poster-title-line {
+        width: 20px;
+    }
+}
+
+.poster-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* biar efek zig-zag kelihatan dari garis dasar */
+    gap: 0;
+    flex-wrap: nowrap;
+    max-width: 1450px;
+    margin: 0 auto;
+    padding-top: 1px;
+    perspective: 1200px;
+}
+
+/* dim kartu lain saat salah satu di-hover -> efek "spotlight"*/
+.poster-container:has(.member-poster-card:hover) .member-poster-card:not(:hover) {
+    opacity: 0.45;
+    filter: grayscale(100%) brightness(0.6);
+    transform: scale(0.97);
+}
+
+.poster-container:has(.member-poster-card:hover) .member-poster-card:not(:hover) .poster-img {
+    filter: grayscale(100%) contrast(110%) brightness(0.7);
+}
+
+/* ---------- Card ---------- */
+
+.member-poster-card {
+    position: relative;
+    width: 230px;
+    height: 460px;
+    background: #0d0203;
+    overflow: hidden;
+    margin-left: -18px; /* supaya kartu saling overlap sedikit seperti referensi */
+    clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+    box-shadow: -8px 10px 25px rgba(0, 0, 0, 0.65);
+    border-right: 1px solid rgba(255, 212, 100, 0.25);
+    transition: transform 0.45s cubic-bezier(0.165, 0.84, 0.44, 1),
+                opacity 0.35s ease,
+                filter 0.35s ease,
+                box-shadow 0.35s ease,
+                z-index 0s;
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.member-poster-card:first-child {
+    margin-left: 0;
+}
+
+/* efek zig-zag naik-turun seperti referensi kanan */
+.member-poster-card:nth-child(odd) {
+    transform: translateY(0px);
+}
+
+.member-poster-card:nth-child(even) {
+    transform: translateY(38px);
+}
+
+.member-poster-card:hover {
+    transform: translateY(-22px) scale(1.06);
+    z-index: 20;
+    box-shadow: 0 25px 55px rgba(225, 60, 100, 0.5);
+    border-right-color: #FFD464;
+}
+
+.member-poster-card:nth-child(even):hover {
+    transform: translateY(16px) scale(1.06);
+}
+
+/* ---------- Foto ---------- */
+
+.poster-image-wrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a0509;
+}
+
+.poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    filter: grayscale(100%) contrast(115%) brightness(0.95);
+    transition: filter 0.4s ease, transform 0.6s ease;
+    transform: scale(1.02);
+}
+
+.member-poster-card:hover .poster-img {
+    filter: grayscale(0%) contrast(105%) brightness(1);
+    transform: scale(1.08);
+}
+
+/* overlay gradasi bawah supaya nama tetap terbaca di atas foto */
+.poster-gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55%;
+    background: linear-gradient(to top,
+        #120306 0%,
+        rgba(176, 24, 61, 0.85) 30%,
+        rgba(226, 60, 100, 0.35) 65%,
+        rgba(255, 94, 94, 0) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.member-poster-card:hover .poster-gradient-overlay::before {
+    opacity: 1;
+}
+
+/* ---------- Konten teks ---------- */
+
+.poster-content {
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 0 1.1rem 1.2rem;
+}
+
+.poster-text-box {
+    text-align: left;
+}
+
+.poster-role {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #FFD464;
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    position: relative;
+    padding-left: 0.6rem;
+}
+
+.poster-role::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: #FFD464;
+    border-radius: 50%;
+}
+
+/* Nama besar ala credit-title poster referensi */
+.poster-name {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #FCEDD8;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    margin: 0 0 0.35rem 0;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
+    word-break: break-word;
+}
+
+.poster-nickname {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #FF5E5E;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.poster-nim {
+    font-size: 0.68rem;
+    color: rgba(252, 237, 216, 0.75);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+}
+
+/* nomor urut besar transparan di pojok atas, aksen khas poster cast */
+.poster-index {
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    z-index: 3;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: rgba(252, 237, 216, 0.12);
+    line-height: 1;
+    pointer-events: none;
+    transition: color 0.35s ease;
+}
+
+.member-poster-card:hover .poster-index {
+    color: rgba(255, 212, 100, 0.35);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1200px) {
+    .poster-container {
+        flex-wrap: wrap;
+        row-gap: 2.5rem;
+    }
+    .member-poster-card {
+        margin-left: -12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .poster-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .member-poster-card {
+        width: 100%;
+        max-width: 320px;
+        margin-left: 0 !important;
+        transform: none !important;
+    }
+    .member-poster-card:hover {
+        transform: translateY(-8px) scale(1.02) !important;
+    }
+}
+
+/* ---------- Modal ---------- */
+
+#memberModal {
+    transition: opacity 0.25s ease;
+}
+
+#memberModal .modal-card {
+    animation: modalPop 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
