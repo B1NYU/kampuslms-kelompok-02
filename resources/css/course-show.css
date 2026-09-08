@@ -1,0 +1,768 @@
+/* ============================================================
+   KAMPUS LMS - COURSE SHOW STYLES (STANDALONE LAYOUT)
+   Kombinasi Warna Terang Mengacu pada Referensi Dashboard LMS:
+   1. #FCEDD8 - Background Canvas Luar
+   2. #FFFFFF - Kartu Konten Bersih & Cerah
+   3. #F2DCD3 - Garis Batas / Border Halus
+   4. #B0182D - Warna Judul Utama & Brand
+   5. #5F3540 - Warna Teks Gelap Utama
+   6. #8E5360 / #8E6570 - Warna Teks Keterangan
+   7. #FF5E5E - Aksen Coral & Tombol Aksi
+   8. #E23C64 - Aksen Crimson & Avatar
+   9. #FFD464 - Aksen Kuning Emas Dekoratif
+   10. #FFF5E8 - Background Chip Highlight
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: #FCEDD8;
+    color: #5F3540;
+    min-height: 100vh;
+    padding: 28px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* =========================================
+   BACKGROUND DECORATIVE SHAPES
+   ========================================= */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(2px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 380px;
+    height: 380px;
+    background: #FFD464;
+    top: -120px;
+    right: -80px;
+    opacity: 0.7;
+}
+
+.bg-shape-2 {
+    width: 300px;
+    height: 300px;
+    background: #FF5E5E;
+    bottom: -90px;
+    left: -80px;
+    opacity: 0.35;
+}
+
+/* =========================================
+   MAIN CONTAINER (STANDALONE 2-COLUMN)
+   ========================================= */
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Top Navbar */
+.top-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #F2DCD3;
+}
+
+.top-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    font-size: 20px;
+    font-weight: 900;
+    color: #B0182D;
+    text-decoration: none;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.brand-logo span {
+    color: #FF5E5E;
+}
+
+.brand-divider {
+    color: #EBD6CE;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.brand-sub {
+    font-size: 14px;
+    font-weight: 800;
+    color: #5F3540;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #B0182D;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    background: #FFFFFF;
+    padding: 9px 18px;
+    border-radius: 999px;
+    border: 1px solid #F2DCD3;
+    box-shadow: 0 4px 14px rgba(176, 24, 45, 0.05);
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    background: #FFF5E8;
+    color: #E23C64;
+    transform: translateX(-3px);
+    border-color: #F4D9C1;
+}
+
+/* =========================================
+   TATA LETAK 2 KOLOM
+   ========================================= */
+.split-layout {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ============================================================
+   KOLOM KIRI: PANEL RENCANA PERTEMUAN (SCROLLBAR INTERNAL)
+   ============================================================ */
+.left-panel {
+    background: #FFFFFF;
+    border-radius: 26px;
+    padding: 24px 22px 24px 26px;
+    border: 1px solid #F2DCD3;
+    box-shadow: 0 10px 30px rgba(176, 24, 45, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #F4E8E2;
+}
+
+.panel-header h2 {
+    font-size: 19px;
+    font-weight: 900;
+    color: #B0182D;
+    letter-spacing: -0.2px;
+}
+
+.header-pill {
+    font-size: 11px;
+    font-weight: 800;
+    color: #B0182D;
+    background: #FFF5E8;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid #F4D9C1;
+}
+
+/* WADAH SCROLL INTERNAL */
+.timeline-scroll-box {
+    max-height: 540px;
+    overflow-y: auto;
+    padding-right: 8px;
+    padding-left: 36px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-scroll-box::-webkit-scrollbar {
+    width: 6px;
+}
+.timeline-scroll-box::-webkit-scrollbar-track {
+    background: #F8F3ED;
+    border-radius: 10px;
+}
+.timeline-scroll-box::-webkit-scrollbar-thumb {
+    background: #EBD6CE;
+    border-radius: 10px;
+}
+.timeline-scroll-box::-webkit-scrollbar-thumb:hover {
+    background: #FF5E5E;
+}
+
+.timeline-scroll-box::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 20px;
+    bottom: 25px;
+    width: 2.5px;
+    background: #F2DCD3;
+    border-radius: 2px;
+}
+
+.timeline-item { position: relative; }
+
+.timeline-node {
+    position: absolute;
+    left: -36px;
+    top: 16px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid #F2DCD3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: all 0.2s;
+}
+
+.timeline-node-inner {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #EBD6CE;
+}
+
+.timeline-node.done { border-color: #10B981; }
+.timeline-node.done .timeline-node-inner { background: #10B981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+
+.timeline-node.active { border-color: #FF5E5E; }
+.timeline-node.active .timeline-node-inner { background: #FF5E5E; box-shadow: 0 0 8px rgba(255, 94, 94, 0.5); }
+
+.timeline-node.exam { border-color: #E23C64; }
+.timeline-node.exam .timeline-node-inner { background: #E23C64; box-shadow: 0 0 8px rgba(226, 60, 100, 0.5); }
+
+/* KARTU SESI (BERSIH, PUTIH & ELEGAN) */
+.session-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 13px 15px;
+    border: 1px solid #F2DCD3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(176, 24, 45, 0.02);
+}
+
+.session-card:hover {
+    transform: translateX(4px);
+    background: #FFFBF7;
+    border-color: #FF5E5E;
+    box-shadow: 0 6px 18px rgba(176, 24, 45, 0.08);
+}
+
+.session-card.selected-active {
+    border-color: #FF5E5E;
+    background: #FFF5F7;
+    box-shadow: 0 4px 16px rgba(226, 60, 100, 0.12);
+}
+
+.session-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.session-icon-circle {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    background: #F8F3ED;
+    color: #8E5360;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #F2DCD3;
+}
+
+.session-icon-circle.done {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.session-icon-circle.active {
+    background: linear-gradient(135deg, #FF5E5E, #E23C64);
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 3px 10px rgba(255, 94, 94, 0.35);
+}
+
+.session-icon-circle.exam-icon {
+    background: #E23C64;
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 3px 10px rgba(226, 60, 100, 0.35);
+}
+
+.session-text h4 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #5F3540;
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+
+.session-text p {
+    font-size: 11.5px;
+    color: #8E6570;
+    line-height: 1.3;
+}
+
+.session-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-status {
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.badge-status.done {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-status.active {
+    background: #FFF0F3;
+    color: #FF5E5E;
+    border: 1px solid rgba(255, 94, 94, 0.3);
+}
+
+.badge-status.exam {
+    background: #FFF0F5;
+    color: #E23C64;
+    border: 1px solid rgba(226, 60, 100, 0.3);
+}
+
+.badge-status.locked {
+    background: #F8F3ED;
+    color: #987982;
+    border: 1px solid #F2DCD3;
+}
+
+.arrow-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #F8F3ED;
+    color: #B0182D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    border: 1px solid #F2DCD3;
+    transition: all 0.2s;
+}
+
+.session-card:hover .arrow-btn {
+    background: #FF5E5E;
+    color: #FFFFFF;
+    border-color: #FF5E5E;
+}
+
+/* ============================================================
+   KOLOM KANAN: PANEL STICKY BERSIH
+   ============================================================ */
+.right-panel {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.content-fade {
+    animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Kartu Info & CPMK */
+.card-course-info,
+.card-cpmk-premium,
+.card-week-detail-panel {
+    background: #FFFFFF;
+    border-radius: 26px;
+    padding: 24px;
+    border: 1px solid #F2DCD3;
+    box-shadow: 0 10px 30px rgba(176, 24, 45, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card-course-info h3,
+.card-cpmk-premium h3,
+.card-week-detail-panel h3 {
+    font-size: 17px;
+    font-weight: 900;
+    color: #B0182D;
+    border-bottom: 1px solid #F4E8E2;
+    padding-bottom: 12px;
+}
+
+.lecturer-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFF9F3;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid #F2DCD3;
+}
+
+.lecturer-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #E23C64;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 15px;
+}
+
+.lecturer-info h5 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #5F3540;
+}
+
+.lecturer-info span {
+    font-size: 11px;
+    color: #8E6570;
+}
+
+.meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #F7ECE6;
+}
+
+.meta-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.meta-row span {
+    color: #8E5360;
+    font-weight: 600;
+}
+
+/* Chip Indikator Sesuai Dashboard */
+.meta-chip {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+
+.chip-gold {
+    background: #FFF5E8;
+    color: #B0182D;
+    border: 1px solid #F4D9C1;
+}
+
+.chip-cream {
+    background: #F8F3ED;
+    color: #5F3540;
+    border: 1px solid #F2DCD3;
+}
+
+.chip-coral {
+    background: #FFF0F3;
+    color: #FF5E5E;
+    border: 1px solid rgba(255, 94, 94, 0.25);
+}
+
+.chip-crimson {
+    background: #FFF0F5;
+    color: #E23C64;
+    border: 1px solid rgba(226, 60, 100, 0.25);
+}
+
+.cpmk-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cpmk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    color: #5F3540;
+    line-height: 1.45;
+}
+
+.check-icon {
+    color: #10B981;
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.btn-gradient-action {
+    width: 100%;
+    background: #FF5E5E;
+    color: #FFFFFF;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255, 94, 94, 0.25);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-gradient-action:hover {
+    background: #B0182D;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(176, 24, 45, 0.3);
+}
+
+/* Detail Panel Elements */
+.detail-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F4E8E2;
+    padding-bottom: 10px;
+}
+
+.btn-restore-info {
+    background: #FFF5E8;
+    color: #B0182D;
+    border: 1px solid #F4D9C1;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-restore-info:hover {
+    background: #B0182D;
+    color: #FFFFFF;
+    border-color: #B0182D;
+}
+
+.detail-title-group h3 {
+    font-size: 17px;
+    font-weight: 900;
+    color: #B0182D;
+    line-height: 1.3;
+    margin-top: 3px;
+}
+
+.detail-badge-session {
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #E23C64;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-block-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #8E5360;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-desc-box {
+    background: #FFF9F3;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #F2DCD3;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #5F3540;
+}
+
+.resource-card {
+    background: #FFF9F3;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #F2DCD3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.resource-name { font-size: 12.5px; font-weight: 800; color: #5F3540; }
+.resource-meta { font-size: 11px; color: #8E6570; }
+
+.btn-mini-download {
+    background: #FF5E5E;
+    color: #FFFFFF;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-mini-download:hover {
+    background: #B0182D;
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-card-box {
+    background: #FFFBF7;
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1px solid #F2DCD3;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.task-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.task-badge-tag {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 5px;
+}
+
+.task-badge-tag.quiz {
+    color: #B0182D;
+    background: #FFF5E8;
+    border: 1px solid #F4D9C1;
+}
+
+.task-badge-tag.praktikum {
+    color: #FF5E5E;
+    background: #FFF0F3;
+    border: 1px solid rgba(255, 94, 94, 0.2);
+}
+
+.task-badge-tag.milestone {
+    color: #E23C64;
+    background: #FFF0F5;
+    border: 1px solid rgba(226, 60, 100, 0.2);
+}
+
+.task-badge-tag.exam {
+    color: #FFFFFF;
+    background: #FF5E5E;
+}
+
+.task-card-title {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #5F3540;
+}
+
+.task-deadline {
+    font-size: 11px;
+    color: #8E6570;
+}
+
+.btn-task-action {
+    width: 100%;
+    background: #FF5E5E;
+    color: #FFFFFF;
+    border: none;
+    padding: 9px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 3px;
+}
+
+.btn-task-action:hover {
+    background: #B0182D;
+}
+
+@media (max-width: 960px) {
+    .split-layout { grid-template-columns: 1fr; }
+    .timeline-scroll-box { max-height: 420px; }
+    .right-panel { position: static; }
+}
