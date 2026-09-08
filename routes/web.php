@@ -16,3 +16,7 @@ Route::prefix('mata-kuliah')->name('mata-kuliah.')->group(function () {
     Route::get('/', [CourseController::class, 'index'])->name('index');
     Route::get('/mata_kuliah', [CourseController::class, 'show'])->name('show');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+});
