@@ -6,55 +6,73 @@ use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-    private function data(): array
-    {
-        return [
-            1 => [
-                'id' => 1,
-                'kode' => 'IF101',
-                'nama' => 'Pemrograman Dasar',
-                'sks' => 3,
-                'dosen' => 'Dr. Andi Wijaya',
-                'deskripsi' => 'Pengantar konsep pemrograman menggunakan bahasa Python, mencakup variabel, struktur kontrol, dan fungsi.',
-            ],
-            2 => [
-                'id' => 2,
-                'kode' => 'IF201',
-                'nama' => 'Struktur Data',
-                'sks' => 3,
-                'dosen' => 'Dr. Siti Rahma',
-                'deskripsi' => 'Mempelajari struktur data dasar seperti array, linked list, stack, queue, tree, dan graph beserta penerapannya.',
-            ],
-            3 => [
-                'id' => 3,
-                'kode' => 'IF301',
-                'nama' => 'Basis Data',
-                'sks' => 3,
-                'dosen' => 'Prof. Budi Santoso',
-                'deskripsi' => 'Konsep perancangan basis data relasional, normalisasi, entity-relationship diagram, dan bahasa SQL.',
-            ],
-        ];
-    }
 
     public function index(): View
     {
-        $matakuliah = array_values($this->data());
+        // Data statis sementara list mata kuliah
+        $matakuliah = [
+            [
+                'id' => 1,
+                'kode' => 'SI101',
+                'nama' => 'Pemrograman Web',
+                'sks' => 3,
+                'dosen' => 'Dr. Budi Santoso',
+            ],
+            [
+                'id' => 2,
+                'kode' => 'SI102',
+                'nama' => 'Basis Data',
+                'sks' => 3,
+                'dosen' => 'Siti Rahma, M.Kom.',
+            ],
+            [
+                'id' => 3,
+                'kode' => 'SI103',
+                'nama' => 'Analisis dan Perancangan Sistem',
+                'sks' => 3,
+                'dosen' => 'Andi Wijaya, M.Kom.',
+            ],
+        ];
 
-        // Sesuaikan folder 'courses.index' karena file ada di resources/views/courses/index.blade.php
-        return view('courses.index', [
-            'matakuliah' => $matakuliah,
-        ]);
+        return view('courses.index', compact('matakuliah'));
     }
 
     public function show(int $mata_kuliah): View
     {
-        $data = $this->data();
+        $daftarMataKuliah = [
+            1 => [
+                'id' => 1,
+                'kode' => 'SI101',
+                'nama' => 'Pemrograman Web',
+                'sks' => 3,
+                'dosen' => 'Dr. Budi Santoso',
+                'deskripsi' => 'Mempelajari dasar-dasar pengembangan aplikasi web menggunakan PHP dan Laravel.',
+            ],
+            2 => [
+                'id' => 2,
+                'kode' => 'SI102',
+                'nama' => 'Basis Data',
+                'sks' => 3,
+                'dosen' => 'Siti Rahma, M.Kom.',
+                'deskripsi' => 'Mempelajari konsep basis data relasional, perancangan database, dan SQL.',
+            ],
+            3 => [
+                'id' => 3,
+                'kode' => 'SI103',
+                'nama' => 'Analisis dan Perancangan Sistem',
+                'sks' => 3,
+                'dosen' => 'Andi Wijaya, M.Kom.',
+                'deskripsi' => 'Mempelajari proses analisis kebutuhan dan perancangan arsitektur sistem informasi.',
+            ],
+        ];
 
-        abort_if(!isset($data[$mata_kuliah]), 404);
+        // Cari mata kuliah berdasarkan ID ($mata_kuliah) yang dikirim dari URL
+        $mataKuliah = $daftarMataKuliah[$mata_kuliah] ?? null;
 
-        // Sesuaikan folder 'courses.show'
-        return view('courses.show', [
-            'mataKuliah' => $data[$mata_kuliah],
-        ]);
+        // Jika ID tidak ada, tampilkan halaman 404 (Not Found)
+        abort_if($mataKuliah === null, 404);
+
+        // Dikirim dengan nama 'mataKuliah' agar cocok dengan $mataKuliah['nama'] di view show
+        return view('courses.show', compact('mataKuliah'));
     }
 }
