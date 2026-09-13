@@ -13,14 +13,14 @@
     <div class="bg-shape bg-shape-1"></div>
     <div class="bg-shape bg-shape-2"></div>
 
-    <!-- Main Window Canvas disamakan dengan dashboard.blade.php -->
-    <div class="app-window" style="display: flex; flex-direction: column; overflow: hidden;">
+    <!-- Main Window Canvas -->
+    <div class="app-window">
         
         <!-- 1. Panggil Komponen Navbar -->
         <x-layout />
 
         <!-- 2. Konten Utama Laman Anggota -->
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 10px 20px;">
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px;">
             <div class="max-w-7xl mx-auto px-4 w-full">
                
                 <div class="poster-header" style="margin-bottom: 1rem;">

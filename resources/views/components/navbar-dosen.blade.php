@@ -14,8 +14,8 @@
 
         <!-- Navigation Menu Khusus Fitur Dosen -->
         <ul class="navbar-nav dosen-nav">
-            <li class="active">
-                <a href="#overview" class="nav-link-dosen" data-target="overview">
+            <li class="{{ request()->is('dosen/dashboard') || request()->is('dosen') ? 'active' : '' }}">
+                <a href="{{ route('dosen.dashboard') }}" class="nav-link-dosen">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
@@ -25,8 +25,8 @@
                     Dashboard
                 </a>
             </li>
-            <li>
-                <a href="#kelola-mahasiswa" class="nav-link-dosen" data-target="kelola-mahasiswa">
+            <li class="{{ request()->is('dosen/mahasiswa') ? 'active' : '' }}">
+                <a href="{{ route('dosen.mahasiswa') }}" class="nav-link-dosen">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
@@ -36,8 +36,8 @@
                     Kelola Mahasiswa
                 </a>
             </li>
-            <li>
-                <a href="#unggah-materi" class="nav-link-dosen" data-target="unggah-materi">
+            <li class="{{ request()->is('dosen/materi') ? 'active' : '' }}">
+                <a href="{{ route('dosen.materi') }}" class="nav-link-dosen">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
                         <path d="M12 12v9"></path>
@@ -46,8 +46,8 @@
                     Unggah Materi
                 </a>
             </li>
-            <li>
-                <a href="#buat-tugas" class="nav-link-dosen" data-target="buat-tugas">
+            <li class="{{ request()->is('dosen/tugas') ? 'active' : '' }}">
+                <a href="{{ route('dosen.tugas') }}" class="nav-link-dosen">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -55,8 +55,8 @@
                     Buat Tugas
                 </a>
             </li>
-            <li>
-                <a href="#penilaian-tugas" class="nav-link-dosen" data-target="penilaian-tugas">
+            <li class="{{ request()->is('dosen/penilaian') ? 'active' : '' }}">
+                <a href="{{ route('dosen.penilaian') }}" class="nav-link-dosen">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>

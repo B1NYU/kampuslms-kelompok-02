@@ -166,7 +166,7 @@
                                         <tr>
                                             <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $mk['kode'] }}</span></td>
                                             <td style="font-weight:700;font-size:13px;">{{ $mk['nama'] }}</td>
-                                            <td style="font-size:12px;font-weight:700;color:#3B5BDB;">{{ $mk['sks'] }} SKS</td>
+                                            <td style="font-size:12px;font-weight:700;color:#B0182D;">{{ $mk['sks'] }} SKS</td>
                                             <td style="font-size:12px;color:#64748B;">{{ $mk['dosen'] }}</td>
                                             <td>
                                                 <span class="badge-status {{ $mk['status'] === 'Aktif' ? 'badge-status-active' : 'badge-status-inactive' }}">
@@ -221,7 +221,7 @@
             tr.innerHTML = `
                 <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${kode}</span></td>
                 <td style="font-weight:700;font-size:13px;">${nama}</td>
-                <td style="font-size:12px;font-weight:700;color:#3B5BDB;">${sks} SKS</td>
+                <td style="font-size:12px;font-weight:700;color:#B0182D;">${sks} SKS</td>
                 <td style="font-size:12px;color:#64748B;">${dosen}</td>
                 <td><span class="badge-status ${isAktif ? 'badge-status-active' : 'badge-status-inactive'}">${stat}</span></td>
                 <td><div class="btn-actions">

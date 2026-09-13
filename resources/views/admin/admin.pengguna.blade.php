@@ -144,11 +144,11 @@
                                     <tbody id="userTableBody">
                                         @php
                                             $users = [
-                                                ['inisial'=>'AD','nama'=>'Super Admin','id'=>'ADMIN-001','role'=>'admin','prodi'=>'Administrasi','status'=>'aktif','bg'=>'#EEF2FF','c'=>'#3B5BDB'],
+                                                ['inisial'=>'AD','nama'=>'Super Admin','id'=>'ADMIN-001','role'=>'admin','prodi'=>'Administrasi','status'=>'aktif','bg'=>'#FFE2E8','c'=>'#B0182D'],
                                                 ['inisial'=>'BS','nama'=>'Dr. Budi Santoso, M.Kom','id'=>'NIP-001','role'=>'dosen','prodi'=>'Teknologi Informasi','status'=>'aktif','bg'=>'#FFF0DE','c'=>'#C98A1F'],
                                                 ['inisial'=>'RM','nama'=>'Rina Marlina, M.Kom','id'=>'NIP-002','role'=>'dosen','prodi'=>'Sistem Informasi','status'=>'aktif','bg'=>'#FFF0DE','c'=>'#C98A1F'],
                                                 ['inisial'=>'BK','nama'=>'Baihaqi Abimanyu','id'=>'10241014','role'=>'mahasiswa','prodi'=>'Sistem Informasi','status'=>'aktif','bg'=>'#ECFDF5','c'=>'#16A34A'],
-                                                ['inisial'=>'CA','nama'=>'Calvin Adithya','id'=>'10241016','role'=>'mahasiswa','prodi'=>'Sistem Informasi','status'=>'aktif','bg'=>'#EBF3FF','c'=>'#1971C2'],
+                                                ['inisial'=>'CA','nama'=>'Calvin Adithya','id'=>'10241016','role'=>'mahasiswa','prodi'=>'Sistem Informasi','status'=>'aktif','bg'=>'#FFF0DE','c'=>'#C98A1F'],
                                                 ['inisial'=>'CL','nama'=>'Clara Shinta','id'=>'10241018','role'=>'mahasiswa','prodi'=>'Sistem Informasi','status'=>'aktif','bg'=>'#F2EBF9','c'=>'#8E44AD'],
                                                 ['inisial'=>'DE','nama'=>'Desta Arkan','id'=>'10241020','role'=>'mahasiswa','prodi'=>'Sistem Informasi','status'=>'aktif','bg'=>'#EBF9F1','c'=>'#1B8A5A'],
                                                 ['inisial'=>'DV','nama'=>'Devina Putri','id'=>'10241022','role'=>'mahasiswa','prodi'=>'Sistem Informasi','status'=>'nonaktif','bg'=>'#F1F5F9','c'=>'#64748B'],
@@ -211,7 +211,7 @@
             if (!nama || !id) return;
 
             const roleColors = {
-                admin: ['#EEF2FF','#3B5BDB'],
+                admin: ['#FFE2E8','#B0182D'],
                 dosen: ['#FFF0DE','#C98A1F'],
                 mahasiswa: ['#ECFDF5','#16A34A'],
             };

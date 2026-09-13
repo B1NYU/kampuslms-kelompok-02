@@ -22,8 +22,14 @@
             font-family: 'Nunito', sans-serif;
             background: #FCEDD8;
             color: #B0182D;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         a {
@@ -73,54 +79,55 @@
 
         .navbar {
             width: 100%;
-            padding: 28px 7%;
+            padding: 12px 8%;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 13px;
+            gap: 10px;
         }
 
         .brand-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: #E23C64;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 8px 20px rgba(226, 60, 100, 0.25);
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(226, 60, 100, 0.22);
         }
 
         .brand-text h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             color: #B0182D;
             line-height: 1.1;
         }
 
         .brand-text p {
-            font-size: 11px;
+            font-size: 10px;
             color: #8E5360;
-            margin-top: 4px;
+            margin-top: 2px;
             font-weight: 600;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .nav-link {
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 7px 15px;
+            border-radius: 10px;
+            font-size: 12.5px;
             font-weight: 700;
             transition: all 0.25s ease;
         }
@@ -157,15 +164,17 @@
         ========================= */
 
         .main-container {
-            width: 86%;
-            max-width: 1250px;
-            margin: 45px auto 0;
+            width: 82%;
+            max-width: 940px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
+            grid-template-columns: 1.08fr 0.92fr;
             align-items: center;
-            gap: 80px;
-            min-height: calc(100vh - 150px);
-            padding-bottom: 50px;
+            justify-content: center;
+            gap: 44px;
+            flex: 1;
+            padding: 0;
+            min-height: 0;
         }
 
         /* =========================
@@ -179,32 +188,32 @@
         .welcome-label {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
+            gap: 6px;
+            padding: 4px 12px;
             background: #FFD464;
             color: #B0182D;
             border-radius: 30px;
-            font-size: 12px;
+            font-size: 10.5px;
             font-weight: 800;
-            letter-spacing: 0.7px;
-            margin-bottom: 20px;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
         }
 
         .welcome-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: #E23C64;
             border-radius: 50%;
         }
 
         .left-content h1 {
-            font-size: clamp(45px, 5vw, 70px);
-            line-height: 1.02;
+            font-size: clamp(26px, 3.2vw, 42px);
+            line-height: 1.08;
             font-weight: 900;
-            letter-spacing: -2.5px;
+            letter-spacing: -1.2px;
             color: #B0182D;
-            max-width: 650px;
-            margin-bottom: 24px;
+            max-width: 520px;
+            margin-bottom: 10px;
         }
 
         .left-content h1 span {
@@ -212,11 +221,11 @@
         }
 
         .description {
-            max-width: 590px;
+            max-width: 480px;
             color: #80525D;
-            font-size: 16px;
-            line-height: 1.8;
-            margin-bottom: 32px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 14px;
         }
 
         /* =========================
@@ -226,27 +235,27 @@
         .features {
             display: flex;
             flex-wrap: wrap;
-            gap: 18px;
-            margin-bottom: 35px;
+            gap: 10px;
+            margin-bottom: 0;
         }
 
         .feature {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 7px;
             color: #69424C;
-            font-size: 13px;
+            font-size: 11.5px;
             font-weight: 700;
         }
 
         .feature-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 13px;
         }
 
         .feature-blue {
@@ -272,36 +281,36 @@
 
         .login-card {
             width: 100%;
-            max-width: 430px;
+            max-width: 375px;
             background: #FFFFFF;
-            border-radius: 28px;
-            padding: 35px;
+            border-radius: 20px;
+            padding: 18px 22px;
             box-shadow:
-                0 25px 60px rgba(176, 24, 45, 0.10),
-                0 8px 25px rgba(176, 24, 45, 0.06);
+                0 15px 40px rgba(176, 24, 45, 0.08),
+                0 4px 15px rgba(176, 24, 45, 0.04);
             border: 1px solid #F2DCD3;
             position: relative;
         }
 
         .card-decoration {
             position: absolute;
-            width: 75px;
-            height: 75px;
+            width: 50px;
+            height: 50px;
             background: #FFD464;
             border-radius: 50%;
-            top: -28px;
-            right: -20px;
+            top: -14px;
+            right: -10px;
             z-index: 0;
         }
 
         .card-decoration-two {
             position: absolute;
-            width: 45px;
-            height: 45px;
+            width: 28px;
+            height: 28px;
             background: #FF5E5E;
             border-radius: 50%;
-            bottom: -15px;
-            left: -15px;
+            bottom: -8px;
+            left: -8px;
             opacity: 0.8;
         }
 
@@ -311,30 +320,30 @@
         }
 
         .portal-icon {
-            width: 58px;
-            height: 58px;
-            border-radius: 17px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: #FCEDD8;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 27px;
-            margin-bottom: 20px;
+            font-size: 18px;
+            margin-bottom: 6px;
             border: 1px solid #F5D9C3;
         }
 
         .login-card h2 {
-            font-size: 27px;
+            font-size: 18px;
             font-weight: 900;
             color: #B0182D;
-            margin-bottom: 7px;
+            margin-bottom: 2px;
         }
 
         .login-subtitle {
             color: #8E6570;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 27px;
+            font-size: 11.5px;
+            line-height: 1.35;
+            margin-bottom: 10px;
         }
 
         /* =========================
@@ -344,25 +353,25 @@
         .role-switch-container {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
+            gap: 4px;
             background: #FFF5E8;
-            padding: 5px;
-            border-radius: 14px;
+            padding: 3px;
+            border-radius: 9px;
             border: 1px solid #F4D9C1;
-            margin-bottom: 22px;
+            margin-bottom: 10px;
         }
 
         .role-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 10px 12px;
-            border-radius: 10px;
+            gap: 5px;
+            padding: 5px 6px;
+            border-radius: 7px;
             border: none;
             background: transparent;
             color: #8E5360;
-            font-size: 13.5px;
+            font-size: 11.5px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.25s ease;
@@ -376,7 +385,7 @@
         .role-btn.active {
             background: #FFFFFF;
             color: #B0182D;
-            box-shadow: 0 3px 10px rgba(176, 24, 45, 0.08);
+            box-shadow: 0 2px 8px rgba(176, 24, 45, 0.08);
             border: 1px solid #F2DCD3;
         }
 
@@ -385,15 +394,15 @@
         ========================= */
 
         .form-group {
-            margin-bottom: 19px;
+            margin-bottom: 8px;
         }
 
         .form-label {
             display: block;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 800;
             color: #5F3540;
-            margin-bottom: 8px;
+            margin-bottom: 3px;
         }
 
         .input-wrapper {
@@ -402,23 +411,23 @@
 
         .input-icon {
             position: absolute;
-            left: 15px;
+            left: 11px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 17px;
+            font-size: 14px;
             color: #E23C64;
             pointer-events: none;
         }
 
         .form-input {
             width: 100%;
-            height: 50px;
+            height: 36px;
             border: 1.5px solid #EBD6CE;
-            border-radius: 13px;
-            padding: 0 15px 0 45px;
+            border-radius: 9px;
+            padding: 0 10px 0 32px;
             outline: none;
             font-family: 'Nunito', sans-serif;
-            font-size: 14px;
+            font-size: 12px;
             color: #5A2F39;
             background: #FFFDFB;
             transition: all 0.25s ease;
@@ -431,7 +440,7 @@
         .form-input:focus {
             border-color: #E23C64;
             background: white;
-            box-shadow: 0 0 0 4px rgba(226, 60, 100, 0.10);
+            box-shadow: 0 0 0 3px rgba(226, 60, 100, 0.10);
         }
 
         /* =========================
@@ -440,24 +449,24 @@
 
         .login-submit {
             width: 100%;
-            height: 51px;
+            height: 37px;
             border: none;
-            border-radius: 13px;
+            border-radius: 10px;
             background: #E23C64;
             color: white;
             font-family: 'Nunito', sans-serif;
-            font-size: 14px;
+            font-size: 12.5px;
             font-weight: 800;
             cursor: pointer;
-            margin-top: 5px;
-            box-shadow: 0 8px 18px rgba(226, 60, 100, 0.22);
+            margin-top: 2px;
+            box-shadow: 0 4px 12px rgba(226, 60, 100, 0.22);
             transition: all 0.25s ease;
         }
 
         .login-submit:hover {
             background: #B0182D;
-            transform: translateY(-2px);
-            box-shadow: 0 11px 22px rgba(176, 24, 45, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(176, 24, 45, 0.25);
         }
 
         .login-submit:active {
@@ -470,20 +479,20 @@
 
         .register-area {
             text-align: center;
-            margin-top: 22px;
-            padding-top: 20px;
+            margin-top: 8px;
+            padding-top: 6px;
             border-top: 1px solid #F1E1DA;
         }
 
         .register-area p {
             color: #987982;
-            font-size: 13px;
-            margin-bottom: 9px;
+            font-size: 11px;
+            margin-bottom: 2px;
         }
 
         .register-link {
             color: #E23C64;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 800;
         }
 
@@ -498,33 +507,36 @@
 
         .footer {
             text-align: center;
-            padding: 0 20px 25px;
+            padding: 4px 20px 8px;
             color: #9C737B;
-            font-size: 12px;
+            font-size: 10.5px;
             font-weight: 600;
+            flex-shrink: 0;
         }
 
         /* =========================
            RESPONSIVE
         ========================= */
 
-        @media (max-width: 950px) {
+        @media (max-width: 820px) {
+
+            body {
+                overflow-y: auto;
+                height: auto;
+                max-height: none;
+            }
 
             .main-container {
                 grid-template-columns: 1fr;
-                gap: 50px;
-                margin-top: 35px;
+                gap: 28px;
+                padding: 16px 0 24px;
             }
 
             .left-content {
                 text-align: center;
             }
 
-            .left-content h1 {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
+            .left-content h1,
             .description {
                 margin-left: auto;
                 margin-right: auto;
@@ -535,7 +547,7 @@
             }
 
             .right-content {
-                padding-bottom: 20px;
+                padding-bottom: 10px;
             }
         }
 
@@ -901,7 +913,7 @@
                 labelIdentifier.textContent = 'ID Admin';
                 inputIdentifier.placeholder = 'Contoh: ADMIN-001';
                 btnSubmit.innerHTML = 'Masuk sebagai Admin &rarr;';
-                btnSubmit.style.background = 'linear-gradient(135deg, #3B5BDB, #4C6EF5)';
+                btnSubmit.style.background = 'linear-gradient(135deg, #B0182D, #C98A1F)';
             } else {
                 btnMhs.classList.add('active');
                 inputRole.value = 'mahasiswa';

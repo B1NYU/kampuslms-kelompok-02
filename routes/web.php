@@ -51,11 +51,31 @@ Route::prefix('dosen')->name('dosen.')->group(function () {
         }
         return view('dosen.dashboard');
     })->name('dashboard');
+
+    Route::get('/mahasiswa', function () {
+        return view()->file(resource_path('views/dosen/mahasiswa.blade.php'));
+    })->name('mahasiswa');
+
+    Route::get('/materi', function () {
+        return view()->file(resource_path('views/dosen/materi.blade.php'));
+    })->name('materi');
+
+    Route::get('/tugas', function () {
+        return view()->file(resource_path('views/dosen/tugas.blade.php'));
+    })->name('tugas');
+
+    Route::get('/penilaian', function () {
+        return view()->file(resource_path('views/dosen/penilaian.blade.php'));
+    })->name('penilaian');
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
-        return view()->file(resource_path('views/admin/admin.dashboard.blade.php'));
+        $path = resource_path('views/admin/admin.dashboard.blade.php');
+        if (file_exists($path)) {
+            return view()->file($path);
+        }
+        return view('admin.dashboard');
     })->name('dashboard');
 
     Route::get('/pengguna', function () {

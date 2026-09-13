@@ -145,7 +145,7 @@
                                         @php
                                             $enrollments = [
                                                 ['mhs'=>'Baihaqi Abimanyu','nim'=>'10241014','mk'=>'IF301 • Pemrograman Web Lanjut','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#ECFDF5','c'=>'#16A34A'],
-                                                ['mhs'=>'Calvin Adithya','nim'=>'10241016','mk'=>'IF301 • Pemrograman Web Lanjut','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#EBF3FF','c'=>'#1971C2'],
+                                                ['mhs'=>'Calvin Adithya','nim'=>'10241016','mk'=>'IF301 • Pemrograman Web Lanjut','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#FFF0DE','c'=>'#C98A1F'],
                                                 ['mhs'=>'Clara Shinta','nim'=>'10241018','mk'=>'IF302 • Basis Data & Relasional','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#F2EBF9','c'=>'#8E44AD'],
                                                 ['mhs'=>'Desta Arkan','nim'=>'10241020','mk'=>'IF305 • Kecerdasan Buatan','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#EBF9F1','c'=>'#1B8A5A'],
                                                 ['mhs'=>'Devina Putri','nim'=>'10241022','mk'=>'IF310 • Rekayasa Perangkat Lunak','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#FFF0DE','c'=>'#C98A1F'],
@@ -211,7 +211,7 @@
             const tbody = document.getElementById('enrollTableBody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><div class="user-cell"><div class="user-avatar" style="background:#EEF2FF;color:#3B5BDB;">${inits}</div><div class="user-meta"><span class="user-name">${mhs}</span><span class="user-id">${nim}</span></div></div></td>
+                <td><div class="user-cell"><div class="user-avatar" style="background:#FFE2E8;color:#B0182D;">${inits}</div><div class="user-meta"><span class="user-name">${mhs}</span><span class="user-id">${nim}</span></div></div></td>
                 <td style="font-size:12.5px;font-weight:700;">${mk}</td>
                 <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${kelas}</span></td>
                 <td style="font-size:12px;color:#64748B;">${smt}</td>
