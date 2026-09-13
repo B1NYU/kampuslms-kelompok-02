@@ -1,7 +1,7 @@
 /* =================================================================
    ADMIN DASHBOARD CSS — KampusLMS
-   Palet: Biru-Indigo Premium (#3B5BDB / #4C6EF5)
-   Konsisten dengan pola dashboard mahasiswa & dosen
+   Palet: Warm Burgundy & Gold (#B0182D / #C98A1F)
+   Konsisten dan senada dengan pola dashboard mahasiswa & dosen
    ================================================================= */
 
 * {
@@ -13,66 +13,42 @@
 
 /* ---- CSS Variables ---- */
 :root {
-    --admin-primary:    #3B5BDB;
-    --admin-accent:     #4C6EF5;
-    --admin-light:      #EEF2FF;
-    --admin-mid:        #C5D0FA;
-    --admin-dark:       #1E3A8A;
-    --admin-text:       #1E293B;
-    --admin-muted:      #64748B;
-    --admin-border:     #D6E0FF;
-    --admin-bg:         #F5F7FF;
+    --admin-primary:    #B0182D;
+    --admin-accent:     #C98A1F;
+    --admin-light:      #FFF5E8;
+    --admin-mid:        #F4D9C1;
+    --admin-dark:       #7A0E1E;
+    --admin-text:       #5F3540;
+    --admin-muted:      #8E6570;
+    --admin-border:     #F2DCD3;
+    --admin-bg:         #FAF6F3;
     --admin-white:      #FFFFFF;
-    --admin-danger:     #EF4444;
-    --admin-success:    #22C55E;
-    --admin-warning:    #F59E0B;
-    --admin-green-bg:   #ECFDF5;
-    --admin-red-bg:     #FEF2F2;
+    --admin-danger:     #E23C64;
+    --admin-success:    #1B8A5A;
+    --admin-warning:    #C98A1F;
+    --admin-green-bg:   #EBF9F1;
+    --admin-red-bg:     #FFEBEF;
 }
 
 body {
     background-color: var(--admin-bg);
-    background-image: radial-gradient(circle at 10% 0%, rgba(75, 110, 245, 0.12) 0%, transparent 55%),
-                      radial-gradient(circle at 90% 100%, rgba(59, 91, 219, 0.08) 0%, transparent 50%);
     color: var(--admin-text);
-    height: 100vh;
-    width: 100vw;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
 }
 
 /* =========================================
    BACKGROUND DECORATIVE GLOW
    ========================================= */
 .bg-shape {
-    position: fixed;
-    border-radius: 50%;
-    z-index: 0;
-    filter: blur(2px);
-    pointer-events: none;
-}
-
-.bg-shape-1 {
-    width: 380px;
-    height: 380px;
-    background: #4C6EF5;
-    top: -120px;
-    right: -80px;
-    opacity: 0.18;
-}
-
-.bg-shape-2 {
-    width: 300px;
-    height: 300px;
-    background: #3B5BDB;
-    bottom: -90px;
-    left: -80px;
-    opacity: 0.12;
+    display: none;
 }
 
 /* =========================================
@@ -80,18 +56,17 @@ body {
    ========================================= */
 .app-window {
     width: 100%;
-    max-width: 1440px;
-    height: calc(100vh - 40px);
-    background: var(--admin-white);
-    border-radius: 28px;
-    box-shadow: 0 20px 60px rgba(59, 91, 219, 0.10),
-                0 4px 20px rgba(0, 0, 0, 0.04);
+    max-width: 100%;
+    min-height: 100vh;
+    background: var(--admin-bg);
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 1;
-    overflow: hidden;
-    border: 1px solid var(--admin-border);
+    overflow: visible;
+    border: none;
 }
 
 /* =========================================
@@ -100,13 +75,17 @@ body {
 .admin-navbar {
     background: var(--admin-white);
     border-bottom: 1px solid var(--admin-border);
-    padding: 0 24px;
-    height: 60px;
+    padding: 0 36px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
     gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .navbar-left-group {
@@ -142,7 +121,7 @@ body {
 }
 
 .portal-badge-admin {
-    background: linear-gradient(90deg, #3B5BDB, #4C6EF5);
+    background: linear-gradient(90deg, #B0182D, #C98A1F);
     color: #FFFFFF;
 }
 
@@ -205,7 +184,7 @@ body {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4C6EF5, #3B5BDB);
+    background: linear-gradient(135deg, #B0182D, #C98A1F);
     color: #fff;
     display: flex;
     align-items: center;
@@ -257,12 +236,14 @@ body {
    ========================================= */
 .admin-content {
     flex: 1;
-    padding: 28px 32px;
-    overflow-y: auto;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 36px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
-    background: var(--admin-bg);
+    gap: 24px;
+    background: transparent;
 }
 
 /* Topbar */
@@ -306,8 +287,8 @@ body {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--admin-accent);
-    box-shadow: 0 0 6px rgba(76, 110, 245, 0.5);
+    background: var(--admin-primary);
+    box-shadow: 0 0 6px rgba(176, 24, 45, 0.4);
     flex-shrink: 0;
 }
 
@@ -340,14 +321,14 @@ body {
 }
 
 .btn-quick-action.btn-primary {
-    background: linear-gradient(135deg, #4C6EF5, #3B5BDB);
+    background: linear-gradient(135deg, #B0182D, #8E1324);
     color: #fff;
-    box-shadow: 0 6px 18px rgba(76, 110, 245, 0.25);
+    box-shadow: 0 6px 18px rgba(176, 24, 45, 0.22);
 }
 
 .btn-quick-action.btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(76, 110, 245, 0.35);
+    box-shadow: 0 10px 24px rgba(176, 24, 45, 0.32);
 }
 
 .btn-quick-action.btn-outline {
@@ -378,7 +359,7 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: 0 2px 12px rgba(59, 91, 219, 0.05);
+    box-shadow: 0 2px 12px rgba(176, 24, 45, 0.04);
     transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
@@ -398,7 +379,7 @@ body {
 
 .admin-stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(59, 91, 219, 0.12);
+    box-shadow: 0 12px 30px rgba(176, 24, 45, 0.10);
     border-color: var(--admin-mid);
 }
 
@@ -416,10 +397,10 @@ body {
     flex-shrink: 0;
 }
 
-.stat-icon-users  { background: #EEF2FF; color: #3B5BDB; }
+.stat-icon-users  { background: #FFE2E8; color: #B0182D; }
 .stat-icon-dosen  { background: #FFF0DE; color: #C98A1F; }
-.stat-icon-matkul { background: #ECFDF5; color: #16A34A; }
-.stat-icon-enroll { background: #FEF2F2; color: #DC2626; }
+.stat-icon-matkul { background: #EBF9F1; color: #1B8A5A; }
+.stat-icon-enroll { background: #FFEBEF; color: #E23C64; }
 
 .stat-details {
     display: flex;
@@ -456,7 +437,7 @@ body {
     border-radius: 20px;
     padding: 24px 26px;
     border: 1px solid var(--admin-border);
-    box-shadow: 0 2px 12px rgba(59, 91, 219, 0.04);
+    box-shadow: 0 2px 12px rgba(176, 24, 45, 0.04);
 }
 
 .section-header {
@@ -575,8 +556,8 @@ body {
 }
 
 .form-control:focus {
-    border-color: var(--admin-accent);
-    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.12);
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.12);
 }
 
 .form-select {
@@ -595,8 +576,8 @@ body {
 }
 
 .form-select:focus {
-    border-color: var(--admin-accent);
-    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.12);
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.12);
 }
 
 .form-textarea {
@@ -614,8 +595,8 @@ body {
 }
 
 .form-textarea:focus {
-    border-color: var(--admin-accent);
-    box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.12);
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.12);
 }
 
 .form-row-2 {
@@ -633,20 +614,20 @@ body {
     height: 42px;
     border: none;
     border-radius: 12px;
-    background: linear-gradient(135deg, #4C6EF5, #3B5BDB);
+    background: linear-gradient(135deg, #B0182D, #8E1324);
     color: #fff;
     font-family: 'Nunito', sans-serif;
     font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.22s ease;
-    box-shadow: 0 6px 16px rgba(76, 110, 245, 0.25);
+    box-shadow: 0 6px 16px rgba(176, 24, 45, 0.22);
     margin-top: 4px;
 }
 
 .btn-primary-action:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(76, 110, 245, 0.35);
+    box-shadow: 0 10px 22px rgba(176, 24, 45, 0.32);
 }
 
 /* =========================================
@@ -731,7 +712,7 @@ body {
 }
 
 .custom-admin-table tbody tr {
-    border-bottom: 1px solid #EEF2FF;
+    border-bottom: 1px solid #FAF0EC;
     transition: background 0.15s ease;
 }
 
@@ -740,7 +721,7 @@ body {
 }
 
 .custom-admin-table tbody tr:hover {
-    background: #F8F9FF;
+    background: #FAF6F3;
 }
 
 .custom-admin-table td {
@@ -794,11 +775,11 @@ body {
     text-transform: uppercase;
 }
 
-.badge-role-admin    { background: #EEF2FF; color: #3B5BDB; border: 1px solid #C5D0FA; }
+.badge-role-admin    { background: #FFE2E8; color: #B0182D; border: 1px solid #FFD2DC; }
 .badge-role-dosen    { background: #FFF0DE; color: #C98A1F; border: 1px solid #FFE4A0; }
-.badge-role-mahasiswa{ background: #ECFDF5; color: #16A34A; border: 1px solid #A7F3D0; }
+.badge-role-mahasiswa{ background: #EBF9F1; color: #1B8A5A; border: 1px solid #C4F1D9; }
 
-.badge-status-active   { background: #ECFDF5; color: #16A34A; border: 1px solid #A7F3D0; }
+.badge-status-active   { background: #EBF9F1; color: #1B8A5A; border: 1px solid #C4F1D9; }
 .badge-status-inactive { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
 
 /* Action Buttons */
@@ -856,7 +837,7 @@ body {
     border-radius: 20px;
     padding: 22px 24px;
     border: 1px solid var(--admin-border);
-    box-shadow: 0 2px 12px rgba(59, 91, 219, 0.04);
+    box-shadow: 0 2px 12px rgba(176, 24, 45, 0.04);
 }
 
 .card-header-clean {
@@ -963,9 +944,9 @@ body {
 
 .qa-card:hover {
     background: var(--admin-light);
-    border-color: var(--admin-accent);
+    border-color: var(--admin-mid);
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(76, 110, 245, 0.12);
+    box-shadow: 0 6px 18px rgba(176, 24, 45, 0.10);
 }
 
 .qa-icon {
@@ -986,6 +967,10 @@ body {
     background: var(--admin-white);
     border-top: 1px solid var(--admin-border);
     color: var(--admin-muted);
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 36px;
+    margin-top: auto;
 }
 
 /* =========================================
@@ -998,9 +983,9 @@ body {
 }
 
 @media (max-width: 900px) {
-    body { padding: 12px; }
-    .app-window { border-radius: 20px; }
-    .admin-content { padding: 18px; }
+    body { padding: 0; }
+    .app-window { border-radius: 0; }
+    .admin-content { padding: 20px 16px; }
     .admin-navbar { padding: 0 16px; }
     .navbar-nav.admin-nav { display: none; }
 }

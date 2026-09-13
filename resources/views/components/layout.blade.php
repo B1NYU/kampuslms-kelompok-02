@@ -3,7 +3,7 @@
     <div class="navbar-left-group">
         <div class="navbar-brand">
             <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="20" r="11" stroke="white" stroke-width="3.5" fill="none" opacity="0.95" />
+                <circle cx="16" cy="20" r="11" stroke="#B0182D" stroke-width="3.5" fill="none" opacity="0.95" />
                 <circle cx="24" cy="20" r="11" stroke="#FFD464" stroke-width="3.5" fill="none" opacity="0.95" />
             </svg>
             <div class="brand-info">

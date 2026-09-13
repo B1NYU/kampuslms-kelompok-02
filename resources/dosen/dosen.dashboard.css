@@ -11,47 +11,24 @@
 }
 
 body {
-    background-color: #FCEDD8;
-    background-image: radial-gradient(circle at 50% 0%, rgba(255, 212, 100, 0.35) 0%, transparent 60%);
+    background-color: #FAF6F3;
     color: #5F3540;
-    height: 100vh;
-    width: 100vw;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
 }
 
 /* =========================================
    BACKGROUND DECORATIVE GLOW
    ========================================= */
 .bg-shape {
-    position: fixed;
-    border-radius: 50%;
-    z-index: 0;
-    filter: blur(2px);
-    pointer-events: none;
-}
-
-.bg-shape-1 {
-    width: 380px;
-    height: 380px;
-    background: #FFD464;
-    top: -120px;
-    right: -80px;
-    opacity: 0.6;
-}
-
-.bg-shape-2 {
-    width: 300px;
-    height: 300px;
-    background: #FF5E5E;
-    bottom: -90px;
-    left: -80px;
-    opacity: 0.3;
+    display: none;
 }
 
 /* =========================================
@@ -59,18 +36,17 @@ body {
    ========================================= */
 .app-window {
     width: 100%;
-    max-width: 1380px;
-    height: calc(100vh - 40px);
-    background: #FFFFFF;
-    border-radius: 28px;
-    box-shadow: 0 20px 60px rgba(176, 24, 45, 0.08),
-                0 4px 20px rgba(0, 0, 0, 0.03);
+    max-width: 100%;
+    min-height: 100vh;
+    background: #FAF6F3;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 1;
-    overflow: hidden;
-    border: 1px solid #F2DCD3;
+    overflow: visible;
+    border: none;
 }
 
 /* =========================================
@@ -80,11 +56,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 32px;
+    padding: 0 36px;
+    height: 64px;
     background: #FFFFFF;
     border-bottom: 1px solid #F2DCD3;
     flex-shrink: 0;
-    z-index: 50;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .navbar-left-group {
@@ -238,12 +218,14 @@ body {
    ========================================= */
 .dosen-content {
     flex: 1;
-    padding: 24px 34px;
-    overflow-y: auto;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 36px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    background: #FAF6F3;
+    background: transparent;
     scroll-behavior: smooth;
 }
 
@@ -1439,17 +1421,28 @@ body {
     }
 }
 
+.app-window .app-footer {
+    background: #FFFFFF;
+    border-top: 1px solid #F2DCD3;
+    color: #8E6570;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 36px;
+    margin-top: auto;
+}
+
 @media (max-width: 900px) {
     body {
-        padding: 10px;
+        padding: 0;
     }
 
     .app-window {
-        border-radius: 18px;
+        border-radius: 0;
     }
 
     .top-navbar.dosen-navbar {
         padding: 12px 18px;
+        height: auto;
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
@@ -1465,7 +1458,7 @@ body {
     }
 
     .dosen-content {
-        padding: 16px;
+        padding: 20px 16px;
     }
 
     .dosen-stats-grid {

@@ -4,25 +4,58 @@ html, body.poster-page {
         radial-gradient(circle at 50% 0%, rgba(225, 60, 100, 0.22) 0%, transparent 55%),
         linear-gradient(to bottom, #120306 0%, #080102 100%);
     color: #FCEDD8;
-    height: 100vh;
-    width: 100vw;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
     font-family: 'Nunito', sans-serif;
 }
 
-.page-wrapper {
-    height: 100vh;
-    width: 100vw;
+.poster-page .bg-shape {
+    display: none;
+}
+
+.poster-page .app-window {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+    border: none;
+}
+
+.poster-page .top-navbar {
+    background: #FFFFFF;
+    border-bottom: 1px solid #F2DCD3;
+    padding: 0 36px;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    justify-content: space-between;
+}
+
+.page-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
 }
 
 .max-w-7xl {
