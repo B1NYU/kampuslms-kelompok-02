@@ -10,9 +10,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
-    <!-- Memuat CSS via Vite sesuai lokasi resources/css/dashboard.css -->
+    <!-- Memuat CSS via Vite sesuai lokasi resources/css/mahasiswa/mahasiswa.dashboard.css -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/dashboard.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.dashboard.css', 'resources/js/app.js'])
     @endif
 </head>
 

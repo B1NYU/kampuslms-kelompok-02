@@ -338,6 +338,49 @@
         }
 
         /* =========================
+           ROLE SELECTOR
+        ========================= */
+
+        .role-switch-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            background: #FFF5E8;
+            padding: 5px;
+            border-radius: 14px;
+            border: 1px solid #F4D9C1;
+            margin-bottom: 22px;
+        }
+
+        .role-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #8E5360;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .role-btn:hover {
+            color: #B0182D;
+        }
+
+        .role-btn.active {
+            background: #FFFFFF;
+            color: #B0182D;
+            box-shadow: 0 3px 10px rgba(176, 24, 45, 0.08);
+            border: 1px solid #F2DCD3;
+        }
+
+        /* =========================
            FORM
         ========================= */
 
@@ -586,12 +629,12 @@
 
         <nav class="nav-links">
 
-            <a href="/login" class="nav-link nav-login">
+            <a href="#loginCard" class="nav-link nav-login" onclick="document.getElementById('loginCard').scrollIntoView({behavior: 'smooth'}); return false;">
                 Log in
             </a>
 
-            <a href="/register" class="nav-link nav-register">
-                Register
+            <a href="/tentang" class="nav-link nav-register">
+                Tentang Kami
             </a>
 
         </nav>
@@ -691,106 +734,92 @@
                 <div class="card-decoration-two"></div>
 
 
-                <div class="login-card-content">
+                <div class="login-card-content" id="loginCard">
 
+                    <!-- Role Switcher: Mahasiswa vs Dosen -->
+                    <div class="role-switch-container">
+                        <button type="button" class="role-btn active" id="btnRoleMahasiswa" onclick="selectRole('mahasiswa')">
+                            <span>🎓 Mahasiswa</span>
+                        </button>
+                        <button type="button" class="role-btn" id="btnRoleDosen" onclick="selectRole('dosen')">
+                            <span>👨‍🏫 Dosen</span>
+                        </button>
+                        <button type="button" class="role-btn" id="btnRoleAdmin" onclick="selectRole('admin')">
+                            <span>👨‍💼 Admin</span>
+                        </button>
+                    </div>
+
+                    @if(session('status'))
+                        <div style="background: #EBF9F1; color: #1B8A5A; border: 1px solid #C4EED0; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 800; margin-bottom: 16px; text-align: center;">
+                            ✓ {{ session('status') }}
+                        </div>
+                    @endif
 
                     <!-- Portal Icon -->
-                    <div class="portal-icon">
+                    <div class="portal-icon" id="portalIcon">
                         🎓
                     </div>
 
-
                     <!-- Title -->
-                    <h2>
+                    <h2 id="portalTitle">
                         Student Portal
                     </h2>
 
-
-                    <p class="login-subtitle">
-                        Welcome back! Enter your information
-                        to access your campus account.
+                    <p class="login-subtitle" id="portalSubtitle">
+                        Selamat datang! Masukkan informasi akun untuk mengakses perkuliahan Anda.
                     </p>
-
-
 
                     <!-- =========================
                          LOGIN FORM
                     ========================== -->
-
-                    <form action="/login" method="GET">
-
+                    <form action="/login" method="POST" id="loginForm">
+                        @csrf
+                        <input type="hidden" name="role" id="inputRole" value="mahasiswa">
 
                         <!-- Nama -->
                         <div class="form-group">
-
-                            <label
-                                for="nama"
-                                class="form-label"
-                            >
-                                Nama
+                            <label for="nama" class="form-label" id="labelNama">
+                                Nama Lengkap
                             </label>
-
-
                             <div class="input-wrapper">
-
-                                <span class="input-icon">
-                                    👤
-                                </span>
-
-
+                                <span class="input-icon">👤</span>
                                 <input
                                     type="text"
                                     id="nama"
                                     name="nama"
                                     class="form-input"
-                                    placeholder="Masukkan nama"
+                                    placeholder="Masukkan nama Anda"
                                     autocomplete="name"
+                                    required
                                 >
-
                             </div>
-
                         </div>
 
-
-
-                        <!-- NIM -->
+                        <!-- NIM / NIP -->
                         <div class="form-group">
-
-                            <label
-                                for="nim"
-                                class="form-label"
-                            >
-                                NIM
+                            <label for="identifier" class="form-label" id="labelIdentifier">
+                                NIM (Nomor Induk Mahasiswa)
                             </label>
-
-
                             <div class="input-wrapper">
-
-                                <span class="input-icon">
-                                    🪪
-                                </span>
-
-
+                                <span class="input-icon">🪪</span>
                                 <input
                                     type="text"
-                                    id="nim"
-                                    name="nim"
+                                    id="identifier"
+                                    name="identifier"
                                     class="form-input"
-                                    placeholder="Masukkan NIM"
+                                    placeholder="Contoh: 10241014"
+                                    required
                                 >
-
                             </div>
-
                         </div>
-
-
 
                         <!-- Login Button -->
                         <button
                             type="submit"
                             class="login-submit"
+                            id="btnSubmitLogin"
                         >
-                            Log In
+                            Masuk sebagai Mahasiswa &rarr;
                         </button>
 
                     </form>
@@ -835,6 +864,57 @@
         Student Management Campus · Academic Management System
     </footer>
 
+    <script>
+        function selectRole(role) {
+            const btnMhs   = document.getElementById('btnRoleMahasiswa');
+            const btnDosen = document.getElementById('btnRoleDosen');
+            const btnAdmin = document.getElementById('btnRoleAdmin');
+            const inputRole = document.getElementById('inputRole');
+            const portalIcon = document.getElementById('portalIcon');
+            const portalTitle = document.getElementById('portalTitle');
+            const portalSubtitle = document.getElementById('portalSubtitle');
+            const labelIdentifier = document.getElementById('labelIdentifier');
+            const inputIdentifier = document.getElementById('identifier');
+            const btnSubmit = document.getElementById('btnSubmitLogin');
+
+            // Reset semua tab
+            btnMhs.classList.remove('active');
+            btnDosen.classList.remove('active');
+            btnAdmin.classList.remove('active');
+
+            if (role === 'dosen') {
+                btnDosen.classList.add('active');
+                inputRole.value = 'dosen';
+                portalIcon.textContent = '👨‍🏫';
+                portalTitle.textContent = 'Dosen Portal';
+                portalSubtitle.textContent = 'Selamat datang Dosen! Masukkan identitas Anda untuk mengelola kelas, materi, dan perkuliahan.';
+                labelIdentifier.textContent = 'NIP (Nomor Induk Pegawai)';
+                inputIdentifier.placeholder = 'Contoh: 198503122010121002';
+                btnSubmit.innerHTML = 'Masuk sebagai Dosen &rarr;';
+                btnSubmit.style.background = 'linear-gradient(135deg, #B0182D, #E23C64)';
+            } else if (role === 'admin') {
+                btnAdmin.classList.add('active');
+                inputRole.value = 'admin';
+                portalIcon.textContent = '👨‍💼';
+                portalTitle.textContent = 'Admin Portal';
+                portalSubtitle.textContent = 'Akses administrator penuh. Masukkan ID Admin Anda untuk melanjutkan.';
+                labelIdentifier.textContent = 'ID Admin';
+                inputIdentifier.placeholder = 'Contoh: ADMIN-001';
+                btnSubmit.innerHTML = 'Masuk sebagai Admin &rarr;';
+                btnSubmit.style.background = 'linear-gradient(135deg, #3B5BDB, #4C6EF5)';
+            } else {
+                btnMhs.classList.add('active');
+                inputRole.value = 'mahasiswa';
+                portalIcon.textContent = '🎓';
+                portalTitle.textContent = 'Student Portal';
+                portalSubtitle.textContent = 'Selamat datang! Masukkan informasi akun untuk mengakses perkuliahan Anda.';
+                labelIdentifier.textContent = 'NIM (Nomor Induk Mahasiswa)';
+                inputIdentifier.placeholder = 'Contoh: 10241014';
+                btnSubmit.innerHTML = 'Masuk sebagai Mahasiswa &rarr;';
+                btnSubmit.style.background = '#E23C64';
+            }
+        }
+    </script>
 </body>
 
 </html>

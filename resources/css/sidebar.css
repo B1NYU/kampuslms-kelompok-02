@@ -4,7 +4,7 @@
 .top-navbar {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Mengatur isi agar dimulai dari kiri */
+    justify-content: space-between; /* Mengatur grup navigasi kiri dan tombol logout kanan */
     padding: 15px 36px;
     background: rgba(23, 4, 10, 0.95);
     border-bottom: 1px solid rgba(255, 212, 100, 0.18);
@@ -51,4 +51,37 @@
 .navbar-nav li.active a, 
 .navbar-nav li a:hover {
     color: #FFD464;
+}
+
+.top-navbar .navbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 15px;
+    background: rgba(226, 60, 100, 0.12);
+    border: 1px solid rgba(226, 60, 100, 0.3);
+    color: #E23C64;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.btn-logout:hover {
+    background: #E23C64;
+    color: #FFFFFF;
+    border-color: #E23C64;
+    box-shadow: 0 4px 12px rgba(226, 60, 100, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-logout:active {
+    transform: translateY(0);
 }
