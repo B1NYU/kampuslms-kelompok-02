@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Mata Kuliah — KampusLMS Admin</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
@@ -55,13 +56,17 @@
                     <div class="two-col-grid">
                         <!-- Form Tambah/Edit Mata Kuliah -->
                         <form id="formAddMatkul" class="card-form">
-                            <h4 class="card-form-title">
+                            <input type="hidden" id="mkId" value="">
+
+                            <h4 class="card-form-title" id="formMkTitle">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                     <polyline points="14 2 14 8 20 8"></polyline>
                                 </svg>
-                                Form Tambah / Edit MK
+                                <span>Form Tambah / Edit MK</span>
                             </h4>
+
+                            <div id="mkFormAlert" style="display:none;margin-bottom:10px;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:8px;"></div>
 
                             <div class="form-row-2">
                                 <div class="form-group">
@@ -118,18 +123,21 @@
                                 <textarea id="mkDeskripsi" class="form-textarea" rows="2" placeholder="Gambaran singkat mata kuliah ini..."></textarea>
                             </div>
 
-                            <button type="submit" class="btn-primary-action">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                Simpan Mata Kuliah
-                            </button>
+                            <div style="display:flex;gap:8px;">
+                                <button type="submit" class="btn-primary-action" id="mkSubmitBtn">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span>Simpan Mata Kuliah</span>
+                                </button>
+                                <button type="button" id="mkCancelEditBtn" class="btn-icon" style="display:none;padding:0 14px;">Batal Edit</button>
+                            </div>
                         </form>
 
                         <!-- Tabel Mata Kuliah -->
                         <div class="table-container">
                             <div class="table-header-tools">
-                                <span class="table-summary-info">Total <strong id="mkTableCount">6</strong> Mata Kuliah</span>
+                                <span class="table-summary-info">Total <strong id="mkTableCount">{{ $matkulList->count() }}</strong> Mata Kuliah</span>
                                 <div class="search-input-box">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="11" cy="11" r="8"></circle>
@@ -152,39 +160,40 @@
                                         </tr>
                                     </thead>
                                     <tbody id="mkTableBody">
-                                        @php
-                                            $matkulList = [
-                                                ['kode'=>'IF301','nama'=>'Pemrograman Web Lanjut','sks'=>3,'dosen'=>'Dr. Ahmad Fauzan','status'=>'Aktif'],
-                                                ['kode'=>'IF302','nama'=>'Basis Data & Relasional','sks'=>3,'dosen'=>'Rina Marlina, M.Kom','status'=>'Aktif'],
-                                                ['kode'=>'IF305','nama'=>'Kecerdasan Buatan (AI)','sks'=>3,'dosen'=>'Dr. Yusuf Pratama','status'=>'Aktif'],
-                                                ['kode'=>'IF310','nama'=>'Rekayasa Perangkat Lunak','sks'=>3,'dosen'=>'Siti Nurhaliza, M.T','status'=>'Aktif'],
-                                                ['kode'=>'IF312','nama'=>'Jaringan Komputer','sks'=>2,'dosen'=>'Dr. Budi Santoso, M.Kom','status'=>'Tidak Aktif'],
-                                                ['kode'=>'IF318','nama'=>'Manajemen Proyek TI','sks'=>2,'dosen'=>'Dr. Lestari Wibowo','status'=>'Aktif'],
-                                            ];
-                                        @endphp
-                                        @foreach ($matkulList as $mk)
-                                        <tr>
-                                            <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $mk['kode'] }}</span></td>
-                                            <td style="font-weight:700;font-size:13px;">{{ $mk['nama'] }}</td>
-                                            <td style="font-size:12px;font-weight:700;color:#B0182D;">{{ $mk['sks'] }} SKS</td>
-                                            <td style="font-size:12px;color:#64748B;">{{ $mk['dosen'] }}</td>
+                                        @forelse ($matkulList as $mk)
+                                        <tr data-id="{{ $mk->id }}"
+                                            data-kode="{{ $mk->kode }}"
+                                            data-nama="{{ $mk->nama }}"
+                                            data-sks="{{ $mk->sks }}"
+                                            data-dosen="{{ $mk->dosen }}"
+                                            data-semester="{{ $mk->semester }}"
+                                            data-status="{{ $mk->status }}"
+                                            data-deskripsi="{{ $mk->deskripsi }}">
+                                            <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $mk->kode }}</span></td>
+                                            <td style="font-weight:700;font-size:13px;">{{ $mk->nama }}</td>
+                                            <td style="font-size:12px;font-weight:700;color:#B0182D;">{{ $mk->sks }} SKS</td>
+                                            <td style="font-size:12px;color:#64748B;">{{ $mk->dosen ?? '—' }}</td>
                                             <td>
-                                                <span class="badge-status {{ $mk['status'] === 'Aktif' ? 'badge-status-active' : 'badge-status-inactive' }}">
-                                                    {{ $mk['status'] }}
+                                                <span class="badge-status {{ $mk->status === 'Aktif' ? 'badge-status-active' : 'badge-status-inactive' }}">
+                                                    {{ $mk->status }}
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="btn-actions">
-                                                    <button class="btn-icon btn-icon-edit btn-edit-mk" title="Edit mata kuliah">
+                                                    <button type="button" class="btn-icon btn-icon-edit btn-edit-mk" title="Edit mata kuliah">
                                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                     </button>
-                                                    <button class="btn-icon btn-icon-danger btn-delete-mk" title="Hapus mata kuliah">
+                                                    <button type="button" class="btn-icon btn-icon-danger btn-delete-mk" title="Hapus mata kuliah">
                                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
-                                        @endforeach
+                                        @empty
+                                        <tr id="mkEmptyRow">
+                                            <td colspan="6" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada data mata kuliah.</td>
+                                        </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -199,52 +208,192 @@
     </div>
 
     <script>
-        document.getElementById('searchMkInput').addEventListener('input', function() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        // Template URL — "__ID__" akan diganti dengan id asli saat dipakai.
+        const storeUrl          = "{{ route('admin.matkul.store') }}";
+        const updateUrlTemplate = "{{ route('admin.matkul.update', ['matkul' => '__ID__']) }}";
+        const deleteUrlTemplate = "{{ route('admin.matkul.destroy', ['matkul' => '__ID__']) }}";
+
+        const form      = document.getElementById('formAddMatkul');
+        const tbody     = document.getElementById('mkTableBody');
+        const alertBox  = document.getElementById('mkFormAlert');
+        const submitBtn = document.getElementById('mkSubmitBtn');
+        const cancelBtn = document.getElementById('mkCancelEditBtn');
+        const formTitle = document.getElementById('formMkTitle').querySelector('span');
+        const submitLabel = submitBtn.querySelector('span');
+
+        function showAlert(message, type = 'error') {
+            alertBox.style.display = 'block';
+            alertBox.style.background = type === 'error' ? '#FEE2E2' : '#DCFCE7';
+            alertBox.style.color = type === 'error' ? '#B91C1C' : '#166534';
+            alertBox.textContent = message;
+            setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+        }
+
+        function updateCount() {
+            document.getElementById('mkTableCount').textContent = tbody.querySelectorAll('tr[data-id]').length;
+        }
+
+        function badgeClass(status) {
+            return status === 'Aktif' ? 'badge-status-active' : 'badge-status-inactive';
+        }
+
+        function rowHtml(mk) {
+            return `
+                <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${mk.kode}</span></td>
+                <td style="font-weight:700;font-size:13px;">${mk.nama}</td>
+                <td style="font-size:12px;font-weight:700;color:#B0182D;">${mk.sks} SKS</td>
+                <td style="font-size:12px;color:#64748B;">${mk.dosen ?? '—'}</td>
+                <td><span class="badge-status ${badgeClass(mk.status)}">${mk.status}</span></td>
+                <td><div class="btn-actions">
+                    <button type="button" class="btn-icon btn-icon-edit btn-edit-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                    <button type="button" class="btn-icon btn-icon-danger btn-delete-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></button>
+                </div></td>`;
+        }
+
+        function upsertRow(mk) {
+            let tr = tbody.querySelector(`tr[data-id="${mk.id}"]`);
+            const emptyRow = document.getElementById('mkEmptyRow');
+            if (emptyRow) emptyRow.remove();
+
+            if (!tr) {
+                tr = document.createElement('tr');
+                tbody.prepend(tr);
+            }
+            tr.dataset.id = mk.id;
+            tr.dataset.kode = mk.kode;
+            tr.dataset.nama = mk.nama;
+            tr.dataset.sks = mk.sks;
+            tr.dataset.dosen = mk.dosen ?? '';
+            tr.dataset.semester = mk.semester ?? '';
+            tr.dataset.status = mk.status;
+            tr.dataset.deskripsi = mk.deskripsi ?? '';
+            tr.innerHTML = rowHtml(mk);
+
+            bindRowButtons(tr);
+            updateCount();
+        }
+
+        function resetForm() {
+            form.reset();
+            document.getElementById('mkId').value = '';
+            submitLabel.textContent = 'Simpan Mata Kuliah';
+            cancelBtn.style.display = 'none';
+            formTitle.textContent = 'Form Tambah / Edit MK';
+        }
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById('mkId').value;
+            const payload = {
+                kode: document.getElementById('mkKode').value.trim(),
+                nama: document.getElementById('mkNama').value.trim(),
+                sks: document.getElementById('mkSks').value,
+                dosen: document.getElementById('mkDosen').value,
+                semester: document.getElementById('mkSemester').value,
+                status: document.getElementById('mkStatus').value,
+                deskripsi: document.getElementById('mkDeskripsi').value.trim(),
+            };
+
+            const url = id ? updateUrlTemplate.replace('__ID__', id) : storeUrl;
+            const method = id ? 'PUT' : 'POST';
+
+            submitBtn.disabled = true;
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await res.json();
+
+                if (!res.ok) {
+                    if (res.status === 422) {
+                        const firstError = Object.values(result.errors)[0][0];
+                        showAlert(firstError, 'error');
+                    } else {
+                        showAlert(result.message || 'Terjadi kesalahan.', 'error');
+                    }
+                    return;
+                }
+
+                upsertRow(result.data);
+                showAlert(result.message, 'success');
+                resetForm();
+            } catch (err) {
+                showAlert('Gagal terhubung ke server.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        cancelBtn.addEventListener('click', resetForm);
+
+        function bindRowButtons(tr) {
+            tr.querySelector('.btn-edit-mk').addEventListener('click', function () {
+                document.getElementById('mkId').value = tr.dataset.id;
+                document.getElementById('mkKode').value = tr.dataset.kode;
+                document.getElementById('mkNama').value = tr.dataset.nama;
+                document.getElementById('mkSks').value = tr.dataset.sks;
+                document.getElementById('mkDosen').value = tr.dataset.dosen;
+                document.getElementById('mkSemester').value = tr.dataset.semester;
+                document.getElementById('mkStatus').value = tr.dataset.status;
+                document.getElementById('mkDeskripsi').value = tr.dataset.deskripsi;
+
+                submitLabel.textContent = 'Update Mata Kuliah';
+                cancelBtn.style.display = 'inline-block';
+                formTitle.textContent = 'Form Edit Mata Kuliah';
+
+                document.getElementById('mkKode').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            tr.querySelector('.btn-delete-mk').addEventListener('click', async function () {
+                if (!confirm('Hapus mata kuliah ini?')) return;
+
+                try {
+                    const res = await fetch(deleteUrlTemplate.replace('__ID__', tr.dataset.id), {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                    });
+                    const result = await res.json();
+
+                    if (!res.ok) {
+                        showAlert(result.message || 'Gagal menghapus data.', 'error');
+                        return;
+                    }
+
+                    tr.remove();
+                    updateCount();
+                    showAlert(result.message, 'success');
+
+                    if (!tbody.querySelector('tr[data-id]')) {
+                        tbody.innerHTML = `<tr id="mkEmptyRow"><td colspan="6" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada data mata kuliah.</td></tr>`;
+                    }
+                } catch (err) {
+                    showAlert('Gagal terhubung ke server.', 'error');
+                }
+            });
+        }
+
+        document.querySelectorAll('#mkTableBody tr[data-id]').forEach(bindRowButtons);
+
+        document.getElementById('searchMkInput').addEventListener('input', function () {
             const q = this.value.toLowerCase();
-            document.querySelectorAll('#mkTableBody tr').forEach(row => {
+            document.querySelectorAll('#mkTableBody tr[data-id]').forEach(row => {
                 row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
             });
         });
-
-        document.getElementById('formAddMatkul').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const kode  = document.getElementById('mkKode').value.trim();
-            const nama  = document.getElementById('mkNama').value.trim();
-            const sks   = document.getElementById('mkSks').value;
-            const dosen = document.getElementById('mkDosen').value || '—';
-            const stat  = document.getElementById('mkStatus').value;
-            if (!kode || !nama) return;
-
-            const tbody = document.getElementById('mkTableBody');
-            const tr = document.createElement('tr');
-            const isAktif = stat === 'Aktif';
-            tr.innerHTML = `
-                <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${kode}</span></td>
-                <td style="font-weight:700;font-size:13px;">${nama}</td>
-                <td style="font-size:12px;font-weight:700;color:#B0182D;">${sks} SKS</td>
-                <td style="font-size:12px;color:#64748B;">${dosen}</td>
-                <td><span class="badge-status ${isAktif ? 'badge-status-active' : 'badge-status-inactive'}">${stat}</span></td>
-                <td><div class="btn-actions">
-                    <button class="btn-icon btn-icon-edit btn-edit-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    <button class="btn-icon btn-icon-danger btn-delete-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></button>
-                </div></td>`;
-            tbody.prepend(tr);
-            document.getElementById('mkTableCount').textContent = tbody.rows.length;
-            this.reset();
-            bindMkDeleteButtons();
-        });
-
-        function bindMkDeleteButtons() {
-            document.querySelectorAll('.btn-delete-mk').forEach(btn => {
-                btn.onclick = function() {
-                    if (confirm('Hapus mata kuliah ini?')) {
-                        this.closest('tr').remove();
-                        document.getElementById('mkTableCount').textContent = document.getElementById('mkTableBody').rows.length;
-                    }
-                };
-            });
-        }
-        bindMkDeleteButtons();
     </script>
 </body>
 </html>
