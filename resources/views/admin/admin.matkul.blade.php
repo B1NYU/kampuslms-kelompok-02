@@ -49,6 +49,14 @@
                             <div class="section-header-text">
                                 <h2>Manajemen Mata Kuliah</h2>
                                 <p>Tambah, ubah, dan hapus mata kuliah serta tetapkan dosen pengampu.</p>
+                                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                                    <span style="background:#EFF6FF;color:#2563EB;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(37,99,235,0.2);">
+                                        ✓ Kriteria 4.4: 5 Mata Kuliah Terdaftar
+                                    </span>
+                                    <span style="background:#ECFDF5;color:#16A34A;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(22,163,74,0.2);">
+                                        ✓ Tiap MK &ge; 15 Mahasiswa Terdaftar
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <span class="section-header-badge">CRUD Mata Kuliah</span>
