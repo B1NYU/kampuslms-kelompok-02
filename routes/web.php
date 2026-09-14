@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\MataKuliahController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -80,14 +82,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
-    Route::get('/pengguna', function () {
-        return view()->file(resource_path('views/admin/admin.pengguna.blade.php'));
-    })->name('pengguna');
+    // --- CRUD Pengguna (model: User; role di-assign eksplisit di controller) ---
+    Route::get('/pengguna', [AdminUserController::class, 'index'])->name('pengguna');
+    Route::post('/pengguna', [AdminUserController::class, 'store'])->name('pengguna.store');
+    Route::put('/pengguna/{user}', [AdminUserController::class, 'update'])->name('pengguna.update')->withTrashed();
+    Route::delete('/pengguna/{user}', [AdminUserController::class, 'destroy'])->name('pengguna.destroy')->withTrashed();
 
-    Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('matkul');
-    Route::post('/mata-kuliah', [MataKuliahController::class, 'store'])->name('matkul.store');
-    Route::put('/mata-kuliah/{matkul}', [MataKuliahController::class, 'update'])->name('matkul.update');
-    Route::delete('/mata-kuliah/{matkul}', [MataKuliahController::class, 'destroy'])->name('matkul.destroy');
+    // --- CRUD Mata Kuliah (tabel & model: Course, sesuai skema database) ---
+    Route::get('/mata-kuliah', [AdminCourseController::class, 'index'])->name('matkul');
+    Route::post('/mata-kuliah', [AdminCourseController::class, 'store'])->name('matkul.store');
+    Route::put('/mata-kuliah/{matkul}', [AdminCourseController::class, 'update'])->name('matkul.update');
+    Route::delete('/mata-kuliah/{matkul}', [AdminCourseController::class, 'destroy'])->name('matkul.destroy');
 
     Route::get('/pendaftaran', function () {
         return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));

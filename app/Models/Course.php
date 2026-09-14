@@ -4,13 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
-use App\Models\User;
-use App\Models\Material;
-use App\Models\Assignment;
 
 class Course extends Model
 {
@@ -21,6 +14,7 @@ class Course extends Model
         'name',
         'description',
         'sks',
+        'lecturer_id',
         'status',
     ];
 
@@ -31,27 +25,37 @@ class Course extends Model
         ];
     }
 
-
-    public function lecturer(): BelongsTo
+    /**
+     * Dosen pengampu mata kuliah ini.
+     */
+    public function lecturer()
     {
         return $this->belongsTo(User::class, 'lecturer_id');
-    } // many-to-one, setiap mata kuliah diajar oleh satu dosen
+    }
 
-
-    public function students(): BelongsToMany
+    /**
+     * Mahasiswa yang terdaftar (enrolled) di mata kuliah ini.
+     */
+    public function students()
     {
         return $this->belongsToMany(User::class)
             ->withPivot('enrolled_at')
             ->withTimestamps();
-    } // one-to-many, satu mata kuliah untuk mengambil seluruh daftar mahasiswa yang menjadi peserta kelas
+    }
 
-    public function materials(): HasMany
+    /**
+     * Materi-materi yang diunggah pada mata kuliah ini.
+     */
+    public function materials()
     {
         return $this->hasMany(Material::class);
-    } // one-to-many, satu mata kuliah dapat memiliki banyak materi pembelajaran
+    }
 
-    public function assignments(): HasMany
+    /**
+     * Tugas-tugas pada mata kuliah ini.
+     */
+    public function assignments()
     {
         return $this->hasMany(Assignment::class);
-    } // one-to-many, satu mata kuliah dapat memiliki banyak tugas yang diupload oleh dosen
+    }
 }
