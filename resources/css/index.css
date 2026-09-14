@@ -6,7 +6,7 @@
 }
 
 body {
-    background-color: #FAF6F3;
+    background-color: #FCEDD8;
     color: #5F3540;
     min-height: 100vh;
     width: 100%;
@@ -20,20 +20,51 @@ body {
 }
 
 /* =========================================
-   BACKGROUND DECORATIVE GLOW (Selaras Welcome & Show)
+   BACKGROUND DECORATIVE SHAPES (Matching Login Page)
    ========================================= */
 .bg-shape {
-    display: none;
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 340px;
+    height: 340px;
+    background: #FFD464;
+    top: -120px;
+    right: -70px;
+    opacity: 0.85;
+}
+
+.bg-shape-2 {
+    width: 250px;
+    height: 250px;
+    background: #FF5E5E;
+    bottom: -80px;
+    left: -70px;
+    opacity: 0.35;
+}
+
+.bg-shape-3 {
+    width: 130px;
+    height: 130px;
+    background: #E23C64;
+    top: 48%;
+    right: 35%;
+    opacity: 0.16;
 }
 
 /* =========================================
-   MAIN APP CONTAINER (Frame Putih Bersih)
+   MAIN APP CONTAINER
    ========================================= */
 .app-window {
     width: 100%;
     max-width: 100%;
     min-height: 100vh;
-    background: #FAF6F3;
+    background: transparent;
     border-radius: 0;
     box-shadow: none;
     display: flex;
@@ -59,19 +90,6 @@ body {
     justify-content: space-between;
 }
 
-.app-window .top-navbar .navbar-brand h2 {
-    color: #B0182D;
-}
-
-.app-window .top-navbar .navbar-nav li a {
-    color: #8E5360;
-}
-
-.app-window .top-navbar .navbar-nav li.active a,
-.app-window .top-navbar .navbar-nav li a:hover {
-    color: #E23C64;
-}
-
 /* Penyesuaian Footer di dalam App Window */
 .app-window .app-footer {
     background: #FFFFFF;
@@ -89,9 +107,7 @@ body {
 .courses-content {
     flex: 1;
     width: 100%;
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 32px 36px;
+    padding: 28px 36px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -405,4 +421,14 @@ body {
     .courses-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Fix browser default black focus ring */
+a:focus-visible,
+button:focus-visible,
+.filter-btn:focus-visible,
+.btn-enroll:focus-visible {
+    outline: none !important;
+    border-color: #B0182D !important;
+    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.18) !important;
 }

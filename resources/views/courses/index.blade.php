@@ -19,6 +19,7 @@
     <!-- Background Decorative Glow (selaras dengan halaman lain) -->
     <div class="bg-shape bg-shape-1"></div>
     <div class="bg-shape bg-shape-2"></div>
+    <div class="bg-shape bg-shape-3"></div>
 
     <!-- Main Window Canvas -->
     <div class="app-window">

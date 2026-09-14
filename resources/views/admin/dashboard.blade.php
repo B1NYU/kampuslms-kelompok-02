@@ -13,6 +13,7 @@
 <body>
     <div class="bg-shape bg-shape-1"></div>
     <div class="bg-shape bg-shape-2"></div>
+    <div class="bg-shape bg-shape-3"></div>
 
     <div class="app-window">
 
@@ -113,7 +114,7 @@
                 </div>
             </section>
 
-            <!-- Middle: Aktivitas + Quick Actions -->
+            <!-- Middle: Aktivitas + Right Column -->
             <section class="admin-middle-grid">
 
                 <!-- Aktivitas Terkini -->
@@ -125,12 +126,12 @@
                     <div class="activity-list">
                         @php
                             $activities = [
-                                ['dot' => '#B0182D', 'title' => 'Pengguna baru didaftarkan', 'desc' => 'Baihaqi Abimanyu (Mahasiswa) — NIM 10241014', 'time' => '2 mnt lalu'],
-                                ['dot' => '#22C55E', 'title' => 'Mata kuliah ditambahkan', 'desc' => 'SI104 • Pemrograman Mobile (3 SKS)', 'time' => '14 mnt lalu'],
+                                ['dot' => '#B0182D', 'title' => 'Pengguna baru didaftarkan', 'desc' => 'Baihaqi Abimanyu (Mahasiswa) &mdash; NIM 10241014', 'time' => '2 mnt lalu'],
+                                ['dot' => '#22C55E', 'title' => 'Mata kuliah ditambahkan', 'desc' => 'SI104 &bull; Pemrograman Mobile (3 SKS)', 'time' => '14 mnt lalu'],
                                 ['dot' => '#F59E0B', 'title' => 'Pendaftaran mahasiswa', 'desc' => 'Calvin Adithya didaftarkan ke SI101', 'time' => '31 mnt lalu'],
                                 ['dot' => '#EF4444', 'title' => 'Pengguna dinonaktifkan', 'desc' => 'Akun mahasiswa IF312-C dibekukan admin', 'time' => '1 jam lalu'],
-                                ['dot' => '#B0182D', 'title' => 'Role diperbarui', 'desc' => 'Dr. Rina Marlina — role diubah menjadi Dosen', 'time' => '2 jam lalu'],
-                                ['dot' => '#22C55E', 'title' => 'Data mata kuliah diperbarui', 'desc' => 'IF305 • Kecerdasan Buatan — SKS diubah ke 4', 'time' => '3 jam lalu'],
+                                ['dot' => '#B0182D', 'title' => 'Role diperbarui', 'desc' => 'Dr. Rina Marlina &mdash; role diubah menjadi Dosen', 'time' => '2 jam lalu'],
+                                ['dot' => '#22C55E', 'title' => 'Data mata kuliah diperbarui', 'desc' => 'IF305 &bull; Kecerdasan Buatan &mdash; SKS diubah ke 4', 'time' => '3 jam lalu'],
                             ];
                         @endphp
                         @foreach ($activities as $act)
@@ -138,7 +139,7 @@
                                 <div class="activity-dot" style="background: {{ $act['dot'] }}; box-shadow: 0 0 6px {{ $act['dot'] }}66;"></div>
                                 <div class="activity-info">
                                     <strong>{{ $act['title'] }}</strong>
-                                    <span>{{ $act['desc'] }}</span>
+                                    <span>{!! $act['desc'] !!}</span>
                                 </div>
                                 <span class="activity-time">{{ $act['time'] }}</span>
                             </div>
@@ -146,53 +147,89 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="card-box">
-                    <div class="card-header-clean">
-                        <h3>Akses Cepat Admin</h3>
-                        <span class="card-subtitle-tag">Pintasan</span>
+                <!-- Right Column: Akses Cepat + Status Sistem -->
+                <div class="admin-side-col">
+                    <!-- Akses Cepat Admin -->
+                    <div class="card-box">
+                        <div class="card-header-clean">
+                            <h3>Akses Cepat Admin</h3>
+                            <span class="card-subtitle-tag">Pintasan</span>
+                        </div>
+                        <div class="quick-actions-grid">
+                            <a href="{{ route('admin.pengguna') }}" class="qa-card">
+                                <div class="qa-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                                        <line x1="22" y1="11" x2="16" y2="11"></line>
+                                    </svg>
+                                </div>
+                                Tambah Pengguna
+                            </a>
+                            <a href="{{ route('admin.matkul') }}" class="qa-card">
+                                <div class="qa-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                    </svg>
+                                </div>
+                                CRUD Mata Kuliah
+                            </a>
+                            <a href="{{ route('admin.pendaftaran') }}" class="qa-card">
+                                <div class="qa-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <polyline points="16 11 18 13 22 9"></polyline>
+                                    </svg>
+                                </div>
+                                Daftarkan Mahasiswa
+                            </a>
+                            <a href="#laporan" class="qa-card">
+                                <div class="qa-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                                    </svg>
+                                </div>
+                                Laporan & Log
+                            </a>
+                        </div>
                     </div>
-                    <div class="quick-actions-grid">
-                        <a href="{{ route('admin.pengguna') }}" class="qa-card">
-                            <div class="qa-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <line x1="19" y1="8" x2="19" y2="14"></line>
-                                    <line x1="22" y1="11" x2="16" y2="11"></line>
-                                </svg>
+
+                    <!-- Status Sistem & Akademik -->
+                    <div class="card-box sys-status-card">
+                        <div class="card-header-clean">
+                            <h3>Status Sistem & Akademik</h3>
+                            <span class="status-indicator-badge">
+                                <span class="status-pulse-dot"></span> Server Normal
+                            </span>
+                        </div>
+                        <div class="sys-status-list">
+                            <div class="sys-item">
+                                <div class="sys-item-text">
+                                    <span class="sys-item-label">Tahun Akademik</span>
+                                    <strong class="sys-item-val">Ganjil 2026/2027</strong>
+                                </div>
+                                <span class="sys-pill sys-pill-primary">Aktif</span>
                             </div>
-                            Tambah Pengguna
-                        </a>
-                        <a href="{{ route('admin.matkul') }}" class="qa-card">
-                            <div class="qa-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                </svg>
+                            <div class="sys-item">
+                                <div class="sys-item-text">
+                                    <span class="sys-item-label">Periode KRS Mahasiswa</span>
+                                    <strong class="sys-item-val">01 Sep &mdash; 30 Sep 2026</strong>
+                                </div>
+                                <span class="sys-pill sys-pill-success">Berjalan</span>
                             </div>
-                            CRUD Mata Kuliah
-                        </a>
-                        <a href="{{ route('admin.pendaftaran') }}" class="qa-card">
-                            <div class="qa-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <polyline points="16 11 18 13 22 9"></polyline>
-                                </svg>
+                            <div class="sys-item">
+                                <div class="sys-item-text">
+                                    <span class="sys-item-label">Server & Database</span>
+                                    <strong class="sys-item-val">MySQL 8.0 &bull; PHP 8.5 &bull; Laravel 12</strong>
+                                </div>
+                                <span class="sys-pill sys-pill-ok">Optimal</span>
                             </div>
-                            Daftarkan Mahasiswa
-                        </a>
-                        <a href="#laporan" class="qa-card">
-                            <div class="qa-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                                </svg>
-                            </div>
-                            Laporan & Log
-                        </a>
+                        </div>
                     </div>
                 </div>
 

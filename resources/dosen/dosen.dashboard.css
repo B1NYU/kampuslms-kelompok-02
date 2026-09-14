@@ -11,7 +11,7 @@
 }
 
 body {
-    background-color: #FAF6F3;
+    background-color: #FCEDD8;
     color: #5F3540;
     min-height: 100vh;
     width: 100%;
@@ -25,10 +25,41 @@ body {
 }
 
 /* =========================================
-   BACKGROUND DECORATIVE GLOW
+   BACKGROUND DECORATIVE SHAPES (Matching Login Page)
    ========================================= */
 .bg-shape {
-    display: none;
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 340px;
+    height: 340px;
+    background: #FFD464;
+    top: -120px;
+    right: -70px;
+    opacity: 0.85;
+}
+
+.bg-shape-2 {
+    width: 250px;
+    height: 250px;
+    background: #FF5E5E;
+    bottom: -80px;
+    left: -70px;
+    opacity: 0.35;
+}
+
+.bg-shape-3 {
+    width: 130px;
+    height: 130px;
+    background: #E23C64;
+    top: 48%;
+    right: 35%;
+    opacity: 0.16;
 }
 
 /* =========================================
@@ -38,7 +69,7 @@ body {
     width: 100%;
     max-width: 100%;
     min-height: 100vh;
-    background: #FAF6F3;
+    background: transparent;
     border-radius: 0;
     box-shadow: none;
     display: flex;
@@ -70,47 +101,49 @@ body {
 .navbar-left-group {
     display: flex;
     align-items: center;
-    gap: 36px;
+    gap: 28px;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    text-decoration: none;
 }
 
 .brand-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
 }
 
 .navbar-brand h2 {
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 900;
     margin: 0;
     color: #B0182D;
-    letter-spacing: 0.5px;
-    line-height: 1.1;
+    letter-spacing: 0.05em;
+    line-height: 1;
 }
 
 .portal-badge-dosen {
-    font-size: 9.5px;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    color: #B0182D;
-    background: linear-gradient(135deg, #FFF5E8, #FFE2CF);
-    border: 1px solid #F4D9C1;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background: linear-gradient(90deg, #B0182D, #C98A1F);
     padding: 2px 7px;
-    border-radius: 6px;
+    border-radius: 999px;
+    margin-top: 2px;
     display: inline-block;
     width: fit-content;
 }
 
 .navbar-nav.dosen-nav {
     display: flex;
+    align-items: center;
     list-style: none;
-    gap: 10px;
+    gap: 2px;
     margin: 0;
     padding: 0;
 }
@@ -118,14 +151,15 @@ body {
 .navbar-nav.dosen-nav li a {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     text-decoration: none;
-    color: #8E5360;
-    font-weight: 800;
-    font-size: 13.5px;
-    padding: 7px 14px;
-    border-radius: 12px;
-    transition: all 0.25s ease;
+    color: #8E6570;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 7px 13px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .navbar-nav.dosen-nav li.active a,
@@ -136,63 +170,37 @@ body {
 
 .navbar-nav.dosen-nav li.active a {
     color: #B0182D;
-    background: #FFF2DF;
-    border: 1px solid #F4D9C1;
-    box-shadow: 0 2px 6px rgba(176, 24, 45, 0.05);
+    background: #FFF5E8;
+    font-weight: 800;
 }
 
 .navbar-right-group {
     display: flex;
     align-items: center;
-    gap: 16px;
-}
-
-.btn-logout {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: rgba(226, 60, 100, 0.08);
-    border: 1px solid rgba(226, 60, 100, 0.25);
-    color: #B0182D;
-    text-decoration: none;
-    font-size: 12.5px;
-    font-weight: 800;
-    padding: 7px 15px;
-    border-radius: 20px;
-    transition: all 0.2s ease;
-}
-
-.btn-logout:hover {
-    background: #B0182D;
-    color: #FFFFFF;
-    border-color: #B0182D;
-    box-shadow: 0 4px 12px rgba(176, 24, 45, 0.25);
-    transform: translateY(-1px);
+    gap: 12px;
 }
 
 .dosen-avatar-badge {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: #FFFFFF;
-    padding: 4px 12px 4px 5px;
+    gap: 9px;
+    background: #FFF5E8;
+    padding: 5px 13px 5px 5px;
     border-radius: 30px;
-    border: 1px solid #F2DCD3;
-    box-shadow: 0 2px 8px rgba(176, 24, 45, 0.04);
+    border: 1px solid #F4D9C1;
 }
 
 .dosen-avatar {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #B0182D, #E23C64);
+    background: #B0182D;
     color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 900;
-    box-shadow: 0 2px 6px rgba(176, 24, 45, 0.25);
 }
 
 .dosen-badge-info {
@@ -208,9 +216,32 @@ body {
 }
 
 .dosen-role-tag {
-    font-size: 10px;
-    font-weight: 700;
-    color: #8E6570;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #B0182D;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(176, 24, 45, 0.25);
+    color: #B0182D;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: #B0182D;
+    color: #FFFFFF;
+    border-color: #B0182D;
+    box-shadow: 0 4px 12px rgba(176, 24, 45, 0.2);
 }
 
 /* =========================================
@@ -219,9 +250,7 @@ body {
 .dosen-content {
     flex: 1;
     width: 100%;
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 32px 36px;
+    padding: 28px 36px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -1465,3 +1494,14 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Fix browser default black focus ring */
+a:focus-visible,
+button:focus-visible,
+.btn-dosen-action:focus-visible,
+.nav-link-dosen:focus-visible {
+    outline: none !important;
+    border-color: #B0182D !important;
+    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.18) !important;
+}
+

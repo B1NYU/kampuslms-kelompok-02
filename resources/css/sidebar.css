@@ -1,87 +1,191 @@
 /* =========================================
-   TOP NAVBAR (Pengganti Sidebar)
+   TOP NAVBAR (Standardized matching Admin Style)
    ========================================= */
 .top-navbar {
+    background: #FFFFFF;
+    border-bottom: 1px solid #F2DCD3;
+    padding: 0 36px;
+    height: 64px;
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Mengatur grup navigasi kiri dan tombol logout kanan */
-    padding: 15px 36px;
-    background: rgba(23, 4, 10, 0.95);
-    border-bottom: 1px solid rgba(255, 212, 100, 0.18);
+    justify-content: space-between;
     flex-shrink: 0;
-    z-index: 50;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .navbar-left-group {
     display: flex;
     align-items: center;
-    gap: 48px; /* Jarak antara logo KAMPUS LMS dengan menu navigasi */
+    gap: 28px;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    text-decoration: none;
 }
 
+.brand-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-info h2,
 .navbar-brand h2 {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 900;
     margin: 0;
-    color: #FCEDD8;
-    letter-spacing: 1px;
+    color: #B0182D;
+    letter-spacing: 0.05em;
+    line-height: 1;
 }
 
-.navbar-nav {
+.portal-badge {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-top: 2px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.portal-badge-mhs {
+    background: linear-gradient(90deg, #B0182D, #E23C64);
+    color: #FFFFFF;
+}
+
+/* Nav Menu Mahasiswa */
+.navbar-nav,
+.navbar-nav.mhs-nav {
     display: flex;
+    align-items: center;
     list-style: none;
-    gap: 32px; /* Jarak antar menu Dashboard, Anggota, Mata Kuliah */
+    gap: 2px;
     margin: 0;
     padding: 0;
 }
 
-.navbar-nav li a {
-    text-decoration: none;
-    color: rgba(252, 237, 216, 0.6);
-    font-weight: 800;
-    font-size: 14.5px;
-    transition: all 0.3s ease;
-}
-
-.navbar-nav li.active a, 
-.navbar-nav li a:hover {
-    color: #FFD464;
-}
-
-.top-navbar .navbar-right-group {
+.navbar-nav li a,
+.nav-link-mhs {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #8E6570;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
+.navbar-nav li a:hover,
+.nav-link-mhs:hover {
+    color: #B0182D;
+    background: #FFF5E8;
+}
+
+.navbar-nav li.active a,
+.nav-link-mhs.active {
+    color: #B0182D;
+    background: #FFF5E8;
+    font-weight: 800;
+}
+
+/* Right Group */
+.top-navbar .navbar-right-group,
+.navbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Avatar Badge Mahasiswa */
+.mhs-avatar-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #FFF5E8;
+    padding: 5px 13px 5px 5px;
+    border-radius: 30px;
+    border: 1px solid #F4D9C1;
+}
+
+.mhs-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #B0182D;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mhs-badge-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.mhs-name {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #5F3540;
+    line-height: 1.2;
+}
+
+.mhs-role {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #B0182D;
+}
+
+/* Tombol Logout */
 .btn-logout {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 7px 15px;
-    background: rgba(226, 60, 100, 0.12);
-    border: 1px solid rgba(226, 60, 100, 0.3);
-    color: #E23C64;
-    text-decoration: none;
-    font-size: 13px;
+    gap: 6px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid rgba(176, 24, 45, 0.25);
+    color: #B0182D;
+    font-size: 12px;
     font-weight: 800;
-    border-radius: 12px;
-    transition: all 0.25s ease;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
 }
 
 .btn-logout:hover {
-    background: #E23C64;
+    background: #B0182D;
     color: #FFFFFF;
-    border-color: #E23C64;
-    box-shadow: 0 4px 12px rgba(226, 60, 100, 0.3);
-    transform: translateY(-1px);
+    border-color: #B0182D;
+    box-shadow: 0 4px 12px rgba(176, 24, 45, 0.2);
 }
 
 .btn-logout:active {
     transform: translateY(0);
+}
+
+/* Focus reset */
+.nav-link-mhs:focus,
+.nav-link-mhs:focus-visible,
+.btn-logout:focus,
+.btn-logout:focus-visible {
+    outline: none !important;
+    border-color: #B0182D !important;
+    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.18) !important;
 }
