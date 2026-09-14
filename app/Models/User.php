@@ -2,49 +2,41 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+// Note: FULL REPLACEMENT untuk app/Models/User.php.
+// Perubahan dari versi sebelumnya: 'role' DIKELUARKAN dari $fillable secara
+// sengaja. Ini artinya User::create([...'role'=>...]) atau $user->fill([...])
+// TIDAK akan pernah mengisi kolom role, meski payload-nya mengandung field
+// itu. Role hanya boleh diisi lewat assignment eksplisit:
+//
+//     $user->role = $validated['role'];
+//
+// seperti yang dilakukan di Admin\UserController. Ini mencegah role
+// ter-override secara tidak sengaja lewat mass assignment (misalnya kalau
+// suatu saat ada form/endpoint lain yang forward $request->all() ke User).
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-use App\Models\Course;
-use App\Models\Submission;
-use App\Models\Grade;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
         'nim_nip',
+        // 'role' SENGAJA TIDAK ADA DI SINI — lihat catatan di atas.
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -53,25 +45,37 @@ class User extends Authenticatable
         ];
     }
 
-        public function taughtCourses(): HasMany
+    /**
+     * Mata kuliah yang diajar user ini (kalau role-nya dosen).
+     */
+    public function taughtCourses()
     {
         return $this->hasMany(Course::class, 'lecturer_id');
-    } // one-to-many, satu role dosen mengajar banyak mata kuliah.
+    }
 
-    public function courses(): BelongsToMany
+    /**
+     * Mata kuliah yang diikuti user ini (kalau role-nya mahasiswa).
+     */
+    public function courses()
     {
         return $this->belongsToMany(Course::class)
             ->withPivot('enrolled_at')
             ->withTimestamps();
-    } // many-to-many, satu mahasiswa bisa terdaftar di banyak mata kuliah, dan satu mata kuliah diisi oleh banyak mahasiswa
+    }
 
-    public function submissions(): HasMany
+    /**
+     * Semua submission tugas yang pernah dikumpulkan user ini.
+     */
+    public function submissions()
     {
         return $this->hasMany(Submission::class);
-    } // one-to-many, satu mahasiswa dapat memiliki banyak pengumpulan tugas untuk berbagai tugas yang diikutinya
+    }
 
-    public function gradesGiven(): HasMany
+    /**
+     * Semua nilai yang pernah diberikan user ini (kalau role-nya dosen).
+     */
+    public function gradesGiven()
     {
         return $this->hasMany(Grade::class, 'graded_by');
-    } // one-to-many, satu dosen dapat memberikan banyak nilai pada banyak mahasiswa
+    }
 }
