@@ -43,12 +43,18 @@
                     </div>
                 </div>
 
+                @php
+                    $dosenCourses = \App\Models\Course::with(['students', 'lecturer'])->get();
+                    $firstCourse = $dosenCourses->first();
+                @endphp
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
                     <select id="selectCurrentCourse" class="course-select">
-                        <option value="SI101" selected>SI101 &bull; Pemrograman Web (3 SKS)</option>
-                        <option value="SI102">SI102 &bull; Basis Data Lanjut (3 SKS)</option>
-                        <option value="SI103">SI103 &bull; Analisis &amp; Desain SI (4 SKS)</option>
+                        @foreach ($dosenCourses as $idx => $c)
+                            <option value="{{ $c->code }}" {{ $idx === 0 ? 'selected' : '' }}>
+                                {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </header>
@@ -67,7 +73,7 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Pendaftaran Mahasiswa ke Mata Kuliah</h2>
-                                <p>Dosen dapat menambahkan mahasiswa baru ke kelas secara langsung dan mengelola daftar peserta aktif.</p>
+                                <p>Dosen dapat menambahkan mahasiswa baru ke kelas dan memantau seluruh peserta aktif yang terdaftar di database.</p>
                             </div>
                         </div>
                         <span class="section-header-badge">Kelola Peserta Kelas</span>
@@ -88,9 +94,9 @@
                             <div class="form-group">
                                 <label for="mhsMatkul">Mata Kuliah Target <span class="required">*</span></label>
                                 <select id="mhsMatkul" class="form-select" required>
-                                    <option value="SI101 - Pemrograman Web">SI101 - Pemrograman Web</option>
-                                    <option value="SI102 - Basis Data">SI102 - Basis Data</option>
-                                    <option value="SI103 - Analisis & Perancangan Sistem">SI103 - Analisis & Perancangan Sistem</option>
+                                    @foreach ($dosenCourses as $c)
+                                        <option value="{{ $c->code }} - {{ $c->name }}">{{ $c->code }} - {{ $c->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -156,116 +162,51 @@
                                         </tr>
                                     </thead>
                                     <tbody id="studentTableBody">
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="student-avatar" style="background:#FFE2E8; color:#B0182D;">BK</div>
-                                                    <div class="student-meta">
-                                                        <span class="student-name">Baihaqi Abimanyu</span>
-                                                        <span class="student-nim">10241014</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Sistem Informasi</td>
-                                            <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
-                                            <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                            <td style="text-align: right;">
-                                                <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="student-avatar" style="background:#FFF0DE; color:#C98A1F;">CA</div>
-                                                    <div class="student-meta">
-                                                        <span class="student-name">Calvin Adithya</span>
-                                                        <span class="student-nim">10241016</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Sistem Informasi</td>
-                                            <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
-                                            <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                            <td style="text-align: right;">
-                                                <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="student-avatar" style="background:#EBF3FF; color:#1971C2;">CL</div>
-                                                    <div class="student-meta">
-                                                        <span class="student-name">Clara Shinta</span>
-                                                        <span class="student-nim">10241018</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Sistem Informasi</td>
-                                            <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
-                                            <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                            <td style="text-align: right;">
-                                                <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="student-avatar" style="background:#EBF9F1; color:#1B8A5A;">DE</div>
-                                                    <div class="student-meta">
-                                                        <span class="student-name">Desta Arkan</span>
-                                                        <span class="student-nim">10241020</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Sistem Informasi</td>
-                                            <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
-                                            <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                            <td style="text-align: right;">
-                                                <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="student-avatar" style="background:#F2EBF9; color:#8E44AD;">DV</div>
-                                                    <div class="student-meta">
-                                                        <span class="student-name">Devina Putri</span>
-                                                        <span class="student-nim">10241022</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>Sistem Informasi</td>
-                                            <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
-                                            <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                            <td style="text-align: right;">
-                                                <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        @php
+                                            $selectedCourseCode = $firstCourse?->code ?? '';
+                                        @endphp
+                                        @forelse ($dosenCourses as $course)
+                                            @foreach ($course->students as $mhs)
+                                                @php
+                                                    $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
+                                                    $initials = strtoupper(mb_substr($initials, 0, 2));
+                                                    $colors = [
+                                                        ['#FFE2E8', '#B0182D'],
+                                                        ['#EBF3FF', '#1971C2'],
+                                                        ['#EBF9F1', '#1B8A5A'],
+                                                        ['#FFF0DE', '#C98A1F'],
+                                                        ['#F2EBF9', '#8E44AD']
+                                                    ];
+                                                    [$bg, $c] = $colors[$mhs->id % count($colors)];
+                                                @endphp
+                                                <tr data-mk="{{ $course->code }}" style="{{ $course->code === $selectedCourseCode ? '' : 'display:none;' }}">
+                                                    <td>
+                                                        <div class="student-cell">
+                                                            <div class="student-avatar" style="background:{{ $bg }}; color:{{ $c }};">{{ $initials }}</div>
+                                                            <div class="student-meta">
+                                                                <span class="student-name">{{ $mhs->name }}</span>
+                                                                <span class="student-nim">{{ $mhs->nim_nip }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>Sistem Informasi</td>
+                                                    <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
+                                                    <td><span class="badge-status badge-status-active">Aktif</span></td>
+                                                    <td style="text-align: right;">
+                                                        <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada mahasiswa terdaftar.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -363,9 +304,36 @@
                 showToast(`Mahasiswa ${nama} (${nim}) berhasil didaftarkan ke kelas!`);
             });
 
-            function updateStudentCount() {
-                const total = studentTableBody.querySelectorAll('tr').length;
-                if (studentTableCount) studentTableCount.textContent = total;
+            const selectCurrentCourse = document.getElementById('selectCurrentCourse');
+
+            function applyCourseFilter() {
+                const currentMk = selectCurrentCourse ? selectCurrentCourse.value : '';
+                const query = (searchStudentInput ? searchStudentInput.value : '').toLowerCase().trim();
+                let visibleCount = 0;
+
+                const rows = studentTableBody.querySelectorAll('tr[data-mk]');
+                rows.forEach(row => {
+                    const matchMk = (!currentMk || row.dataset.mk === currentMk);
+                    const text = row.textContent.toLowerCase();
+                    const matchSearch = (!query || text.includes(query));
+
+                    if (matchMk && matchSearch) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (studentTableCount) studentTableCount.textContent = visibleCount;
+            }
+
+            if (selectCurrentCourse) {
+                selectCurrentCourse.addEventListener('change', applyCourseFilter);
+            }
+
+            if (searchStudentInput) {
+                searchStudentInput.addEventListener('input', applyCourseFilter);
             }
 
             function attachDeleteStudentEvents() {
@@ -376,24 +344,14 @@
                         const studentName = tr.querySelector('.student-name').textContent;
                         if (confirm(`Keluarkan ${studentName} dari mata kuliah ini?`)) {
                             tr.remove();
-                            updateStudentCount();
+                            applyCourseFilter();
                             showToast(`${studentName} telah dikeluarkan dari kelas.`, false);
                         }
                     };
                 });
             }
             attachDeleteStudentEvents();
-
-            if (searchStudentInput) {
-                searchStudentInput.addEventListener('input', (e) => {
-                    const query = e.target.value.toLowerCase();
-                    const rows = studentTableBody.querySelectorAll('tr');
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(query) ? '' : 'none';
-                    });
-                });
-            }
+            applyCourseFilter();
 
         });
     </script>

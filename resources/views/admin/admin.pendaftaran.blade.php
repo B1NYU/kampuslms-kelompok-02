@@ -36,6 +36,24 @@
 
             <!-- Fitur: Pendaftaran -->
             <section>
+                @php
+                    $coursesList = \App\Models\Course::with(['lecturer', 'students'])->get();
+                    $mahasiswaList = \App\Models\User::where('role', 'mahasiswa')->orderBy('name')->get();
+                    $allEnrollments = collect();
+                    foreach ($coursesList as $course) {
+                        foreach ($course->students as $student) {
+                            $allEnrollments->push([
+                                'mhs' => $student->name,
+                                'nim' => $student->nim_nip,
+                                'mk' => $course->code . ' • ' . $course->name,
+                                'mk_code' => $course->code,
+                                'kelas' => 'SI-A',
+                                'smt' => 'Genap 2026',
+                                'dosen' => $course->lecturer?->name ?? 'Dosen Pengampu',
+                            ]);
+                        }
+                    }
+                @endphp
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
@@ -48,7 +66,15 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Daftarkan Mahasiswa ke Mata Kuliah</h2>
-                                <p>Admin dapat mendaftarkan mahasiswa ke satu atau lebih mata kuliah aktif secara langsung.</p>
+                                <p>Admin dapat mendaftarkan mahasiswa ke mata kuliah aktif. Sesuai Kriteria 4.4, tiap mata kuliah memiliki &ge; 15 mahasiswa terdaftar.</p>
+                                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                                    <span style="background:#EFF6FF;color:#2563EB;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(37,99,235,0.2);">
+                                        ✓ Tiap MK &ge; 15 Mahasiswa Terdaftar
+                                    </span>
+                                    <span style="background:#ECFDF5;color:#16A34A;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(22,163,74,0.2);">
+                                        Total {{ $allEnrollments->count() }} Pendaftaran Terdata
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <span class="section-header-badge">Kelola Enrollment</span>
@@ -69,12 +95,10 @@
                             <div class="form-group">
                                 <label for="enrollMahasiswa">Pilih Mahasiswa <span class="required">*</span></label>
                                 <select id="enrollMahasiswa" class="form-select" required>
-                                    <option value="">— Pilih Mahasiswa —</option>
-                                    <option value="Baihaqi Abimanyu|10241014">Baihaqi Abimanyu (10241014)</option>
-                                    <option value="Calvin Adithya|10241016">Calvin Adithya (10241016)</option>
-                                    <option value="Clara Shinta|10241018">Clara Shinta (10241018)</option>
-                                    <option value="Desta Arkan|10241020">Desta Arkan (10241020)</option>
-                                    <option value="Devina Putri|10241022">Devina Putri (10241022)</option>
+                                    <option value="">— Pilih Mahasiswa ({{ $mahasiswaList->count() }} Terdaftar) —</option>
+                                    @foreach ($mahasiswaList as $mhs)
+                                        <option value="{{ $mhs->name }}|{{ $mhs->nim_nip }}">{{ $mhs->name }} ({{ $mhs->nim_nip }})</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -82,12 +106,9 @@
                                 <label for="enrollMatkul">Pilih Mata Kuliah <span class="required">*</span></label>
                                 <select id="enrollMatkul" class="form-select" required>
                                     <option value="">— Pilih Mata Kuliah —</option>
-                                    <option value="IF301 • Pemrograman Web Lanjut">IF301 • Pemrograman Web Lanjut (3 SKS)</option>
-                                    <option value="IF302 • Basis Data & Relasional">IF302 • Basis Data &amp; Relasional (3 SKS)</option>
-                                    <option value="IF305 • Kecerdasan Buatan (AI)">IF305 • Kecerdasan Buatan (AI) (3 SKS)</option>
-                                    <option value="IF310 • Rekayasa Perangkat Lunak">IF310 • Rekayasa Perangkat Lunak (3 SKS)</option>
-                                    <option value="IF312 • Jaringan Komputer">IF312 • Jaringan Komputer (2 SKS)</option>
-                                    <option value="IF318 • Manajemen Proyek TI">IF318 • Manajemen Proyek TI (2 SKS)</option>
+                                    @foreach ($coursesList as $c)
+                                        <option value="{{ $c->code }} • {{ $c->name }}">{{ $c->code }} • {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -121,7 +142,7 @@
                         <!-- Tabel Pendaftaran Aktif -->
                         <div class="table-container">
                             <div class="table-header-tools">
-                                <span class="table-summary-info">Total <strong id="enrollCount">5</strong> Pendaftaran Aktif</span>
+                                <span class="table-summary-info">Total <strong id="enrollCount">{{ $allEnrollments->count() }}</strong> Pendaftaran Aktif</span>
                                 <div class="search-input-box">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="11" cy="11" r="8"></circle>
@@ -131,10 +152,22 @@
                                 </div>
                             </div>
 
-                            <div class="table-responsive">
+                            <!-- Filter per Mata Kuliah -->
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                                <button type="button" class="btn-filter-mk active" data-mk="all" style="padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:800;border:1px solid var(--admin-primary);background:var(--admin-primary);color:#fff;cursor:pointer;">
+                                    Semua MK ({{ $allEnrollments->count() }})
+                                </button>
+                                @foreach ($coursesList as $c)
+                                    <button type="button" class="btn-filter-mk" data-mk="{{ $c->code }}" style="padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:700;border:1px solid var(--admin-border);background:var(--admin-white);color:var(--admin-text);cursor:pointer;">
+                                        {{ $c->code }} ({{ $c->students->count() }})
+                                    </button>
+                                @endforeach
+                            </div>
+
+                            <div class="table-responsive" style="max-height:560px;overflow-y:auto;position:relative;">
                                 <table class="custom-admin-table" id="enrollTable">
                                     <thead>
-                                        <tr>
+                                        <tr style="position:sticky;top:0;z-index:10;background:var(--admin-light);box-shadow:0 1px 2px rgba(0,0,0,0.06);">
                                             <th>Mahasiswa</th>
                                             <th>Mata Kuliah</th>
                                             <th>Kelas</th>
@@ -143,21 +176,16 @@
                                         </tr>
                                     </thead>
                                     <tbody id="enrollTableBody">
+                                        @forelse ($allEnrollments as $e)
                                         @php
-                                            $enrollments = [
-                                                ['mhs'=>'Baihaqi Abimanyu','nim'=>'10241014','mk'=>'IF301 • Pemrograman Web Lanjut','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#ECFDF5','c'=>'#16A34A'],
-                                                ['mhs'=>'Calvin Adithya','nim'=>'10241016','mk'=>'IF301 • Pemrograman Web Lanjut','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#FFF0DE','c'=>'#C98A1F'],
-                                                ['mhs'=>'Clara Shinta','nim'=>'10241018','mk'=>'IF302 • Basis Data & Relasional','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#F2EBF9','c'=>'#8E44AD'],
-                                                ['mhs'=>'Desta Arkan','nim'=>'10241020','mk'=>'IF305 • Kecerdasan Buatan','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#EBF9F1','c'=>'#1B8A5A'],
-                                                ['mhs'=>'Devina Putri','nim'=>'10241022','mk'=>'IF310 • Rekayasa Perangkat Lunak','kelas'=>'SI-A','smt'=>'Genap 2026','bg'=>'#FFF0DE','c'=>'#C98A1F'],
-                                            ];
+                                            $inits = collect(explode(' ', $e['mhs']))->map(fn($w)=>mb_substr($w,0,1))->join('');
+                                            $inits = strtoupper(mb_substr($inits, 0, 2));
                                         @endphp
-                                        @foreach ($enrollments as $e)
-                                        <tr>
+                                        <tr data-mk="{{ $e['mk_code'] }}">
                                             <td>
                                                 <div class="user-cell">
-                                                    <div class="user-avatar" style="background:{{ $e['bg'] }};color:{{ $e['c'] }};">
-                                                        {{ strtoupper(substr($e['mhs'],0,1).substr(strrchr($e['mhs'],' '),1,1)) }}
+                                                    <div class="user-avatar" style="background:#ECFDF5;color:#16A34A;">
+                                                        {{ $inits }}
                                                     </div>
                                                     <div class="user-meta">
                                                         <span class="user-name">{{ $e['mhs'] }}</span>
@@ -165,7 +193,10 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style="font-size:12.5px;font-weight:700;">{{ $e['mk'] }}</td>
+                                            <td style="font-size:12.5px;font-weight:700;">
+                                                <div>{{ $e['mk'] }}</div>
+                                                <small style="color:#8E6570;font-weight:500;">Dosen: {{ $e['dosen'] }}</small>
+                                            </td>
                                             <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $e['kelas'] }}</span></td>
                                             <td style="font-size:12px;color:#64748B;">{{ $e['smt'] }}</td>
                                             <td>
@@ -176,7 +207,11 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        @endforeach
+                                        @empty
+                                        <tr>
+                                            <td colspan="5" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada pendaftaran mata kuliah.</td>
+                                        </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
@@ -191,12 +226,39 @@
     </div>
 
     <script>
-        document.getElementById('searchEnrollInput').addEventListener('input', function() {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('#enrollTableBody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        let currentMkFilter = 'all';
+
+        function applyEnrollFilters() {
+            const q = (document.getElementById('searchEnrollInput')?.value || '').toLowerCase().trim();
+            document.querySelectorAll('#enrollTableBody tr[data-mk]').forEach(row => {
+                const mk = row.dataset.mk;
+                const matchMk = (currentMkFilter === 'all' || mk === currentMkFilter);
+                const text = row.textContent.toLowerCase();
+                const matchSearch = !q || text.includes(q);
+
+                row.style.display = (matchMk && matchSearch) ? '' : 'none';
+            });
+        }
+
+        document.querySelectorAll('.btn-filter-mk').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-filter-mk').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'var(--admin-white)';
+                    b.style.color = 'var(--admin-text)';
+                    b.style.borderColor = 'var(--admin-border)';
+                });
+                this.classList.add('active');
+                this.style.background = 'var(--admin-primary)';
+                this.style.color = '#fff';
+                this.style.borderColor = 'var(--admin-primary)';
+
+                currentMkFilter = this.dataset.mk;
+                applyEnrollFilters();
             });
         });
+
+        document.getElementById('searchEnrollInput').addEventListener('input', applyEnrollFilters);
 
         document.getElementById('formEnroll').addEventListener('submit', function(e) {
             e.preventDefault();

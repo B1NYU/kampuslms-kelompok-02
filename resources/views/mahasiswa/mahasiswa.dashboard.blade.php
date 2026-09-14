@@ -60,91 +60,71 @@
                 </div>
             </header>
 
-            <!-- Row 1: 3 Stat Cards (Total Mahasiswa dihapus) -->
+            @php
+                $mhsUser = \App\Models\User::where('role', 'mahasiswa')->where('email', 'mahasiswa@kampuslms.test')->first()
+                    ?? \App\Models\User::where('role', 'mahasiswa')->first();
+
+                // Mata kuliah dari database
+                $dbCourses = $mhsUser ? $mhsUser->courses()->with('lecturer')->get() : collect();
+                if ($dbCourses->isEmpty()) {
+                    $dbCourses = \App\Models\Course::with('lecturer')->get();
+                }
+                $totalCourseCount = $dbCourses->count();
+                $totalSks = $dbCourses->sum('sks');
+
+                // Tugas aktif & pending
+                $dbAssignments = \App\Models\Assignment::whereIn('course_id', $dbCourses->pluck('id'))
+                    ->where('status', 'published')
+                    ->with('course')
+                    ->orderBy('due_at')
+                    ->get();
+                $tugasPending = $dbAssignments->where('due_at', '>=', now())->count();
+                $tugasSelesai = $mhsUser ? \App\Models\Submission::where('user_id', $mhsUser->id)->count() : 0;
+            @endphp
+
+            <!-- Row 1: 3 Stat Cards terhubung ke Database -->
             <section class="stats-grid">
                 <div class="stat-card">
-                    <span class="stat-label">Mata Kuliah</span>
-                    <span class="stat-value stat-color-2">24</span>
+                    <span class="stat-label">Mata Kuliah Aktif</span>
+                    <span class="stat-value stat-color-2">{{ $totalCourseCount }} MK</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">Rata-rata Nilai</span>
-                    <span class="stat-value stat-color-3">3.82</span>
+                    <span class="stat-label">Total Beban SKS</span>
+                    <span class="stat-value stat-color-3">{{ $totalSks }} SKS</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">Tugas Pending</span>
-                    <span class="stat-value stat-color-4">5</span>
+                    <span class="stat-label">Tugas Terjadwal</span>
+                    <span class="stat-value stat-color-4">{{ $tugasPending }}</span>
                 </div>
             </section>
 
             <!-- Row 2: Middle Section (List Mata Kuliah Diambil & Aktivitas Mingguan) -->
             <section class="middle-grid">
 
-                <!-- Kiri: List Mata Kuliah yang Diambil (menggantikan grafik) -->
+                <!-- Kiri: List Mata Kuliah yang Diambil dari Database -->
                 <div class="card-box">
                     <div class="card-header-clean">
-                        <h3>Mata Kuliah yang Diambil</h3>
-                        <span class="card-subtitle-tag">Semester Genap 2026</span>
+                        <div>
+                            <h3 style="margin:0;">Mata Kuliah yang Diambil</h3>
+                            <small style="color:#8E6570;font-size:12px;">Data langsung dari database LMS</small>
+                        </div>
+                        <a href="{{ route('mata-kuliah.index') }}" class="card-subtitle-tag" style="text-decoration:none;">Lihat Semua &rarr;</a>
                     </div>
 
-                    @php
-                        $mataKuliah = [
-                            [
-                                'kode' => 'IF301',
-                                'nama' => 'Pemrograman Web Lanjut',
-                                'sks' => 3,
-                                'dosen' => 'Dr. Ahmad Fauzan',
-                                'status' => 'Aktif',
-                            ],
-                            [
-                                'kode' => 'IF302',
-                                'nama' => 'Basis Data & Relasional',
-                                'sks' => 3,
-                                'dosen' => 'Rina Marlina, M.Kom',
-                                'status' => 'Aktif',
-                            ],
-                            [
-                                'kode' => 'IF305',
-                                'nama' => 'Kecerdasan Buatan (AI)',
-                                'sks' => 3,
-                                'dosen' => 'Dr. Yusuf Pratama',
-                                'status' => 'Aktif',
-                            ],
-                            [
-                                'kode' => 'IF310',
-                                'nama' => 'Rekayasa Perangkat Lunak',
-                                'sks' => 3,
-                                'dosen' => 'Siti Nurhaliza, M.T',
-                                'status' => 'Aktif',
-                            ],
-                            [
-                                'kode' => 'IF312',
-                                'nama' => 'Jaringan Komputer',
-                                'sks' => 2,
-                                'dosen' => 'Budi Santoso, M.Kom',
-                                'status' => 'Tidak Aktif    ',
-                            ],
-                            [
-                                'kode' => 'IF318',
-                                'nama' => 'Manajemen Proyek TI',
-                                'sks' => 2,
-                                'dosen' => 'Dr. Lestari Wibowo',
-                                'status' => 'Aktif',
-                            ],
-                        ];
-                    @endphp
-
                     <div class="mk-list">
-                        @foreach ($mataKuliah as $mk)
-                            <div class="mk-row">
-                                <span class="mk-code">{{ $mk['kode'] }}</span>
+                        @forelse ($dbCourses as $mk)
+                            <a href="{{ route('mata-kuliah.show', $mk->id) }}" class="mk-row" style="text-decoration:none;color:inherit;transition:background 0.2s;">
+                                <span class="mk-code">{{ $mk->code }}</span>
                                 <div class="mk-info">
-                                    <span class="mk-name">{{ $mk['nama'] }}</span>
-                                    <span class="mk-dosen">{{ $mk['dosen'] }}</span>
+                                    <span class="mk-name">{{ $mk->name }}</span>
+                                    <span class="mk-dosen">{{ $mk->lecturer?->name ?? 'Dosen Pengampu' }}</span>
                                 </div>
-                                <span class="mk-sks">{{ $mk['sks'] }} SKS</span>
-                                <span class="mk-status mk-status-{{ Str::slug($mk['status']) }}">{{ $mk['status'] }}</span>
-                            </div>
-                        @endforeach
+                                <span class="mk-sks">{{ $mk->sks }} SKS</span>
+                                <span class="mk-status mk-status-aktif">{{ ucfirst($mk->status ?? 'Aktif') }}</span>
+                            </a>
+                        @empty
+                            <div style="padding:20px;text-align:center;color:#94A3B8;">Belum ada mata kuliah yang diambil.</div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -229,25 +209,28 @@
                 <!-- Kanan: Pesan & Pengumuman Terbaru -->
                 <div class="card-box">
                     <div class="card-header-clean">
-                        <h3>Pengumuman & Pesan Terkini</h3>
-                        <a href="#" class="link-see-all">Semua</a>
+                        <h3>Tugas & Pengumuman Terkini</h3>
+                        <a href="{{ route('mata-kuliah.index') }}" class="link-see-all">Semua MK</a>
                     </div>
                     <div class="message-list">
-                        <div class="message-item">
-                            <span class="msg-sender">Biro Akademik</span>
-                            <span class="msg-badge">Jadwal</span>
-                            <span class="msg-body">Jadwal Ujian Tengah Semester Genap 2026 telah diterbitkan.</span>
-                        </div>
-                        <div class="message-item">
-                            <span class="msg-sender">Dosen Web</span>
-                            <span class="msg-badge">Tugas</span>
-                            <span class="msg-body">Pengumpulan laporan Proyek Laravel Kelompok 02 dibuka hingga Jumat.</span>
-                        </div>
-                        <div class="message-item">
-                            <span class="msg-sender">Kemahasiswaan</span>
-                            <span class="msg-badge">Info</span>
-                            <span class="msg-body">Sosialisasi beasiswa berprestasi di auditorium utama pk 09:00.</span>
-                        </div>
+                        @forelse ($dbAssignments->take(3) as $assign)
+                            @php
+                                $isDuePast = $assign->due_at ? $assign->due_at->isPast() : false;
+                            @endphp
+                            <div class="message-item">
+                                <span class="msg-sender">{{ $assign->course?->code ?? 'MK' }}</span>
+                                <span class="msg-badge" style="background:{{ $isDuePast ? '#FEE2E2' : '#DCFCE7' }};color:{{ $isDuePast ? '#B91C1C' : '#166534' }};">
+                                    {{ $isDuePast ? 'Lewat Deadline' : 'Aktif' }}
+                                </span>
+                                <span class="msg-body"><strong>{{ $assign->title }}</strong> &bull; Batas: {{ $assign->due_at ? $assign->due_at->translatedFormat('d M Y, H:i') : '-' }}</span>
+                            </div>
+                        @empty
+                            <div class="message-item">
+                                <span class="msg-sender">Sistem</span>
+                                <span class="msg-badge">Info</span>
+                                <span class="msg-body">Belum ada tugas baru yang dipublikasikan.</span>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 

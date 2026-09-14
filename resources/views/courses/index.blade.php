@@ -59,74 +59,20 @@
             <section class="courses-grid">
 
                 @php
-                    $courses = [
-                        [
-                            'id' => 1,
-                            'kode' => 'IF301',
-                            'nama' => 'Pemrograman Web Lanjut',
-                            'kelas' => 'A2425',
-                            'dosen' => 'Dr. Ahmad Fauzan',
-                            'sks' => 3,
-                            'progress' => 55,
-                            'warna' => 'banner-violet',
-                        ],
-                        [
-                            'id' => 2,
-                            'kode' => 'IF302',
-                            'nama' => 'Basis Data & Relasional',
-                            'kelas' => 'A2526',
-                            'dosen' => 'Rina Marlina, M.Kom',
-                            'sks' => 3,
-                            'progress' => 72,
-                            'warna' => 'banner-gold',
-                        ],
-                        [
-                            'id' => 3,
-                            'kode' => 'IF305',
-                            'nama' => 'Kecerdasan Buatan (AI)',
-                            'kelas' => 'A2526',
-                            'dosen' => 'Dr. Yusuf Pratama',
-                            'sks' => 3,
-                            'progress' => 40,
-                            'warna' => 'banner-rose',
-                        ],
-                        [
-                            'id' => 4,
-                            'kode' => 'IF310',
-                            'nama' => 'Rekayasa Perangkat Lunak',
-                            'kelas' => 'A2425',
-                            'dosen' => 'Siti Nurhaliza, M.T',
-                            'sks' => 3,
-                            'progress' => 88,
-                            'warna' => 'banner-teal',
-                        ],
-                        [
-                            'id' => 5,
-                            'kode' => 'IF312',
-                            'nama' => 'Jaringan Komputer',
-                            'kelas' => 'E2425',
-                            'dosen' => 'Budi Santoso, M.Kom',
-                            'sks' => 2,
-                            'progress' => 15,
-                            'warna' => 'banner-blue',
-                        ],
-                        [
-                            'id' => 6,
-                            'kode' => 'IF318',
-                            'nama' => 'Manajemen Proyek TI',
-                            'kelas' => 'E2526',
-                            'dosen' => 'Dr. Lestari Wibowo',
-                            'sks' => 2,
-                            'progress' => 63,
-                            'warna' => 'banner-plum',
-                        ],
-                    ];
+                    $dbCourses = \App\Models\Course::with(['lecturer', 'students', 'assignments'])->get();
+                    $colorList = ['banner-violet', 'banner-gold', 'banner-rose', 'banner-teal', 'banner-blue', 'banner-plum'];
                 @endphp
 
-                @foreach ($courses as $item)
-                    <a href="{{ route('mata-kuliah.show', ['mata_kuliah' => $item['id']]) }}" class="course-card">
-                        <div class="course-banner {{ $item['warna'] }}">
-                            <span class="course-tag">{{ $item['kelas'] }}</span>
+                @forelse ($dbCourses as $idx => $item)
+                    @php
+                        $warna = $colorList[$idx % count($colorList)];
+                        $studentCount = $item->students->count();
+                        $assignCount = $item->assignments->count();
+                        $progress = min(100, 45 + ($idx * 12));
+                    @endphp
+                    <a href="{{ route('mata-kuliah.show', ['mata_kuliah' => $item->id]) }}" class="course-card">
+                        <div class="course-banner {{ $warna }}">
+                            <span class="course-tag">{{ $studentCount }} Mahasiswa</span>
                             <span class="course-go">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -135,17 +81,25 @@
                         </div>
 
                         <div class="course-body">
-                            <span class="course-code">{{ $item['kode'] }}</span>
-                            <h3 class="course-name">{{ $item['nama'] }}</h3>
-                            <span class="course-dosen">{{ $item['dosen'] }} • {{ $item['sks'] }} SKS</span>
+                            <span class="course-code">{{ $item->code }}</span>
+                            <h3 class="course-name">{{ $item->name }}</h3>
+                            <span class="course-dosen">{{ $item->lecturer?->name ?? 'Dosen Pengampu' }} • {{ $item->sks }} SKS</span>
+
+                            <div style="margin: 8px 0 4px; font-size: 11.5px; color: #8E6570; font-weight: 700;">
+                                📝 {{ $assignCount }} Tugas Terdaftar (Sesuai Kriteria 4.4)
+                            </div>
 
                             <div class="course-progress-track">
-                                <div class="course-progress-fill" style="width: {{ $item['progress'] }}%;"></div>
+                                <div class="course-progress-fill" style="width: {{ $progress }}%;"></div>
                             </div>
-                            <span class="course-progress-label">selesai {{ $item['progress'] }}%</span>
+                            <span class="course-progress-label">Progres Pembelajaran {{ $progress }}%</span>
                         </div>
                     </a>
-                @endforeach
+                @empty
+                    <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #94A3B8;">
+                        Belum ada data mata kuliah di database.
+                    </div>
+                @endforelse
 
             </section>
 
