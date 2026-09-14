@@ -71,7 +71,7 @@
                             <div class="form-row-2">
                                 <div class="form-group">
                                     <label for="mkKode">Kode MK <span class="required">*</span></label>
-                                    <input type="text" id="mkKode" class="form-control" placeholder="Contoh: SI101" required>
+                                    <input type="text" id="mkKode" class="form-control" placeholder="Contoh: SI2514024" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="mkSks">Jumlah SKS <span class="required">*</span></label>
@@ -89,33 +89,25 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="mkDosen">Dosen Pengampu</label>
-                                <select id="mkDosen" class="form-select">
+                                <label for="mkDosen">Dosen Pengampu <span class="required">*</span></label>
+                                <select id="mkDosen" class="form-select" required>
                                     <option value="">— Pilih Dosen —</option>
-                                    <option value="Dr. Budi Santoso, M.Kom">Dr. Budi Santoso, M.Kom</option>
-                                    <option value="Rina Marlina, M.Kom">Rina Marlina, M.Kom</option>
-                                    <option value="Dr. Ahmad Fauzan">Dr. Ahmad Fauzan</option>
-                                    <option value="Dr. Yusuf Pratama">Dr. Yusuf Pratama</option>
-                                    <option value="Siti Nurhaliza, M.T">Siti Nurhaliza, M.T</option>
+                                    @foreach ($dosenList as $dosen)
+                                        <option value="{{ $dosen->id }}">{{ $dosen->name }}</option>
+                                    @endforeach
                                 </select>
+                                @if ($dosenList->isEmpty())
+                                    <small style="color:#B91C1C;">Belum ada user dengan role "dosen". Tambahkan lewat Manajemen Pengguna dulu.</small>
+                                @endif
                             </div>
 
-                            <div class="form-row-2">
-                                <div class="form-group">
-                                    <label for="mkSemester">Semester</label>
-                                    <select id="mkSemester" class="form-select">
-                                        <option value="Genap 2026" selected>Genap 2026</option>
-                                        <option value="Ganjil 2026">Ganjil 2026</option>
-                                        <option value="Genap 2025">Genap 2025</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="mkStatus">Status</label>
-                                    <select id="mkStatus" class="form-select">
-                                        <option value="Aktif">Aktif</option>
-                                        <option value="Tidak Aktif">Tidak Aktif</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label for="mkStatus">Status</label>
+                                <select id="mkStatus" class="form-select">
+                                    <option value="draft">Draft</option>
+                                    <option value="active" selected>Aktif</option>
+                                    <option value="archived">Diarsipkan</option>
+                                </select>
                             </div>
 
                             <div class="form-group">
@@ -162,20 +154,20 @@
                                     <tbody id="mkTableBody">
                                         @forelse ($matkulList as $mk)
                                         <tr data-id="{{ $mk->id }}"
-                                            data-kode="{{ $mk->kode }}"
-                                            data-nama="{{ $mk->nama }}"
+                                            data-kode="{{ $mk->code }}"
+                                            data-nama="{{ $mk->name }}"
                                             data-sks="{{ $mk->sks }}"
-                                            data-dosen="{{ $mk->dosen }}"
-                                            data-semester="{{ $mk->semester }}"
+                                            data-lecturer-id="{{ $mk->lecturer_id }}"
+                                            data-lecturer-name="{{ $mk->lecturer?->name }}"
                                             data-status="{{ $mk->status }}"
-                                            data-deskripsi="{{ $mk->deskripsi }}">
-                                            <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $mk->kode }}</span></td>
-                                            <td style="font-weight:700;font-size:13px;">{{ $mk->nama }}</td>
+                                            data-deskripsi="{{ $mk->description }}">
+                                            <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $mk->code }}</span></td>
+                                            <td style="font-weight:700;font-size:13px;">{{ $mk->name }}</td>
                                             <td style="font-size:12px;font-weight:700;color:#B0182D;">{{ $mk->sks }} SKS</td>
-                                            <td style="font-size:12px;color:#64748B;">{{ $mk->dosen ?? '—' }}</td>
+                                            <td style="font-size:12px;color:#64748B;">{{ $mk->lecturer?->name ?? '—' }}</td>
                                             <td>
-                                                <span class="badge-status {{ $mk->status === 'Aktif' ? 'badge-status-active' : 'badge-status-inactive' }}">
-                                                    {{ $mk->status }}
+                                                <span class="badge-status {{ $mk->status === 'active' ? 'badge-status-active' : 'badge-status-inactive' }}">
+                                                    {{ ['draft' => 'DRAFT', 'active' => 'AKTIF', 'archived' => 'DIARSIPKAN'][$mk->status] }}
                                                 </span>
                                             </td>
                                             <td>
@@ -210,7 +202,6 @@
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-        // Template URL — "__ID__" akan diganti dengan id asli saat dipakai.
         const storeUrl          = "{{ route('admin.matkul.store') }}";
         const updateUrlTemplate = "{{ route('admin.matkul.update', ['matkul' => '__ID__']) }}";
         const deleteUrlTemplate = "{{ route('admin.matkul.destroy', ['matkul' => '__ID__']) }}";
@@ -222,6 +213,8 @@
         const cancelBtn = document.getElementById('mkCancelEditBtn');
         const formTitle = document.getElementById('formMkTitle').querySelector('span');
         const submitLabel = submitBtn.querySelector('span');
+
+        const statusLabel = { draft: 'DRAFT', active: 'AKTIF', archived: 'DIARSIPKAN' };
 
         function showAlert(message, type = 'error') {
             alertBox.style.display = 'block';
@@ -236,16 +229,16 @@
         }
 
         function badgeClass(status) {
-            return status === 'Aktif' ? 'badge-status-active' : 'badge-status-inactive';
+            return status === 'active' ? 'badge-status-active' : 'badge-status-inactive';
         }
 
         function rowHtml(mk) {
             return `
-                <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${mk.kode}</span></td>
-                <td style="font-weight:700;font-size:13px;">${mk.nama}</td>
+                <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${mk.code}</span></td>
+                <td style="font-weight:700;font-size:13px;">${mk.name}</td>
                 <td style="font-size:12px;font-weight:700;color:#B0182D;">${mk.sks} SKS</td>
-                <td style="font-size:12px;color:#64748B;">${mk.dosen ?? '—'}</td>
-                <td><span class="badge-status ${badgeClass(mk.status)}">${mk.status}</span></td>
+                <td style="font-size:12px;color:#64748B;">${mk.lecturer_name ?? '—'}</td>
+                <td><span class="badge-status ${badgeClass(mk.status)}">${statusLabel[mk.status]}</span></td>
                 <td><div class="btn-actions">
                     <button type="button" class="btn-icon btn-icon-edit btn-edit-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
                     <button type="button" class="btn-icon btn-icon-danger btn-delete-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></button>
@@ -262,13 +255,13 @@
                 tbody.prepend(tr);
             }
             tr.dataset.id = mk.id;
-            tr.dataset.kode = mk.kode;
-            tr.dataset.nama = mk.nama;
+            tr.dataset.kode = mk.code;
+            tr.dataset.nama = mk.name;
             tr.dataset.sks = mk.sks;
-            tr.dataset.dosen = mk.dosen ?? '';
-            tr.dataset.semester = mk.semester ?? '';
+            tr.dataset.lecturerId = mk.lecturer_id ?? '';
+            tr.dataset.lecturerName = mk.lecturer_name ?? '';
             tr.dataset.status = mk.status;
-            tr.dataset.deskripsi = mk.deskripsi ?? '';
+            tr.dataset.deskripsi = mk.description ?? '';
             tr.innerHTML = rowHtml(mk);
 
             bindRowButtons(tr);
@@ -288,13 +281,12 @@
 
             const id = document.getElementById('mkId').value;
             const payload = {
-                kode: document.getElementById('mkKode').value.trim(),
-                nama: document.getElementById('mkNama').value.trim(),
+                code: document.getElementById('mkKode').value.trim(),
+                name: document.getElementById('mkNama').value.trim(),
                 sks: document.getElementById('mkSks').value,
-                dosen: document.getElementById('mkDosen').value,
-                semester: document.getElementById('mkSemester').value,
+                lecturer_id: document.getElementById('mkDosen').value,
                 status: document.getElementById('mkStatus').value,
-                deskripsi: document.getElementById('mkDeskripsi').value.trim(),
+                description: document.getElementById('mkDeskripsi').value.trim(),
             };
 
             const url = id ? updateUrlTemplate.replace('__ID__', id) : storeUrl;
@@ -343,8 +335,7 @@
                 document.getElementById('mkKode').value = tr.dataset.kode;
                 document.getElementById('mkNama').value = tr.dataset.nama;
                 document.getElementById('mkSks').value = tr.dataset.sks;
-                document.getElementById('mkDosen').value = tr.dataset.dosen;
-                document.getElementById('mkSemester').value = tr.dataset.semester;
+                document.getElementById('mkDosen').value = tr.dataset.lecturerId;
                 document.getElementById('mkStatus').value = tr.dataset.status;
                 document.getElementById('mkDeskripsi').value = tr.dataset.deskripsi;
 

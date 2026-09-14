@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Material extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'course_id',
+        'uploaded_by',
         'title',
         'description',
         'type',
@@ -29,13 +29,18 @@ class Material extends Model
         ];
     }
 
-
-    public function course(): BelongsTo
+    /**
+     * Mata kuliah tempat materi ini berada.
+     */
+    public function course()
     {
         return $this->belongsTo(Course::class);
     }
 
-    public function uploader(): BelongsTo
+    /**
+     * User (dosen) yang mengunggah materi ini.
+     */
+    public function uploader()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }

@@ -4,15 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Grade extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'submission_id',
+        'graded_by',
         'score',
         'feedback',
+        'graded_at',
     ];
 
     protected function casts(): array
@@ -23,13 +25,19 @@ class Grade extends Model
         ];
     }
 
-    public function submission(): BelongsTo
+    /**
+     * Submission yang dinilai lewat entri ini.
+     */
+    public function submission()
     {
         return $this->belongsTo(Submission::class);
-    } // one-to-one, setiap nilai merujuk pada satu berkas pengumpulan tugas spesifik yang dinilai
+    }
 
-    public function grader(): BelongsTo
+    /**
+     * Dosen yang memberi nilai ini.
+     */
+    public function grader()
     {
         return $this->belongsTo(User::class, 'graded_by');
-    } // many-to-one, setiap nilai diberikan oleh satu dosen yang menilai berkas pengumpulan tugas
+    }
 }
