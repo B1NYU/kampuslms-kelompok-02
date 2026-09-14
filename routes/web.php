@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\MataKuliahController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,7 +15,7 @@ Route::get('/tentang', function () {
 Route::match(['get', 'post'], '/login', function (\Illuminate\Http\Request $request) {
     $role = $request->input('role', 'mahasiswa');
     $nama = $request->input('nama', $role === 'dosen' ? 'Dr. Budi Santoso, M.Kom' : 'Mahasiswa');
-    
+
     session(['user_role' => $role, 'user_name' => $nama]);
 
     if ($role === 'dosen') {
@@ -82,9 +83,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view()->file(resource_path('views/admin/admin.pengguna.blade.php'));
     })->name('pengguna');
 
-    Route::get('/mata-kuliah', function () {
-        return view()->file(resource_path('views/admin/admin.matkul.blade.php'));
-    })->name('matkul');
+    Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('matkul');
+    Route::post('/mata-kuliah', [MataKuliahController::class, 'store'])->name('matkul.store');
+    Route::put('/mata-kuliah/{matkul}', [MataKuliahController::class, 'update'])->name('matkul.update');
+    Route::delete('/mata-kuliah/{matkul}', [MataKuliahController::class, 'destroy'])->name('matkul.destroy');
 
     Route::get('/pendaftaran', function () {
         return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));
