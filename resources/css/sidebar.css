@@ -3,7 +3,7 @@
    ========================================= */
 .top-navbar {
     background: #FFFFFF;
-    border-bottom: 1px solid #F2DCD3;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.18);
     padding: 0 36px;
     height: 64px;
     width: 100%;
@@ -40,7 +40,7 @@
     font-size: 14px;
     font-weight: 900;
     margin: 0;
-    color: #B0182D;
+    color: #039FFA;
     letter-spacing: 0.05em;
     line-height: 1;
 }
@@ -58,7 +58,7 @@
 }
 
 .portal-badge-mhs {
-    background: linear-gradient(90deg, #B0182D, #E23C64);
+    background: linear-gradient(90deg, #039FFA, #32B3F1);
     color: #FFFFFF;
 }
 
@@ -82,7 +82,7 @@
     border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
-    color: #8E6570;
+    color: #334155;
     text-decoration: none;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -90,14 +90,14 @@
 
 .navbar-nav li a:hover,
 .nav-link-mhs:hover {
-    color: #B0182D;
-    background: #FFF5E8;
+    color: #039FFA;
+    background: #FFFDF8;
 }
 
 .navbar-nav li.active a,
 .nav-link-mhs.active {
-    color: #B0182D;
-    background: #FFF5E8;
+    color: #039FFA;
+    background: #FFFDF8;
     font-weight: 800;
 }
 
@@ -114,17 +114,17 @@
     display: flex;
     align-items: center;
     gap: 9px;
-    background: #FFF5E8;
+    background: #FFFDF8;
     padding: 5px 13px 5px 5px;
     border-radius: 30px;
-    border: 1px solid #F4D9C1;
+    border: 1px solid rgba(3, 159, 250, 0.25);
 }
 
 .mhs-avatar {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: #B0182D;
+    background: linear-gradient(135deg, #039FFA, #32B3F1);
     color: #FFFFFF;
     font-size: 11px;
     font-weight: 900;
@@ -142,14 +142,14 @@
 .mhs-name {
     font-size: 12.5px;
     font-weight: 800;
-    color: #5F3540;
+    color: #0F172A;
     line-height: 1.2;
 }
 
 .mhs-role {
     font-size: 10.5px;
     font-weight: 600;
-    color: #B0182D;
+    color: #F96305;
 }
 
 /* Tombol Logout */
@@ -159,8 +159,8 @@
     gap: 6px;
     padding: 6px 14px;
     background: transparent;
-    border: 1px solid rgba(176, 24, 45, 0.25);
-    color: #B0182D;
+    border: 1px solid rgba(249, 99, 5, 0.3);
+    color: #F96305;
     font-size: 12px;
     font-weight: 800;
     border-radius: 10px;
@@ -170,10 +170,10 @@
 }
 
 .btn-logout:hover {
-    background: #B0182D;
+    background: #F96305;
     color: #FFFFFF;
-    border-color: #B0182D;
-    box-shadow: 0 4px 12px rgba(176, 24, 45, 0.2);
+    border-color: #F96305;
+    box-shadow: 0 4px 12px rgba(249, 99, 5, 0.25);
 }
 
 .btn-logout:active {
@@ -186,6 +186,6 @@
 .btn-logout:focus,
 .btn-logout:focus-visible {
     outline: none !important;
-    border-color: #B0182D !important;
-    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.18) !important;
+    border-color: #039FFA !important;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.2) !important;
 }

@@ -21,8 +21,8 @@
 }
 
 body {
-    background-color: #FCEDD8;
-    color: #5F3540;
+    background-color: #FFFDF8;
+    color: #0F172A;
     min-height: 100vh;
     width: 100%;
     padding: 0;
@@ -48,7 +48,7 @@ body {
 .bg-shape-1 {
     width: 340px;
     height: 340px;
-    background: #FFD464;
+    background: #32B3F1;
     top: -120px;
     right: -70px;
     opacity: 0.85;
@@ -57,7 +57,7 @@ body {
 .bg-shape-2 {
     width: 250px;
     height: 250px;
-    background: #FF5E5E;
+    background: #F9B804;
     bottom: -80px;
     left: -70px;
     opacity: 0.35;
@@ -66,7 +66,7 @@ body {
 .bg-shape-3 {
     width: 130px;
     height: 130px;
-    background: #E23C64;
+    background: #F96305;
     top: 48%;
     right: 35%;
     opacity: 0.16;
@@ -91,13 +91,13 @@ body {
    ========================================= */
 .course-subnav {
     background: #FFFFFF;
-    border-bottom: 1px solid #F2DCD3;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.18);
     width: 100%;
     height: 52px;
     position: sticky;
     top: 64px;
     z-index: 90;
-    box-shadow: 0 1px 4px rgba(176, 24, 45, 0.04);
+    box-shadow: 0 1px 4px rgba(3, 159, 250, 0.05);
 }
 
 .course-subnav-inner {
@@ -128,15 +128,15 @@ body {
     font-weight: 800;
     padding: 3px 9px;
     border-radius: 6px;
-    background: #FFF5E8;
-    color: #B0182D;
-    border: 1px solid #F4D9C1;
+    background: #FFFDF8;
+    color: #039FFA;
+    border: 1px solid rgba(3, 159, 250, 0.25);
 }
 
 .crumb-course-name {
     font-size: 14px;
     font-weight: 800;
-    color: #5F3540;
+    color: #0F172A;
     white-space: nowrap;
 }
 
@@ -156,7 +156,7 @@ body {
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
-    color: #8E6570;
+    color: #64748B;
     font-size: 13px;
     font-weight: 700;
     font-family: 'Nunito', sans-serif;
@@ -167,15 +167,15 @@ body {
 }
 
 .subnav-tab-btn:hover {
-    color: #B0182D;
-    background: rgba(176, 24, 45, 0.03);
+    color: #039FFA;
+    background: #FFFDF8;
 }
 
 .subnav-tab-btn.active {
-    color: #B0182D;
+    color: #039FFA;
     font-weight: 800;
-    border-bottom-color: #B0182D;
-    background: rgba(176, 24, 45, 0.04);
+    border-bottom-color: #039FFA;
+    background: #FFFDF8;
 }
 
 .subnav-tab-btn:focus,
@@ -298,14 +298,17 @@ body {
 .timeline-scroll-box::-webkit-scrollbar {
     width: 6px;
 }
+
 .timeline-scroll-box::-webkit-scrollbar-track {
     background: #F8F3ED;
     border-radius: 10px;
 }
+
 .timeline-scroll-box::-webkit-scrollbar-thumb {
     background: #EBD6CE;
     border-radius: 10px;
 }
+
 .timeline-scroll-box::-webkit-scrollbar-thumb:hover {
     background: #FF5E5E;
 }
@@ -321,7 +324,9 @@ body {
     border-radius: 2px;
 }
 
-.timeline-item { position: relative; }
+.timeline-item {
+    position: relative;
+}
 
 .timeline-node {
     position: absolute;
@@ -346,14 +351,32 @@ body {
     background: #EBD6CE;
 }
 
-.timeline-node.done { border-color: #10B981; }
-.timeline-node.done .timeline-node-inner { background: #10B981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+.timeline-node.done {
+    border-color: #10B981;
+}
 
-.timeline-node.active { border-color: #FF5E5E; }
-.timeline-node.active .timeline-node-inner { background: #FF5E5E; box-shadow: 0 0 8px rgba(255, 94, 94, 0.5); }
+.timeline-node.done .timeline-node-inner {
+    background: #10B981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
 
-.timeline-node.exam { border-color: #E23C64; }
-.timeline-node.exam .timeline-node-inner { background: #E23C64; box-shadow: 0 0 8px rgba(226, 60, 100, 0.5); }
+.timeline-node.active {
+    border-color: #FF5E5E;
+}
+
+.timeline-node.active .timeline-node-inner {
+    background: #FF5E5E;
+    box-shadow: 0 0 8px rgba(255, 94, 94, 0.5);
+}
+
+.timeline-node.exam {
+    border-color: #E23C64;
+}
+
+.timeline-node.exam .timeline-node-inner {
+    background: #E23C64;
+    box-shadow: 0 0 8px rgba(226, 60, 100, 0.5);
+}
 
 /* KARTU SESI (BERSIH, PUTIH & ELEGAN) */
 .session-card {
@@ -514,8 +537,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Kartu Info & CPMK */
@@ -756,8 +786,16 @@ body {
     justify-content: space-between;
 }
 
-.resource-name { font-size: 12.5px; font-weight: 800; color: #5F3540; }
-.resource-meta { font-size: 11px; color: #8E6570; }
+.resource-name {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #5F3540;
+}
+
+.resource-meta {
+    font-size: 11px;
+    color: #8E6570;
+}
 
 .btn-mini-download {
     background: #FF5E5E;
@@ -1119,6 +1157,12 @@ body {
     border: 1px solid #E2E8F0;
 }
 
+.status-pill-danger {
+    background: #FEE2E2;
+    color: #DC2626;
+    border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
 .status-dot-green {
     width: 6px;
     height: 6px;
@@ -1132,6 +1176,14 @@ body {
     height: 6px;
     border-radius: 50%;
     background: #C98A1F;
+    display: inline-block;
+}
+
+.status-dot-red {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #DC2626;
     display: inline-block;
 }
 
@@ -1186,16 +1238,35 @@ body {
 }
 
 @media (max-width: 1080px) {
-    .grades-stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .grades-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 960px) {
-    .split-layout { grid-template-columns: 1fr; }
-    .timeline-scroll-box { max-height: 420px; }
-    .right-panel { position: static; }
-    .course-subnav-inner { padding: 0 20px; }
-    .course-main-content { padding: 20px; }
-    .grades-stat-grid { grid-template-columns: 1fr; }
+    .split-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-scroll-box {
+        max-height: 420px;
+    }
+
+    .right-panel {
+        position: static;
+    }
+
+    .course-subnav-inner {
+        padding: 0 20px;
+    }
+
+    .course-main-content {
+        padding: 20px;
+    }
+
+    .grades-stat-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Fix browser default black focus ring */

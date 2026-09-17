@@ -20,8 +20,8 @@
 
         body {
             font-family: 'Nunito', sans-serif;
-            background: #FCEDD8;
-            color: #B0182D;
+            background: #FFFDF8;
+            color: #039FFA;
             height: 100vh;
             max-height: 100vh;
             display: flex;
@@ -50,7 +50,7 @@
         .shape-one {
             width: 320px;
             height: 320px;
-            background: #FFD464;
+            background: #32B3F1;
             top: -130px;
             right: -80px;
         }
@@ -58,7 +58,7 @@
         .shape-two {
             width: 230px;
             height: 230px;
-            background: #FF5E5E;
+            background: #F9B804;
             opacity: 0.35;
             bottom: -80px;
             left: -80px;
@@ -67,7 +67,7 @@
         .shape-three {
             width: 120px;
             height: 120px;
-            background: #E23C64;
+            background: #F96305;
             opacity: 0.16;
             top: 42%;
             left: 44%;
@@ -96,24 +96,25 @@
             width: 36px;
             height: 36px;
             border-radius: 10px;
-            background: #E23C64;
+            background: #039FFA;
+            color: #FFFFFF;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            box-shadow: 0 4px 12px rgba(226, 60, 100, 0.22);
+            box-shadow: 0 4px 12px rgba(3, 159, 250, 0.28);
         }
 
         .brand-text h2 {
             font-size: 16px;
             font-weight: 800;
-            color: #B0182D;
+            color: #039FFA;
             line-height: 1.1;
         }
 
         .brand-text p {
             font-size: 10px;
-            color: #8E5360;
+            color: #F96305;
             margin-top: 2px;
             font-weight: 600;
         }
@@ -133,30 +134,31 @@
         }
 
         .nav-login {
-            color: #B0182D;
-            background: #FFF5E8;
-            border: 1px solid #F4D9C1;
+            color: #039FFA;
+            background: #FFFDF8;
+            border: 1px solid rgba(3, 159, 250, 0.25);
         }
 
         .nav-login:hover {
-            background: #FFD464;
+            background: #32B3F1;
+            color: #FFFFFF;
             transform: translateY(-2px);
         }
 
         .nav-register {
             color: white;
-            background: #E23C64;
-            box-shadow: 0 6px 15px rgba(226, 60, 100, 0.22);
+            background: #F96305;
+            box-shadow: 0 6px 15px rgba(249, 99, 5, 0.25);
         }
 
         .nav-register:hover {
-            background: #B0182D;
+            background: #039FFA;
             transform: translateY(-2px);
         }
 
         .nav-dashboard {
             color: white;
-            background: #E23C64;
+            background: #039FFA;
         }
 
         /* =========================
@@ -190,8 +192,8 @@
             align-items: center;
             gap: 6px;
             padding: 4px 12px;
-            background: #FFD464;
-            color: #B0182D;
+            background: #F9B804;
+            color: #FFFFFF;
             border-radius: 30px;
             font-size: 10.5px;
             font-weight: 800;
@@ -202,7 +204,7 @@
         .welcome-dot {
             width: 6px;
             height: 6px;
-            background: #E23C64;
+            background: #F96305;
             border-radius: 50%;
         }
 
@@ -211,18 +213,18 @@
             line-height: 1.08;
             font-weight: 900;
             letter-spacing: -1.2px;
-            color: #B0182D;
+            color: #039FFA;
             max-width: 520px;
             margin-bottom: 10px;
         }
 
         .left-content h1 span {
-            color: #E23C64;
+            color: #F96305;
         }
 
         .description {
             max-width: 480px;
-            color: #80525D;
+            color: #334155;
             font-size: 13px;
             line-height: 1.5;
             margin-bottom: 14px;
@@ -243,7 +245,7 @@
             display: flex;
             align-items: center;
             gap: 7px;
-            color: #69424C;
+            color: #334155;
             font-size: 11.5px;
             font-weight: 700;
         }
@@ -259,15 +261,18 @@
         }
 
         .feature-blue {
-            background: #FFD464;
+            background: #32B3F1;
+            color: #FFFFFF;
         }
 
         .feature-yellow {
-            background: #FF5E5E;
+            background: #F9B804;
+            color: #FFFFFF;
         }
 
         .feature-purple {
-            background: #E23C64;
+            background: #F96305;
+            color: #FFFFFF;
         }
 
         /* =========================
@@ -286,9 +291,9 @@
             border-radius: 20px;
             padding: 18px 22px;
             box-shadow:
-                0 15px 40px rgba(176, 24, 45, 0.08),
-                0 4px 15px rgba(176, 24, 45, 0.04);
-            border: 1px solid #F2DCD3;
+                0 15px 40px rgba(3, 159, 250, 0.08),
+                0 4px 15px rgba(249, 99, 5, 0.05);
+            border: 1px solid rgba(3, 159, 250, 0.25);
             position: relative;
         }
 
@@ -296,7 +301,7 @@
             position: absolute;
             width: 50px;
             height: 50px;
-            background: #FFD464;
+            background: #F9B804;
             border-radius: 50%;
             top: -14px;
             right: -10px;
@@ -307,7 +312,7 @@
             position: absolute;
             width: 28px;
             height: 28px;
-            background: #FF5E5E;
+            background: #F96305;
             border-radius: 50%;
             bottom: -8px;
             left: -8px;
@@ -323,24 +328,24 @@
             width: 36px;
             height: 36px;
             border-radius: 10px;
-            background: #FCEDD8;
+            background: #FFFDF8;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
             margin-bottom: 6px;
-            border: 1px solid #F5D9C3;
+            border: 1px solid rgba(3, 159, 250, 0.25);
         }
 
         .login-card h2 {
             font-size: 18px;
             font-weight: 900;
-            color: #B0182D;
+            color: #039FFA;
             margin-bottom: 2px;
         }
 
         .login-subtitle {
-            color: #8E6570;
+            color: #F96305;
             font-size: 11.5px;
             line-height: 1.35;
             margin-bottom: 10px;
@@ -354,10 +359,10 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 4px;
-            background: #FFF5E8;
+            background: #FFFDF8;
             padding: 3px;
             border-radius: 9px;
-            border: 1px solid #F4D9C1;
+            border: 1px solid rgba(3, 159, 250, 0.2);
             margin-bottom: 10px;
         }
 
@@ -370,7 +375,7 @@
             border-radius: 7px;
             border: none;
             background: transparent;
-            color: #8E5360;
+            color: #039FFA;
             font-size: 11.5px;
             font-weight: 800;
             cursor: pointer;
@@ -379,14 +384,14 @@
         }
 
         .role-btn:hover {
-            color: #B0182D;
+            color: #F96305;
         }
 
         .role-btn.active {
             background: #FFFFFF;
-            color: #B0182D;
-            box-shadow: 0 2px 8px rgba(176, 24, 45, 0.08);
-            border: 1px solid #F2DCD3;
+            color: #039FFA;
+            box-shadow: 0 2px 8px rgba(3, 159, 250, 0.12);
+            border: 1px solid rgba(3, 159, 250, 0.35);
         }
 
         /* =========================
@@ -401,7 +406,7 @@
             display: block;
             font-size: 11px;
             font-weight: 800;
-            color: #5F3540;
+            color: #039FFA;
             margin-bottom: 3px;
         }
 
@@ -415,32 +420,32 @@
             top: 50%;
             transform: translateY(-50%);
             font-size: 14px;
-            color: #E23C64;
+            color: #039FFA;
             pointer-events: none;
         }
 
         .form-input {
             width: 100%;
             height: 36px;
-            border: 1.5px solid #EBD6CE;
+            border: 1.5px solid rgba(3, 159, 250, 0.28);
             border-radius: 9px;
             padding: 0 10px 0 32px;
             outline: none;
             font-family: 'Nunito', sans-serif;
             font-size: 12px;
-            color: #5A2F39;
-            background: #FFFDFB;
+            color: #0F172A;
+            background: #FFFFFF;
             transition: all 0.25s ease;
         }
 
         .form-input::placeholder {
-            color: #B89CA2;
+            color: #94A3B8;
         }
 
         .form-input:focus {
-            border-color: #E23C64;
+            border-color: #039FFA;
             background: white;
-            box-shadow: 0 0 0 3px rgba(226, 60, 100, 0.10);
+            box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.18);
         }
 
         /* =========================
@@ -452,21 +457,21 @@
             height: 37px;
             border: none;
             border-radius: 10px;
-            background: #E23C64;
+            background: linear-gradient(135deg, #F96305, #F9B804);
             color: white;
             font-family: 'Nunito', sans-serif;
             font-size: 12.5px;
             font-weight: 800;
             cursor: pointer;
             margin-top: 2px;
-            box-shadow: 0 4px 12px rgba(226, 60, 100, 0.22);
+            box-shadow: 0 4px 12px rgba(249, 99, 5, 0.28);
             transition: all 0.25s ease;
         }
 
         .login-submit:hover {
-            background: #B0182D;
+            background: linear-gradient(135deg, #039FFA, #32B3F1);
             transform: translateY(-1px);
-            box-shadow: 0 8px 16px rgba(176, 24, 45, 0.25);
+            box-shadow: 0 8px 16px rgba(3, 159, 250, 0.3);
         }
 
         .login-submit:active {
@@ -481,23 +486,23 @@
             text-align: center;
             margin-top: 8px;
             padding-top: 6px;
-            border-top: 1px solid #F1E1DA;
+            border-top: 1px solid rgba(3, 159, 250, 0.18);
         }
 
         .register-area p {
-            color: #987982;
+            color: #64748B;
             font-size: 11px;
             margin-bottom: 2px;
         }
 
         .register-link {
-            color: #E23C64;
+            color: #F96305;
             font-size: 11px;
             font-weight: 800;
         }
 
         .register-link:hover {
-            color: #B0182D;
+            color: #D19F1F;
             text-decoration: underline;
         }
 
@@ -508,7 +513,7 @@
         .footer {
             text-align: center;
             padding: 4px 20px 8px;
-            color: #9C737B;
+            color: #64748B;
             font-size: 10.5px;
             font-weight: 600;
             flex-shrink: 0;
@@ -903,7 +908,7 @@
                 labelIdentifier.textContent = 'NIP (Nomor Induk Pegawai)';
                 inputIdentifier.placeholder = 'Contoh: 198503122010121002';
                 btnSubmit.innerHTML = 'Masuk sebagai Dosen &rarr;';
-                btnSubmit.style.background = 'linear-gradient(135deg, #B0182D, #E23C64)';
+                btnSubmit.style.background = 'linear-gradient(135deg, #D19F1F, #F9B804)';
             } else if (role === 'admin') {
                 btnAdmin.classList.add('active');
                 inputRole.value = 'admin';
@@ -913,7 +918,7 @@
                 labelIdentifier.textContent = 'ID Admin';
                 inputIdentifier.placeholder = 'Contoh: ADMIN-001';
                 btnSubmit.innerHTML = 'Masuk sebagai Admin &rarr;';
-                btnSubmit.style.background = 'linear-gradient(135deg, #B0182D, #C98A1F)';
+                btnSubmit.style.background = 'linear-gradient(135deg, #F96305, #F86306)';
             } else {
                 btnMhs.classList.add('active');
                 inputRole.value = 'mahasiswa';
@@ -923,7 +928,7 @@
                 labelIdentifier.textContent = 'NIM (Nomor Induk Mahasiswa)';
                 inputIdentifier.placeholder = 'Contoh: 10241014';
                 btnSubmit.innerHTML = 'Masuk sebagai Mahasiswa &rarr;';
-                btnSubmit.style.background = '#E23C64';
+                btnSubmit.style.background = 'linear-gradient(135deg, #039FFA, #32B3F1)';
             }
         }
     </script>

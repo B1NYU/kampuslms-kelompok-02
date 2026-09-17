@@ -5,8 +5,8 @@
     text-align: center;
     padding: 20px 36px;
     background: transparent;
-    border-top: 1px solid rgba(226, 60, 100, 0.15);
-    color: rgba(45, 18, 23, 0.7);
+    border-top: 1px solid rgba(3, 159, 250, 0.18);
+    color: rgba(15, 23, 42, 0.7);
     font-size: 12px;
     font-weight: 700;
     flex-shrink: 0;
@@ -14,6 +14,7 @@
     width: 100%;
     max-width: 1380px;
 }
+
 .footer-content {
     display: flex;
     align-items: center;
@@ -21,16 +22,19 @@
     gap: 12px;
     flex-wrap: wrap;
 }
-.social-links { 
-    display: flex; 
-    gap: 16px; 
+
+.social-links {
+    display: flex;
+    gap: 16px;
 }
+
 .ig-link {
-    color: #E23C64;
+    color: #039FFA;
     text-decoration: none;
     font-weight: 800;
     transition: color 0.3s;
 }
-.ig-link:hover { 
-    color: #B0183D; 
+
+.ig-link:hover {
+    color: #F96305;
 }

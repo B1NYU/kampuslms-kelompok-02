@@ -1,20 +1,5 @@
 @php
-    $mkParam = request()->route('mata_kuliah');
-    $courseDb = is_numeric($mkParam)
-        ? \App\Models\Course::with(['lecturer', 'assignments.submissions.grade', 'students'])->find($mkParam)
-        : null;
-
-    if ($courseDb) {
-        $mataKuliah = [
-            'id' => $courseDb->id,
-            'kode' => $courseDb->code,
-            'nama' => $courseDb->name,
-            'sks' => $courseDb->sks,
-            'dosen' => $courseDb->lecturer?->name ?? 'Dosen Pengampu',
-            'deskripsi' => $courseDb->description ?? 'Mata kuliah kurikulum aktif semester ini.',
-            'students_count' => $courseDb->students->count(),
-        ];
-    }
+    $courseDb = $course;
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -67,15 +52,6 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="course-subnav-right">
-                    <a href="{{ route('mata-kuliah.index') }}" class="btn-subnav-back" title="Kembali ke Daftar Mata Kuliah">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                        <span>Daftar Mata Kuliah</span>
-                    </a>
-                </div>
             </div>
         </nav>
 
@@ -91,47 +67,89 @@
                     <section class="left-panel">
                         <div class="panel-header">
                             <h2>Rencana Pertemuan</h2>
-                            <span class="header-pill">16 Sesi Terstruktur</span>
                         </div>
                         @php
-                            $pertemuanList = [
-                                1 => [
-                                    'judul' => 'Pengenalan & Instalasi Laravel 12',
-                                    'snippet' => 'Arsitektur MVC, struktur direktori & tools',
-                                    'status' => 'done', 'label' => 'Selesai',
-                                    'materi' => [
-                                        'Slide 01 - Pengantar Laravel 12.pdf',
-                                        'Slide 02 - Pengantar Basis Data.pdf'
-                                    ],
-                                    'tasks' => [
-                                        ['tipe' => 'Tugas Mandiri', 'judul' => 'Setup Repo GitHub & Laporan Bacaan 1', 'deadline' => 'Batas: Minggu 1, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;']
-                                    ]
-                                ],
-                                2 => [
-                                    'judul' => 'Routing & Arsitektur Controller',
-                                    'snippet' => 'Route list, prefix, dan controller aksi',
-                                    'status' => 'active', 'label' => 'Berjalan',
-                                    'materi' => ['Slide 02 - Routing & Controller.pdf'],
-                                    'tasks' => [
-                                        ['tipe' => 'Tugas Praktikum', 'judul' => 'Tugas Praktikum: Route Parameter & Show', 'deadline' => 'Batas: Minggu 2, 23.59 WITA', 'btn' => 'Kumpulkan Praktikum &rarr;'],
-                                        ['tipe' => 'Kuis Teori', 'judul' => 'Kuis 1: Konsep Routing & Controller di Laravel', 'deadline' => 'Waktu pengerjaan: 30 Menit (10 Soal)', 'btn' => 'Mulai Kuis Online &rarr;']
-                                    ]
-                                ],
-                                3 => ['judul' => 'Perancangan Database & Migration', 'snippet' => 'Skema 8 tabel wajib & constraint composite', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'ERD Diagram & Migration Guide.pdf', 'tasks' => [['tipe' => 'Tugas Milestone 1', 'judul' => 'Tugas 1: Database Migration & Seeder 8 Tabel', 'deadline' => 'Batas: Minggu 3 (Interview Rekaman)', 'btn' => 'Kumpulkan Berkas &rarr;']]],
-                                4 => ['judul' => 'Eloquent ORM & Relasi Database', 'snippet' => 'hasMany, belongsTo & withPivot', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Slide 04 - Eloquent Relations.pdf', 'tasks' => [['tipe' => 'Latihan Praktikum', 'judul' => 'Implementasi Relasi Model Course & User', 'deadline' => 'Batas: Minggu 4, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;'], ['tipe' => 'Kuis Teori', 'judul' => 'Kuis 2: Eloquent ORM & Query Builder', 'deadline' => 'Waktu pengerjaan: 25 Menit', 'btn' => 'Mulai Kuis Online &rarr;']]],
-                                5 => ['judul' => 'Form Handling & Server Validation', 'snippet' => 'Request validation & error handling aman', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Slide Form Request Rules.pdf', 'tasks' => [['tipe' => 'Tugas Praktikum', 'judul' => 'Latihan CRUD Mata Kuliah & Form Request', 'deadline' => 'Batas: Minggu 5, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;']]],
-                                6 => ['judul' => 'Autentikasi & Multi-Role Access', 'snippet' => 'Role admin, dosen, dan mahasiswa', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Middleware & Session Auth Guide.pdf', 'tasks' => [['tipe' => 'Tugas Kelompok', 'judul' => 'Implementasi Middleware Role Akses', 'deadline' => 'Batas: Minggu 6, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;']]],
-                                7 => ['judul' => 'Review Fondasi & Keamanan Sistem', 'snippet' => 'Checklist persiapan Milestone 2', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Evaluasi Milestone 2 Guide.pdf', 'tasks' => [['tipe' => 'Tugas Milestone 2', 'judul' => 'Tugas 2: Akses & Keamanan Aplikasi (Role & CRUD)', 'deadline' => 'Batas: Minggu 7 (Interview Rekaman)', 'btn' => 'Kumpulkan Berkas &rarr;']]],
-                                8 => ['judul' => 'Ujian Tengah Semester (UTS)', 'snippet' => 'Demo aplikasi & interview pemahaman kode', 'status' => 'exam', 'label' => 'Ujian UTS', 'materi' => 'Rubrik Penilaian UTS (Bobot 20%).pdf', 'tasks' => [['tipe' => 'Ujian UTS (20%)', 'judul' => 'Presentasi & Walkthrough Code Kelompok', 'deadline' => 'Sesi Ujian Minggu 8', 'btn' => 'Lihat Jadwal Ujian &rarr;']]],
-                                9 => ['judul' => 'Pengelolaan Berkas & File Storage', 'snippet' => 'Penyimpanan materi dan berkas privat', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Panduan Private File Storage.pdf', 'tasks' => [['tipe' => 'Tugas Praktikum', 'judul' => 'Fitur Unggah Berkas Materi Kuliah', 'deadline' => 'Batas: Minggu 9, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;']]],
-                                10 => ['judul' => 'Alur Penugasan & Pengumpulan Tugas', 'snippet' => 'Submissions, deadline & late flag', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Alur Submissions & Penilaian.pdf', 'tasks' => [['tipe' => 'Tugas Milestone 3', 'judul' => 'Tugas 3: Modul Penugasan, Submissions & Penilaian', 'deadline' => 'Batas: Minggu 10 (Interview Rekaman)', 'btn' => 'Kumpulkan Tugas &rarr;']]],
-                                11 => ['judul' => 'Optimalisasi Query & Penilaian', 'snippet' => 'Pencegahan N+1 query & rekap nilai', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Slide Eager Loading & Debugbar.pdf', 'tasks' => [['tipe' => 'Latihan Praktikum', 'judul' => 'Deteksi N+1 Query dengan Laravel Debugbar', 'deadline' => 'Batas: Minggu 11, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;']]],
-                                12 => ['judul' => 'Queue System & Notifikasi In-App', 'snippet' => 'Asynchronous queue worker & notifications', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Database Queue Worker Guide.pdf', 'tasks' => [['tipe' => 'Tugas Praktikum', 'judul' => 'Simulasi Notifikasi Email & Database Queue', 'deadline' => 'Batas: Minggu 12, 23.59 WITA', 'btn' => 'Kumpulkan Tugas &rarr;']]],
-                                13 => ['judul' => 'Peer Review Antar Kelompok', 'snippet' => 'Evaluasi Pull Request kelompok lain', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Checklist Resmi Peer Review PR.pdf', 'tasks' => [['tipe' => 'Review (10%)', 'judul' => 'Peer Review Pull Request Kelompok Lain', 'deadline' => 'Batas: Minggu 13, 23.59 WITA', 'btn' => 'Submit Review PR &rarr;']]],
-                                14 => ['judul' => 'Deployment Publik & Konfigurasi SSL', 'snippet' => 'Live deployment pada server VPS publik', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Panduan Setup Nginx & HTTPS.pdf', 'tasks' => [['tipe' => 'Tugas Milestone 4', 'judul' => 'Tugas 4: Live Deployment Aplikasi di Domain Publik', 'deadline' => 'Batas: Minggu 14 (Interview Rekaman)', 'btn' => 'Kumpulkan Link Live &rarr;']]],
-                                15 => ['judul' => 'Finalisasi Fitur Diferensiasi', 'snippet' => 'Penyempurnaan fitur unggulan kelompok', 'status' => 'locked', 'label' => 'Mendatang', 'materi' => 'Dokumentasi Fitur Khusus.pdf', 'tasks' => [['tipe' => 'Laporan Proyek', 'judul' => 'Penyusunan Laporan Proyek & Dokumentasi API', 'deadline' => 'Batas: Minggu 15, 23.59 WITA', 'btn' => 'Unggah Draft Laporan &rarr;']]],
-                                16 => ['judul' => 'Ujian Akhir Semester (UAS)', 'snippet' => 'Presentasi final & evaluasi individu', 'status' => 'exam', 'label' => 'Ujian UAS', 'materi' => 'Rubrik Evaluasi Proyek (20%).pdf', 'tasks' => [['tipe' => 'Proyek Akhir (20%)', 'judul' => 'Presentasi Akhir + Interview Individu + Laporan', 'deadline' => 'Sesi Ujian Minggu 16', 'btn' => 'Kumpulkan Berkas Final &rarr;']]],
-                            ];
+                            $courseAssignments = $course->assignments->sortBy('due_at')->values();
+                            $pertemuanList = [];
+
+                            for ($minggu = 1; $minggu <= 16; $minggu++) {
+                                $isExam = ($minggu == 8 || $minggu == 16);
+                                $judul = $minggu == 8 ? 'Minggu 8 (UTS)' : ($minggu == 16 ? 'Minggu 16 (UAS)' : 'Minggu ' . $minggu);
+
+                                // 1. Hubungkan berkas materi jika ada di database untuk sesi ini
+                                $matFiles = $course->materials ? $course->materials->where('session', $minggu)->pluck('original_name')->toArray() : [];
+
+                                // 2. Hubungkan tugas jika ada di database
+                                $assignIdx = $minggu - 1;
+                                $dbAssign = $courseAssignments->get($assignIdx);
+                                $tasks = [];
+                                $studentSub = null;
+
+                                if ($dbAssign) {
+                                    $studentSub = $student ? $dbAssign->submissions->firstWhere('user_id', $student->id) : null;
+                                    $btnAction = 'Kumpulkan Tugas &rarr;';
+                                    if ($studentSub && $studentSub->grade) {
+                                        $btnAction = 'Lihat Nilai (' . round((float) $studentSub->grade->score, 1) . ') &rarr;';
+                                    } elseif ($studentSub) {
+                                        $btnAction = 'Sudah Dikumpulkan &rarr;';
+                                    } elseif ($dbAssign->status === 'draft') {
+                                        $btnAction = 'Belum Dibuka';
+                                    } elseif ($dbAssign->due_at && $dbAssign->due_at->isPast()) {
+                                        $btnAction = 'Lewat Batas Waktu';
+                                    }
+
+                                    $tasks[] = [
+                                        'tipe' => 'Tugas Kuliah',
+                                        'judul' => $dbAssign->title,
+                                        'deadline' => 'Batas: ' . ($dbAssign->due_at ? $dbAssign->due_at->translatedFormat('d M Y, H:i') . ' WITA' : 'Jadwal fleksibel'),
+                                        'btn' => $btnAction,
+                                    ];
+                                }
+
+                                // 3. Tentukan status & label dinamis berbasis data tugas & materi di database
+                                if ($isExam) {
+                                    $status = 'exam';
+                                    $label = $minggu == 8 ? 'Ujian UTS' : 'Ujian UAS';
+                                } elseif ($dbAssign) {
+                                    if ($studentSub || ($dbAssign->due_at && $dbAssign->due_at->isPast())) {
+                                        $status = 'done';
+                                        $label = 'Selesai';
+                                    } elseif ($dbAssign->status === 'draft') {
+                                        $status = 'locked';
+                                        $label = 'Mendatang';
+                                    } else {
+                                        $status = 'active';
+                                        $label = 'Berjalan';
+                                    }
+                                } elseif (!empty($matFiles)) {
+                                    $status = 'done';
+                                    $label = 'Selesai';
+                                } else {
+                                    $status = 'locked';
+                                    $label = 'Mendatang';
+                                }
+
+                                $pertemuanList[$minggu] = [
+                                    'judul' => $judul,
+                                    'status' => $status,
+                                    'label' => $label,
+                                    'materi' => $matFiles,
+                                    'tasks' => $tasks,
+                                ];
+                            }
+
+                            // Pastikan jika ada mata kuliah aktif dan belum ada sesi aktif, tentukan sesi berjalan berikutnya
+                            $hasActive = collect($pertemuanList)->contains('status', 'active');
+                            if (!$hasActive && ($mataKuliah['status'] ?? 'active') === 'active') {
+                                foreach ($pertemuanList as $m => &$pItem) {
+                                    if ($pItem['status'] === 'locked' && $m != 8 && $m != 16) {
+                                        $pItem['status'] = 'active';
+                                        $pItem['label'] = 'Berjalan';
+                                        break;
+                                    }
+                                }
+                                unset($pItem);
+                            }
                         @endphp
                         <!-- KOTAK SCROLL HANYA DI BAGIAN INI -->
                         <div class="timeline-scroll-box">
@@ -147,14 +165,13 @@
                                         <div class="timeline-node-inner"></div>
                                     </div>
                                     <div class="session-card" id="cardWeek{{ $minggu }}"
-                                         onclick="switchRightToDetail({{ $minggu }}, '{{ addslashes($item['judul']) }}', '{{ addslashes($item['snippet']) }}', '{!! $materiJson !!}', '{!! $tasksJson !!}')">                               
+                                         onclick="switchRightToDetail({{ $minggu }}, '{{ addslashes($item['judul']) }}', '{!! $materiJson !!}', '{!! $tasksJson !!}')">                               
                                         <div class="session-left">
                                             <div class="session-icon-circle {{ $item['status'] }} {{ $isExam ? 'exam-icon' : '' }}">
                                                 {{ $minggu }}
                                             </div>
                                             <div class="session-text">
                                                 <h4>{{ $item['judul'] }}</h4>
-                                                <p>{{ $item['snippet'] }}</p>
                                             </div>
                                         </div>
                                         <div class="session-right">
@@ -179,7 +196,7 @@
                                 <h3>Informasi Mata Kuliah</h3>
                                 <div class="lecturer-box">
                                     <div class="lecturer-avatar">
-                                        {{ substr($mataKuliah['dosen'], 0, 2) }}
+                                        {{ strtoupper(substr($mataKuliah['dosen'], 0, 2)) }}
                                     </div>
                                     <div class="lecturer-info">
                                         <h5>{{ $mataKuliah['dosen'] }}</h5>
@@ -198,52 +215,24 @@
                                     <div class="meta-row">
                                         <span>Peserta Terdaftar</span>
                                         <span class="meta-chip chip-coral" style="background:#ECFDF5;color:#16A34A;font-weight:800;">
-                                            {{ $courseDb ? $courseDb->students->count() : 18 }} Mahasiswa (&ge; 15)
+                                            {{ $courseDb ? $courseDb->students->count() : 0 }} Mahasiswa
                                         </span>
                                     </div>
                                     <div class="meta-row">
                                         <span>Tugas Terjadwal</span>
                                         <span class="meta-chip chip-gold">
-                                            {{ $courseDb ? $courseDb->assignments->count() : 3 }} Tugas (Kriteria 4.4)
+                                            {{ $courseDb ? $courseDb->assignments->count() : 0 }} Tugas di Database
                                         </span>
                                     </div>
                                     <div class="meta-row">
                                         <span>Status Kelas</span>
-                                        <span class="meta-chip chip-gold">Aktif (Genap 2026)</span>
+                                        <span class="meta-chip chip-gold">{{ ucfirst($mataKuliah['status'] ?? 'Aktif') }}</span>
                                     </div>
-                                    <div class="meta-row">
-                                        <span>Jadwal Kuliah</span>
-                                        <span class="meta-chip chip-coral">Senin, 08.00 - 10.30</span>
+                                    <div class="meta-row" style="align-items: flex-start;">
+                                        <span>Deskripsi</span>
+                                        <span style="font-size:12px;color:#5F3540;text-align:right;max-width:62%;font-weight:600;">{{ $mataKuliah['deskripsi'] }}</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-cpmk-premium">
-                                <h3>Capaian Pembelajaran (CPMK)</h3>
-                                <ul class="cpmk-list">
-                                    <li class="cpmk-item">
-                                        <span class="check-icon">&#10003;</span>
-                                        <span>Menguasai arsitektur MVC & alur kerja framework Laravel 12.</span>
-                                    </li>
-                                    <li class="cpmk-item">
-                                        <span class="check-icon">&#10003;</span>
-                                        <span>Mampu merancang database relasional dengan 8 tabel wajib & seeder.</span>
-                                    </li>
-                                    <li class="cpmk-item">
-                                        <span class="check-icon">&#10003;</span>
-                                        <span>Penerapan otorisasi multi-role (Admin, Dosen, Mahasiswa).</span>
-                                    </li>
-                                    <li class="cpmk-item">
-                                        <span class="check-icon">&#10003;</span>
-                                        <span>Pengelolaan upload berkas dan pengumpulan tugas aman.</span>
-                                    </li>
-                                    <li class="cpmk-item">
-                                        <span class="check-icon">&#10003;</span>
-                                        <span>Deployment aplikasi pada server VPS publik dengan domain SSL.</span>
-                                    </li>
-                                </ul>
-                                <button class="btn-gradient-action" onclick="alert('Silabus RPS Lengkap Semester Genap 2026')">
-                                    Unduh RPS & Silabus (PDF)
-                                </button>
                             </div>
                         </div>
 
@@ -258,13 +247,7 @@
                                 </div>
                                 <div class="detail-title-group">
                                     <span class="detail-badge-session">Rincian Pertemuan</span>
-                                    <h3 id="detailHeading">Pengenalan & Instalasi Laravel 12</h3>
-                                </div>
-                                <div class="detail-block">
-                                    <span class="detail-block-title">Pokok Bahasan Perkuliahan</span>
-                                    <div class="detail-desc-box" id="detailDescription">
-                                        Mempelajari pengantar framework Laravel 12, arsitektur MVC, dan setup awal.
-                                    </div>
+                                    <h3 id="detailHeading">Minggu 1</h3>
                                 </div>
                                 
                                 <div class="detail-block">
@@ -323,7 +306,7 @@
                         <div class="grade-card-info">
                             <span class="grade-card-label">PROGRES TUGAS DINILAI</span>
                             <div class="grade-card-num">{{ $nilaiData['stats']['tugas_dinilai'] }}</div>
-                            <span class="grade-card-sub">Semua tugas dikumpulkan tepat waktu</span>
+                            <span class="grade-card-sub">{{ $nilaiData['stats']['rata_rata'] !== '-' ? 'Perhitungan dari tugas yang dinilai' : 'Menunggu proses penilaian dosen' }}</span>
                         </div>
                     </div>
 
@@ -372,14 +355,14 @@
                                 </tr>
                             </thead>
                             <tbody id="gradeTableBody">
-                                @foreach ($nilaiData['items'] as $item)
+                                @forelse ($nilaiData['items'] as $item)
                                     <tr>
                                         <td>
                                             <div class="task-name-cell">
                                                 <div class="task-info">
                                                     <span class="task-title-text">{{ $item['judul'] }}</span>
                                                     <div class="task-meta-tags">
-                                                        <span class="task-pill-type {{ strtolower($item['tipe']) }}">{{ $item['tipe'] }}</span>
+                                                        <span class="task-pill-type {{ strtolower(str_replace(' ', '-', $item['tipe'])) }}">{{ $item['tipe'] }}</span>
                                                         <span class="task-pill-week">{{ $item['pertemuan'] }}</span>
                                                     </div>
                                                 </div>
@@ -387,8 +370,12 @@
                                         </td>
                                         <td style="font-size:12px;color:#64748B;white-space:nowrap;">
                                             <div style="font-weight:700;color:#5F3540;">{{ $item['tanggal_kumpul'] }}</div>
-                                            @if($item['status'] !== 'Belum Dibuka')
-                                                <span style="font-size:10px;color:#1B8A5A;font-weight:800;">&bull; Tepat Waktu</span>
+                                            @if($item['status'] === 'Dinilai' || $item['status'] === 'Menunggu Penilaian')
+                                                <span style="font-size:10px;color:#1B8A5A;font-weight:800;">&bull; Sudah Dikumpulkan</span>
+                                            @elseif($item['status'] === 'Lewat Deadline')
+                                                <span style="font-size:10px;color:#DC2626;font-weight:800;">&bull; Batas Waktu Terlewat</span>
+                                            @elseif($item['status'] === 'Belum Dikumpulkan')
+                                                <span style="font-size:10px;color:#C98A1F;font-weight:800;">&bull; Belum Dikumpulkan</span>
                                             @endif
                                         </td>
                                         <td>
@@ -402,9 +389,19 @@
                                                     <span class="status-dot-orange"></span>
                                                     Sedang Dievaluasi
                                                 </span>
+                                            @elseif ($item['status'] === 'Lewat Deadline')
+                                                <span class="status-pill status-pill-danger">
+                                                    <span class="status-dot-red"></span>
+                                                    Lewat Deadline
+                                                </span>
+                                            @elseif ($item['status'] === 'Belum Dikumpulkan')
+                                                <span class="status-pill status-pill-warning">
+                                                    <span class="status-dot-orange"></span>
+                                                    Belum Dikumpulkan
+                                                </span>
                                             @else
                                                 <span class="status-pill status-pill-muted">
-                                                    Belum Berlangsung
+                                                    Belum Dibuka
                                                 </span>
                                             @endif
                                         </td>
@@ -430,7 +427,14 @@
                                             </div>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 36px 20px; color: #8E6570;">
+                                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">Belum Ada Tugas di Database</div>
+                                            <div style="font-size: 12.5px; color: #64748B;">Mata kuliah ini belum memiliki penugasan atau rekaman nilai aktif.</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -487,37 +491,44 @@
         }
 
         // Switcher Pertemuan Mingguan (Left -> Right)
-        function switchRightToDetail(minggu, judul, snippet, materiJsonStr, tasksJsonStr) {
+        function switchRightToDetail(minggu, judul, materiJsonStr, tasksJsonStr) {
             document.getElementById('defaultRightPanel').style.display = 'none';
             const detailPanel = document.getElementById('detailRightPanel');
             detailPanel.style.display = 'block';
             
-            document.getElementById('detailBadgeSession').innerText = 'Minggu Ke-' + minggu;
-            document.getElementById('detailHeading').innerText = 'Pertemuan ' + minggu + ': ' + judul;
-            document.getElementById('detailDescription').innerText = snippet;
+            document.getElementById('detailBadgeSession').innerText = 'Minggu ' + minggu;
+            document.getElementById('detailHeading').innerText = judul;
             
             // Render Materi
             const materiList = JSON.parse(materiJsonStr);
             const materiContainer = document.getElementById('materiListContainer');
             materiContainer.innerHTML = '';
             
-            materiList.forEach(materi => {
-                const resourceCard = document.createElement('div');
-                resourceCard.className = 'resource-card';
-                resourceCard.innerHTML = `
-                    <div class="resource-left">
-                        <span class="resource-icon">&#128196;</span>
-                        <div>
-                            <div class="resource-name">${materi}</div>
-                            <div class="resource-meta">Materi Dosen &middot; PDF</div>
-                        </div>
+            if (materiList.length === 0) {
+                materiContainer.innerHTML = `
+                    <div style="padding: 14px 16px; background: #FFFDF8; border: 1px dashed rgba(3, 159, 250, 0.25); border-radius: 10px; color: #8E6570; font-size: 12.5px; text-align: center;">
+                        Belum ada berkas materi diunggah di database untuk pertemuan ini.
                     </div>
-                    <button class="btn-mini-download" onclick="alert('Mengunduh ${materi}...')">
-                        Unduh
-                    </button>
                 `;
-                materiContainer.appendChild(resourceCard);
-            });
+            } else {
+                materiList.forEach(materi => {
+                    const resourceCard = document.createElement('div');
+                    resourceCard.className = 'resource-card';
+                    resourceCard.innerHTML = `
+                        <div class="resource-left">
+                            <span class="resource-icon">&#128196;</span>
+                            <div>
+                                <div class="resource-name">${materi}</div>
+                                <div class="resource-meta">Materi Dosen &middot; PDF</div>
+                            </div>
+                        </div>
+                        <button class="btn-mini-download" onclick="alert('Mengunduh ${materi}...')">
+                            Unduh
+                        </button>
+                    `;
+                    materiContainer.appendChild(resourceCard);
+                });
+            }
 
             // Render Tasks
             const tasks = JSON.parse(tasksJsonStr);
@@ -525,29 +536,40 @@
             tasksContainer.innerHTML = '';
             document.getElementById('tasksHeaderTitle').innerText = 'Aktivitas & Tugas (' + tasks.length + ' Penugasan)';
             
-            tasks.forEach((task, index) => {
-                const typeLower = task.tipe.toLowerCase();
-                let badgeClass = '';
-                if (typeLower.includes('kuis')) badgeClass = 'quiz';
-                else if (typeLower.includes('praktikum') || typeLower.includes('latihan')) badgeClass = 'praktikum';
-                else if (typeLower.includes('milestone')) badgeClass = 'milestone';
-                else if (typeLower.includes('ujian') || typeLower.includes('uts') || typeLower.includes('uas')) badgeClass = 'exam';
-                
-                const taskCard = document.createElement('div');
-                taskCard.className = 'task-card-box';
-                taskCard.innerHTML = `
-                    <div class="task-card-header">
-                        <span class="task-badge-tag ${badgeClass}">${task.tipe}</span>
-                        <span style="font-size: 11px; font-weight: 800; color: #FF5E5E;">Penugasan #${index + 1}</span>
+            if (tasks.length === 0) {
+                tasksContainer.innerHTML = `
+                    <div style="padding: 14px 16px; background: #FFFDF8; border: 1px dashed rgba(3, 159, 250, 0.25); border-radius: 10px; color: #8E6570; font-size: 12.5px; text-align: center;">
+                        Tidak ada penugasan terjadwal untuk pertemuan ini.
                     </div>
-                    <div class="task-card-title">${task.judul}</div>
-                    <div class="task-deadline">${task.deadline}</div>
-                    <button class="btn-task-action" onclick="alert('Aksi untuk: ${task.judul}')">
-                        ${task.btn}
-                    </button>
                 `;
-                tasksContainer.appendChild(taskCard);
-            });
+            } else {
+                tasks.forEach((task, index) => {
+                    const typeLower = task.tipe.toLowerCase();
+                    let badgeClass = '';
+                    if (typeLower.includes('kuis')) badgeClass = 'quiz';
+                    else if (typeLower.includes('praktikum') || typeLower.includes('latihan')) badgeClass = 'praktikum';
+                    else if (typeLower.includes('milestone')) badgeClass = 'milestone';
+                    else if (typeLower.includes('ujian') || typeLower.includes('uts') || typeLower.includes('uas')) badgeClass = 'exam';
+                    
+                    const isLihatNilai = task.btn.includes('Lihat Nilai');
+                    const clickAction = isLihatNilai ? "switchCourseTab('nilai')" : "alert('Penugasan: " + task.judul.replace(/'/g, "\\'") + "')";
+
+                    const taskCard = document.createElement('div');
+                    taskCard.className = 'task-card-box';
+                    taskCard.innerHTML = `
+                        <div class="task-card-header">
+                            <span class="task-badge-tag ${badgeClass}">${task.tipe}</span>
+                            <span style="font-size: 11px; font-weight: 800; color: #F96305;">Penugasan #${index + 1}</span>
+                        </div>
+                        <div class="task-card-title">${task.judul}</div>
+                        <div class="task-deadline">${task.deadline}</div>
+                        <button class="btn-task-action" onclick="${clickAction}">
+                            ${task.btn}
+                        </button>
+                    `;
+                    tasksContainer.appendChild(taskCard);
+                });
+            }
 
             document.querySelectorAll('.session-card').forEach(card => {
                 card.classList.remove('selected-active');
