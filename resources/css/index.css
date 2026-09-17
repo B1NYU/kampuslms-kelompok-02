@@ -6,8 +6,8 @@
 }
 
 body {
-    background-color: #FCEDD8;
-    color: #5F3540;
+    background-color: #FFFDF8;
+    color: #0F172A;
     min-height: 100vh;
     width: 100%;
     padding: 0;
@@ -33,7 +33,7 @@ body {
 .bg-shape-1 {
     width: 340px;
     height: 340px;
-    background: #FFD464;
+    background: #32B3F1;
     top: -120px;
     right: -70px;
     opacity: 0.85;
@@ -42,7 +42,7 @@ body {
 .bg-shape-2 {
     width: 250px;
     height: 250px;
-    background: #FF5E5E;
+    background: #F9B804;
     bottom: -80px;
     left: -70px;
     opacity: 0.35;
@@ -51,7 +51,7 @@ body {
 .bg-shape-3 {
     width: 130px;
     height: 130px;
-    background: #E23C64;
+    background: #F96305;
     top: 48%;
     right: 35%;
     opacity: 0.16;
@@ -78,7 +78,7 @@ body {
 /* Penyesuaian Navbar Atas di dalam App Window */
 .app-window .top-navbar {
     background: #FFFFFF;
-    border-bottom: 1px solid #F2DCD3;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.18);
     padding: 0 36px;
     height: 64px;
     position: sticky;
@@ -93,8 +93,8 @@ body {
 /* Penyesuaian Footer di dalam App Window */
 .app-window .app-footer {
     background: #FFFFFF;
-    border-top: 1px solid #F2DCD3;
-    color: #8E6570;
+    border-top: 1px solid rgba(3, 159, 250, 0.18);
+    color: #64748B;
     width: 100%;
     max-width: 100%;
     padding: 20px 36px;
@@ -135,7 +135,7 @@ body {
     height: 38px;
     border-radius: 12px;
     background: #FFFFFF;
-    border: 1px solid #F2DCD3;
+    border: 1px solid rgba(3, 159, 250, 0.22);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -143,19 +143,19 @@ body {
     gap: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(176, 24, 45, 0.04);
+    box-shadow: 0 2px 8px rgba(3, 159, 250, 0.05);
 }
 
 .btn-hamburger:hover {
-    background: #FFF5E8;
-    border-color: #F4D9C1;
+    background: #FFFDF8;
+    border-color: #039FFA;
     transform: translateY(-2px);
 }
 
 .btn-hamburger span {
     width: 18px;
     height: 2.5px;
-    background: #B0182D;
+    background: #039FFA;
     border-radius: 4px;
 }
 
@@ -170,23 +170,23 @@ body {
     align-items: center;
     gap: 0.5rem;
     width: fit-content;
-    color: #B0182D;
+    color: #039FFA;
     font-size: 0.62rem;
     font-weight: 800;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     padding: 0.3rem 0.8rem;
-    border: 1px solid #F4D9C1;
+    border: 1px solid rgba(3, 159, 250, 0.25);
     border-radius: 999px;
-    background: #FFF5E8;
+    background: #FFFDF8;
 }
 
 .page-eyebrow-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #E23C64;
-    box-shadow: 0 0 6px rgba(226, 60, 100, 0.4);
+    background: #F96305;
+    box-shadow: 0 0 6px rgba(249, 99, 5, 0.4);
     flex-shrink: 0;
 }
 
@@ -195,7 +195,7 @@ body {
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: 0.01em;
-    color: #B0182D;
+    color: #039FFA;
     background: none;
     -webkit-text-fill-color: initial;
 }
@@ -206,26 +206,26 @@ body {
     align-items: center;
     gap: 0.5rem;
     width: fit-content;
-    color: #B0182D;
+    color: #039FFA;
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.04em;
     text-decoration: none;
     padding: 0.6rem 1.15rem 0.6rem 0.85rem;
     border-radius: 999px;
-    border: 1px solid #F2DCD3;
+    border: 1px solid rgba(3, 159, 250, 0.22);
     background: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(176, 24, 45, 0.05);
+    box-shadow: 0 4px 12px rgba(3, 159, 250, 0.05);
     transition: all 0.25s ease;
     flex-shrink: 0;
 }
 
 .btn-back:hover {
-    color: #E23C64;
-    border-color: #F4D9C1;
-    background: #FFF5E8;
+    color: #F96305;
+    border-color: #039FFA;
+    background: #FFFDF8;
     transform: translateX(-3px);
-    box-shadow: 0 6px 16px rgba(176, 24, 45, 0.1);
+    box-shadow: 0 6px 16px rgba(3, 159, 250, 0.12);
 }
 
 .btn-back-icon {
@@ -251,18 +251,18 @@ body {
     flex-direction: column;
     background: #FFFFFF;
     border-radius: 20px;
-    border: 1px solid #F2DCD3;
+    border: 1px solid rgba(3, 159, 250, 0.18);
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 4px 16px rgba(176, 24, 45, 0.04);
+    box-shadow: 0 4px 16px rgba(3, 159, 250, 0.05);
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .course-card:hover {
     transform: translateY(-6px);
-    border-color: #F4D9C1;
-    box-shadow: 0 16px 36px rgba(176, 24, 45, 0.1);
+    border-color: #039FFA;
+    box-shadow: 0 16px 36px rgba(3, 159, 250, 0.12);
 }
 
 /* Banner warna-warni tetap cerah & kontras */
@@ -278,33 +278,33 @@ body {
 }
 
 .banner-violet {
-    background-color: #6C3ED9;
-    background-image: linear-gradient(135deg, #7311D4, #B0183D), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+    background-color: #039FFA;
+    background-image: linear-gradient(135deg, #039FFA, #32B3F1), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
 }
 
 .banner-gold {
-    background-color: #C98A1F;
-    background-image: linear-gradient(135deg, #FFD464, #E23C64), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+    background-color: #F9B804;
+    background-image: linear-gradient(135deg, #F9B804, #F96305), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
 }
 
 .banner-rose {
-    background-color: #C23A5E;
-    background-image: linear-gradient(135deg, #E23C64, #B0183D), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+    background-color: #F96305;
+    background-image: linear-gradient(135deg, #F96305, #039FFA), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
 }
 
 .banner-teal {
-    background-color: #1E9E8C;
-    background-image: linear-gradient(135deg, #2FD3B8, #1B6E9E), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+    background-color: #32B3F1;
+    background-image: linear-gradient(135deg, #32B3F1, #F96305), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
 }
 
 .banner-blue {
-    background-color: #2E63C9;
-    background-image: linear-gradient(135deg, #4C8DFF, #7311D4), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+    background-color: #039FFA;
+    background-image: linear-gradient(135deg, #039FFA, #F9B804), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
 }
 
 .banner-plum {
-    background-color: #8A2F6B;
-    background-image: linear-gradient(135deg, #B0183D, #7311D4), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+    background-color: #F96305;
+    background-image: linear-gradient(135deg, #F96305, #D19F1F), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
 }
 
 .course-tag {
@@ -333,7 +333,7 @@ body {
 
 .course-card:hover .course-go {
     background: #FFFFFF;
-    color: #B0182D;
+    color: #039FFA;
     border-color: #FFFFFF;
     transform: translateX(2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -352,13 +352,13 @@ body {
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.1em;
-    color: #E23C64;
+    color: #F96305;
 }
 
 .course-name {
     font-size: 14.5px;
     font-weight: 800;
-    color: #5F3540;
+    color: #0F172A;
     line-height: 1.3;
     margin-bottom: 2px;
 }
@@ -366,7 +366,7 @@ body {
 .course-dosen {
     font-size: 11.5px;
     font-weight: 600;
-    color: #8E6570;
+    color: #64748B;
     margin-bottom: 10px;
 }
 
@@ -374,7 +374,8 @@ body {
     width: 100%;
     height: 6px;
     border-radius: 999px;
-    background: #F4EAE6;
+    background: #FFFDF8;
+    border: 1px solid rgba(3, 159, 250, 0.15);
     overflow: hidden;
     margin-bottom: 6px;
 }
@@ -382,13 +383,13 @@ body {
 .course-progress-fill {
     height: 100%;
     border-radius: 999px;
-    background: linear-gradient(90deg, #FFD464, #FF5E5E);
+    background: linear-gradient(90deg, #F9B804, #039FFA);
 }
 
 .course-progress-label {
     font-size: 11px;
     font-weight: 700;
-    color: #8E6570;
+    color: #64748B;
 }
 
 /* =========================================
@@ -429,6 +430,6 @@ button:focus-visible,
 .filter-btn:focus-visible,
 .btn-enroll:focus-visible {
     outline: none !important;
-    border-color: #B0182D !important;
-    box-shadow: 0 0 0 3px rgba(176, 24, 45, 0.18) !important;
+    border-color: #039FFA !important;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.2) !important;
 }

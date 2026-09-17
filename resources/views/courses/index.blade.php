@@ -33,11 +33,6 @@
             <!-- Topbar -->
             <header class="dash-topbar">
                 <div class="topbar-left">
-                    <button class="btn-hamburger" title="Menu">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
                     <div class="page-title">
                         <span class="page-eyebrow">
                             <span class="page-eyebrow-dot"></span>
@@ -46,20 +41,13 @@
                         <h1>Mata Kuliah Saya</h1>
                     </div>
                 </div>
-
-                <a href="{{ route('dashboard') }}" class="btn-back">
-                    <svg class="btn-back-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Kembali ke Dashboard
-                </a>
             </header>
 
             <!-- Grid Kartu Mata Kuliah -->
             <section class="courses-grid">
 
                 @php
-                    $dbCourses = \App\Models\Course::with(['lecturer', 'students', 'assignments'])->get();
+                    $dbCourses = $courses ?? \App\Models\Course::with(['lecturer', 'students', 'assignments'])->get();
                     $colorList = ['banner-violet', 'banner-gold', 'banner-rose', 'banner-teal', 'banner-blue', 'banner-plum'];
                 @endphp
 
@@ -68,7 +56,6 @@
                         $warna = $colorList[$idx % count($colorList)];
                         $studentCount = $item->students->count();
                         $assignCount = $item->assignments->count();
-                        $progress = min(100, 45 + ($idx * 12));
                     @endphp
                     <a href="{{ route('mata-kuliah.show', ['mata_kuliah' => $item->id]) }}" class="course-card">
                         <div class="course-banner {{ $warna }}">
@@ -85,14 +72,9 @@
                             <h3 class="course-name">{{ $item->name }}</h3>
                             <span class="course-dosen">{{ $item->lecturer?->name ?? 'Dosen Pengampu' }} • {{ $item->sks }} SKS</span>
 
-                            <div style="margin: 8px 0 4px; font-size: 11.5px; color: #8E6570; font-weight: 700;">
-                                📝 {{ $assignCount }} Tugas Terdaftar (Sesuai Kriteria 4.4)
+                            <div style="margin-top: 4px; font-size: 11.5px; color: #8E6570; font-weight: 700;">
+                                📝 {{ $assignCount }} Tugas Terdaftar
                             </div>
-
-                            <div class="course-progress-track">
-                                <div class="course-progress-fill" style="width: {{ $progress }}%;"></div>
-                            </div>
-                            <span class="course-progress-label">Progres Pembelajaran {{ $progress }}%</span>
                         </div>
                     </a>
                 @empty

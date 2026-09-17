@@ -35,11 +35,6 @@
             <!-- Topbar (Hamburger & Profil) -->
             <header class="dash-topbar">
                 <div class="topbar-left">
-                    <button class="btn-hamburger" title="Menu">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
                     <div class="page-title">
                         <span class="page-eyebrow">
                             <span class="page-eyebrow-dot"></span>
@@ -106,7 +101,7 @@
                     <div class="card-header-clean">
                         <div>
                             <h3 style="margin:0;">Mata Kuliah yang Diambil</h3>
-                            <small style="color:#8E6570;font-size:12px;">Data langsung dari database LMS</small>
+                            <small style="color:#64748B;font-size:12px;">Data langsung dari database LMS</small>
                         </div>
                         <a href="{{ route('mata-kuliah.index') }}" class="card-subtitle-tag" style="text-decoration:none;">Lihat Semua &rarr;</a>
                     </div>
@@ -168,9 +163,9 @@
                             <div class="gauge-circle-wrap">
                                 <svg class="gauge-svg" viewBox="0 0 36 36">
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="rgba(252,237,216,0.12)" stroke-width="3.2" />
+                                          fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="#7311D4" stroke-width="3.2" stroke-dasharray="85, 100" stroke-linecap="round" />
+                                          fill="none" stroke="#039FFA" stroke-width="3.2" stroke-dasharray="85, 100" stroke-linecap="round" />
                                 </svg>
                                 <span class="gauge-text">85%</span>
                             </div>
@@ -181,9 +176,9 @@
                             <div class="gauge-circle-wrap">
                                 <svg class="gauge-svg" viewBox="0 0 36 36">
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="rgba(252,237,216,0.12)" stroke-width="3.2" />
+                                          fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="#FF5E5E" stroke-width="3.2" stroke-dasharray="70, 100" stroke-linecap="round" />
+                                          fill="none" stroke="#F96305" stroke-width="3.2" stroke-dasharray="70, 100" stroke-linecap="round" />
                                 </svg>
                                 <span class="gauge-text">70%</span>
                             </div>
@@ -194,9 +189,9 @@
                             <div class="gauge-circle-wrap">
                                 <svg class="gauge-svg" viewBox="0 0 36 36">
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="rgba(252,237,216,0.12)" stroke-width="3.2" />
+                                          fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="#FFD464" stroke-width="3.2" stroke-dasharray="92, 100" stroke-linecap="round" />
+                                          fill="none" stroke="#F9B804" stroke-width="3.2" stroke-dasharray="92, 100" stroke-linecap="round" />
                                 </svg>
                                 <span class="gauge-text">92%</span>
                             </div>
@@ -219,7 +214,7 @@
                             @endphp
                             <div class="message-item">
                                 <span class="msg-sender">{{ $assign->course?->code ?? 'MK' }}</span>
-                                <span class="msg-badge" style="background:{{ $isDuePast ? '#FEE2E2' : '#DCFCE7' }};color:{{ $isDuePast ? '#B91C1C' : '#166534' }};">
+                                <span class="msg-badge" style="background:#FFFDF8; color:{{ $isDuePast ? '#F96305' : '#039FFA' }}; border:1px solid {{ $isDuePast ? 'rgba(249, 99, 5, 0.35)' : 'rgba(3, 159, 250, 0.35)' }};">
                                     {{ $isDuePast ? 'Lewat Deadline' : 'Aktif' }}
                                 </span>
                                 <span class="msg-body"><strong>{{ $assign->title }}</strong> &bull; Batas: {{ $assign->due_at ? $assign->due_at->translatedFormat('d M Y, H:i') : '-' }}</span>
