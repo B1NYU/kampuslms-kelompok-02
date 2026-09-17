@@ -14,11 +14,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ---------------------------------------------------------------
-        // 1. AKUN DEMO WAJIB — dibuat manual (bukan lewat factory random)
-        //    supaya email & nama-nya PERSIS sesuai ketentuan. Password
-        //    'password' di sini HANYA untuk dev/staging.
-        // ---------------------------------------------------------------
         $demoAdmin = User::create([
             'name' => 'Super Administrator',
             'email' => 'admin@kampuslms.test',
@@ -49,10 +44,6 @@ class DatabaseSeeder extends Seeder
         $demoMahasiswa->role = 'mahasiswa';
         $demoMahasiswa->save();
 
-        // ---------------------------------------------------------------
-        // 2. Lengkapi jumlah wajib: 1 admin (dari demo, sudah cukup),
-        //    3 dosen total, 30 mahasiswa total.
-        // ---------------------------------------------------------------
         $dosenLain = User::factory()->dosen()->count(2)->create();
         $mahasiswaLain = User::factory()->mahasiswa()->count(29)->create();
 
@@ -63,9 +54,6 @@ class DatabaseSeeder extends Seeder
             'Users: 1 admin, ' . $semuaDosen->count() . ' dosen, ' . $semuaMahasiswa->count() . ' mahasiswa.'
         );
 
-        // ---------------------------------------------------------------
-        // 3. 5 mata kuliah, dosen pengampu diambil acak dari 3 dosen.
-        // ---------------------------------------------------------------
         $courses = collect(range(1, 5))->map(function () use ($semuaDosen) {
             return Course::factory()->create([
                 'lecturer_id' => $semuaDosen->random()->id,
@@ -73,9 +61,6 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
-        // ---------------------------------------------------------------
-        // 4. Enrollment: tiap MK minimal 15 mahasiswa.
-        // ---------------------------------------------------------------
         $courses->each(function (Course $course) use ($semuaMahasiswa) {
             $jumlahEnroll = random_int(15, min(22, $semuaMahasiswa->count()));
             $terdaftar = $semuaMahasiswa->random($jumlahEnroll);
@@ -87,9 +72,6 @@ class DatabaseSeeder extends Seeder
             $course->students()->attach($pivot->all());
         });
 
-        // ---------------------------------------------------------------
-        // 5. 3 tugas per MK: 1 lewat deadline, 1 aktif, 1 draft.
-        // ---------------------------------------------------------------
         $publishedAssignments = collect();
 
         $courses->each(function (Course $course) use (&$publishedAssignments) {
@@ -126,8 +108,6 @@ class DatabaseSeeder extends Seeder
 
             $isPastDeadline = $assignment->due_at->isPast();
 
-            // Tugas lewat deadline: mayoritas sudah mengumpulkan.
-            // Tugas masih aktif: baru sebagian kecil (submitter awal).
             $ratio = $isPastDeadline
                 ? random_int(70, 95) / 100
                 : random_int(30, 60) / 100;
@@ -159,9 +139,6 @@ class DatabaseSeeder extends Seeder
 
         $this->command?->info('Total submission dibuat: ' . $allSubmissions->count());
 
-        // ---------------------------------------------------------------
-        // 7. Grade — sekitar 60% dari seluruh submission.
-        // ---------------------------------------------------------------
         $jumlahDinilai = (int) round($allSubmissions->count() * 0.6);
         $jumlahDinilai = min($jumlahDinilai, $allSubmissions->count());
         $submissionDinilai = $allSubmissions->random($jumlahDinilai);

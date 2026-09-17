@@ -25,17 +25,11 @@ class Course extends Model
         ];
     }
 
-    /**
-     * Dosen pengampu mata kuliah ini.
-     */
     public function lecturer()
     {
         return $this->belongsTo(User::class, 'lecturer_id');
     }
 
-    /**
-     * Mahasiswa yang terdaftar (enrolled) di mata kuliah ini.
-     */
     public function students()
     {
         return $this->belongsToMany(User::class)
@@ -43,17 +37,11 @@ class Course extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Materi-materi yang diunggah pada mata kuliah ini.
-     */
     public function materials()
     {
         return $this->hasMany(Material::class);
     }
 
-    /**
-     * Tugas-tugas pada mata kuliah ini.
-     */
     public function assignments()
     {
         return $this->hasMany(Assignment::class);

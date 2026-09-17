@@ -29,25 +29,16 @@ class Assignment extends Model
         ];
     }
 
-    /**
-     * Mata kuliah tempat tugas ini berada.
-     */
     public function course()
     {
         return $this->belongsTo(Course::class);
     }
 
-    /**
-     * Semua submission untuk tugas ini.
-     */
     public function submissions()
     {
         return $this->hasMany(Submission::class);
     }
 
-    /**
-     * Nilai-nilai untuk tugas ini, diambil lewat tabel submissions.
-     */
     public function grades()
     {
         return $this->hasManyThrough(Grade::class, Submission::class);

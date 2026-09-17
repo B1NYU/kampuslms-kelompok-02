@@ -25,17 +25,11 @@ class Grade extends Model
         ];
     }
 
-    /**
-     * Submission yang dinilai lewat entri ini.
-     */
     public function submission()
     {
         return $this->belongsTo(Submission::class);
     }
 
-    /**
-     * Dosen yang memberi nilai ini.
-     */
     public function grader()
     {
         return $this->belongsTo(User::class, 'graded_by');

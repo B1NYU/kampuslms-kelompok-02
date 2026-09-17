@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
@@ -17,15 +14,11 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // Index terpisah untuk kolom role (sesuai constraint wajib di skema).
         Schema::table('users', function (Blueprint $table) {
             $table->index('role');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
