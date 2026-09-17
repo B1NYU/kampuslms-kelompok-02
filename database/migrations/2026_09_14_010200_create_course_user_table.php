@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('course_user', function (Blueprint $table) {
@@ -17,15 +14,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamp('enrolled_at')->nullable();
             $table->timestamps();
-
-            // Cegah mahasiswa terdaftar dua kali pada MK yang sama.
             $table->unique(['course_id', 'user_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('course_user');
