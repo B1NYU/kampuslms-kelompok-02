@@ -11,9 +11,6 @@ use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
-    /**
-     * Tampilkan halaman CRUD mata kuliah beserta data awal.
-     */
     public function index(): View
     {
         $matkulList = Course::with('lecturer')->orderByDesc('created_at')->get();
@@ -25,9 +22,6 @@ class CourseController extends Controller
         );
     }
 
-    /**
-     * Simpan mata kuliah baru (dipanggil via fetch/AJAX).
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -48,12 +42,6 @@ class CourseController extends Controller
         ], 201);
     }
 
-    /**
-     * Update mata kuliah yang sudah ada (dipanggil via fetch/AJAX).
-     *
-     * Parameter route sengaja tetap bernama $matkul (bukan $course) supaya
-     * URL & route name lama (admin.matkul.*) tidak perlu diubah.
-     */
     public function update(Request $request, Course $matkul)
     {
         $validated = $request->validate([
@@ -74,9 +62,6 @@ class CourseController extends Controller
         ]);
     }
 
-    /**
-     * Hapus mata kuliah (dipanggil via fetch/AJAX).
-     */
     public function destroy(Course $matkul)
     {
         $matkul->delete();
@@ -86,10 +71,6 @@ class CourseController extends Controller
         ]);
     }
 
-    /**
-     * Bentuk payload JSON yang konsisten untuk frontend (termasuk nama dosen
-     * hasil join, karena kolom 'dosen' string sudah tidak ada di skema baru).
-     */
     private function transform(Course $course): array
     {
         return [
@@ -102,5 +83,23 @@ class CourseController extends Controller
             'status'        => $course->status,
             'description'   => $course->description,
         ];
+    }
+
+    public function studentIndex(): View
+    {
+        $matkulList = Course::with('lecturer')->where('status', 'active')->get();
+
+        return view()->file(
+            resource_path('views/courses/index.blade.php'),
+            compact('matkulList')
+        );
+    }
+
+    public function studentShow(Course $mata_kuliah): View
+    {
+        return view()->file(
+            resource_path('views/courses/show.blade.php'),
+            ['mataKuliah' => $mata_kuliah]
+        );
     }
 }
