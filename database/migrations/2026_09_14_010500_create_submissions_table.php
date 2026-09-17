@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('submissions', function (Blueprint $table) {
@@ -22,15 +19,10 @@ return new class extends Migration
             $table->dateTime('submitted_at');
             $table->boolean('is_late')->default(false);
             $table->timestamps();
-
-            // 1 mahasiswa hanya boleh punya 1 submission aktif per tugas.
             $table->unique(['assignment_id', 'user_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('submissions');
