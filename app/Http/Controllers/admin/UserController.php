@@ -13,11 +13,6 @@ class UserController extends Controller
 {
     private const ROLES = ['admin', 'dosen', 'mahasiswa'];
 
-    /**
-     * Tampilkan halaman CRUD pengguna. Memakai withTrashed() supaya
-     * pengguna yang statusnya "Non-aktif" (soft-deleted) tetap tampil
-     * di tabel, bukan hilang begitu saja.
-     */
     public function index(): View
     {
         $userList = User::withTrashed()->orderByDesc('created_at')->get();
@@ -28,9 +23,6 @@ class UserController extends Controller
         );
     }
 
-    /**
-     * Simpan pengguna baru (dipanggil via fetch/AJAX).
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -47,12 +39,11 @@ class UserController extends Controller
         $user->nim_nip  = $validated['nim_nip'];
         $user->email    = $validated['email'] ?? null;
         $user->password = Hash::make($validated['password']);
-        // Assignment eksplisit, BUKAN lewat $fillable / mass assignment.
         $user->role = $validated['role'];
         $user->save();
 
         if ($validated['status'] === 'nonaktif') {
-            $user->delete(); // soft delete
+            $user->delete();
         }
 
         return response()->json([
@@ -61,11 +52,6 @@ class UserController extends Controller
         ], 201);
     }
 
-    /**
-     * Update pengguna yang sudah ada (dipanggil via fetch/AJAX).
-     * Menerima juga pengguna yang sedang soft-deleted, supaya statusnya
-     * bisa diaktifkan kembali lewat form edit.
-     */
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
@@ -80,7 +66,6 @@ class UserController extends Controller
         $user->name    = $validated['name'];
         $user->nim_nip = $validated['nim_nip'];
         $user->email   = $validated['email'] ?? null;
-        // Assignment eksplisit, BUKAN lewat $fillable / mass assignment.
         $user->role = $validated['role'];
 
         if (!empty($validated['password'])) {
@@ -89,7 +74,6 @@ class UserController extends Controller
 
         $user->save();
 
-        // Sinkronkan status aktif/non-aktif dengan soft delete.
         if ($validated['status'] === 'nonaktif' && !$user->trashed()) {
             $user->delete();
         } elseif ($validated['status'] === 'aktif' && $user->trashed()) {
@@ -102,10 +86,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Hapus pengguna (soft delete — data tetap ada di database sesuai
-     * trait SoftDeletes pada tabel users).
-     */
     public function destroy(User $user)
     {
         $user->delete();
@@ -115,9 +95,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Bentuk payload JSON yang konsisten untuk frontend.
-     */
     private function transform(User $user): array
     {
         return [
