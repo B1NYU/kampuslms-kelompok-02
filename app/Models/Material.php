@@ -29,17 +29,11 @@ class Material extends Model
         ];
     }
 
-    /**
-     * Mata kuliah tempat materi ini berada.
-     */
     public function course()
     {
         return $this->belongsTo(Course::class);
     }
 
-    /**
-     * User (dosen) yang mengunggah materi ini.
-     */
     public function uploader()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
