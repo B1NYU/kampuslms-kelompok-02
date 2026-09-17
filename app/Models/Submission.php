@@ -29,25 +29,16 @@ class Submission extends Model
         ];
     }
 
-    /**
-     * Tugas yang dikumpulkan lewat submission ini.
-     */
     public function assignment()
     {
         return $this->belongsTo(Assignment::class);
     }
 
-    /**
-     * Mahasiswa pengumpul submission ini.
-     */
     public function student()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Nilai untuk submission ini (relasi one-to-one).
-     */
     public function grade()
     {
         return $this->hasOne(Grade::class);
