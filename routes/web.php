@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -42,9 +41,8 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 Route::prefix('mata-kuliah')->name('mata-kuliah.')->group(function () {
-    Route::get('/', [CourseController::class, 'index'])->name('index');
-    Route::get('/{mata_kuliah}', [CourseController::class, 'show'])->name('show');
-    Route::get('/{mata_kuliah}/nilai', [CourseController::class, 'nilai'])->name('nilai');
+    Route::get('/', [AdminCourseController::class, 'studentIndex'])->name('index');
+    Route::get('/{mata_kuliah}', [AdminCourseController::class, 'studentShow'])->name('show');
 });
 
 Route::prefix('dosen')->name('dosen.')->group(function () {
@@ -82,13 +80,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
-    // --- CRUD Pengguna (model: User; role di-assign eksplisit di controller) ---
     Route::get('/pengguna', [AdminUserController::class, 'index'])->name('pengguna');
     Route::post('/pengguna', [AdminUserController::class, 'store'])->name('pengguna.store');
     Route::put('/pengguna/{user}', [AdminUserController::class, 'update'])->name('pengguna.update')->withTrashed();
     Route::delete('/pengguna/{user}', [AdminUserController::class, 'destroy'])->name('pengguna.destroy')->withTrashed();
 
-    // --- CRUD Mata Kuliah (tabel & model: Course, sesuai skema database) ---
     Route::get('/mata-kuliah', [AdminCourseController::class, 'index'])->name('matkul');
     Route::post('/mata-kuliah', [AdminCourseController::class, 'store'])->name('matkul.store');
     Route::put('/mata-kuliah/{matkul}', [AdminCourseController::class, 'update'])->name('matkul.update');
