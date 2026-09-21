@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Mahasiswa;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class MahasiswaCourseController extends Controller
 {
+    /**
+     * Tampilkan katalog seluruh mata kuliah untuk mahasiswa.
+     */
     public function index(): View
     {
         $courses = Course::with(['lecturer', 'students', 'assignments'])->orderBy('code')->get();
@@ -21,6 +24,9 @@ class MahasiswaCourseController extends Controller
         );
     }
 
+    /**
+     * Tampilkan rincian alur 16 sesi perkuliahan dan rekapitulasi nilai tugas mahasiswa.
+     */
     public function show(Course $mata_kuliah): View
     {
         $course = $mata_kuliah->loadMissing([
@@ -30,7 +36,46 @@ class MahasiswaCourseController extends Controller
             'assignments.submissions.grade',
         ]);
 
-        $mataKuliah = [
+        $student = $this->resolveActiveStudent();
+        $mataKuliah = $this->formatCourseMetadata($course);
+        $nilaiData = $this->calculateGradesAndTasks($course, $student);
+
+        return view()->file(
+            resource_path('views/courses/show.blade.php'),
+            compact('course', 'mataKuliah', 'nilaiData', 'student')
+        );
+    }
+
+    /**
+     * Helper: Ambil data mahasiswa aktif (Auth, session user_name, atau fallback aman database).
+     */
+    private function resolveActiveStudent(): ?User
+    {
+        try {
+            if (Auth::check()) {
+                return Auth::user();
+            }
+
+            if (session()->has('user_name')) {
+                $user = User::where('name', session('user_name'))->first();
+                if ($user) {
+                    return $user;
+                }
+            }
+
+            return User::where('role', 'mahasiswa')->where('email', 'mahasiswa@kampuslms.test')->first()
+                ?? User::where('role', 'mahasiswa')->first();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Helper: Format ringkasan metadata mata kuliah untuk tampilan detail.
+     */
+    private function formatCourseMetadata(Course $course): array
+    {
+        return [
             'id'             => $course->id,
             'kode'           => $course->code,
             'nama'           => $course->name,
@@ -40,13 +85,13 @@ class MahasiswaCourseController extends Controller
             'students_count' => $course->students->count(),
             'status'         => $course->status ?? 'active',
         ];
+    }
 
-        // Ambil data mahasiswa aktif (dari auth atau fallback mahasiswa demo)
-        $student = Auth::user()
-            ?? User::where('role', 'mahasiswa')->where('email', 'mahasiswa@kampuslms.test')->first()
-            ?? User::where('role', 'mahasiswa')->first();
-
-        // Urutkan tugas berdasarkan tanggal deadline
+    /**
+     * Helper: Kalkulasi status pengerjaan tugas, deadline WITA, umpan balik dosen, dan nilai.
+     */
+    private function calculateGradesAndTasks(Course $course, ?User $student): array
+    {
         $assignments = $course->assignments->sortBy('due_at')->values();
         $totalAssignments = $assignments->count();
         $items = [];
@@ -103,33 +148,51 @@ class MahasiswaCourseController extends Controller
 
         // Kalkulasi nilai rata-rata dan indeks prestasi
         $avg = $gradedCount > 0 ? round($totalScore / $gradedCount, 1) : null;
-        $indeks = '-';
-        $predikat = 'Belum Ada Penilaian';
+        $indeksPredikat = $this->convertScoreToGrade($avg);
 
-        if ($avg !== null) {
-            if ($avg >= 85) { $indeks = 'A'; $predikat = 'Sangat Memuaskan'; }
-            elseif ($avg >= 75) { $indeks = 'B+'; $predikat = 'Memuaskan'; }
-            elseif ($avg >= 70) { $indeks = 'B'; $predikat = 'Baik'; }
-            elseif ($avg >= 65) { $indeks = 'C+'; $predikat = 'Cukup Baik'; }
-            elseif ($avg >= 60) { $indeks = 'C'; $predikat = 'Cukup'; }
-            elseif ($avg >= 50) { $indeks = 'D'; $predikat = 'Kurang'; }
-            else { $indeks = 'E'; $predikat = 'Tidak Lulus'; }
-        }
-
-        $nilaiData = [
+        return [
             'stats' => [
                 'rata_rata'      => $avg !== null ? number_format($avg, 1) : '-',
-                'indeks'         => $indeks,
-                'predikat'       => $predikat,
+                'indeks'         => $indeksPredikat['indeks'],
+                'predikat'       => $indeksPredikat['predikat'],
                 'tugas_dinilai'  => "{$gradedCount} dari {$totalAssignments}",
                 'bobot_tercapai' => $totalAssignments > 0 ? round(($gradedCount / $totalAssignments) * 100) . '%' : '0%',
             ],
             'items' => $items,
         ];
+    }
 
-        return view()->file(
-            resource_path('views/courses/show.blade.php'),
-            compact('course', 'mataKuliah', 'nilaiData', 'student')
-        );
+    /**
+     * Helper: Konversi nilai numerik (0-100) ke Indeks Huruf & Predikat Akademik.
+     */
+    private function convertScoreToGrade(?float $avg): array
+    {
+        if ($avg === null) {
+            return [
+                'indeks'   => '-',
+                'predikat' => 'Belum Ada Penilaian',
+            ];
+        }
+
+        if ($avg >= 85) {
+            return ['indeks' => 'A',  'predikat' => 'Sangat Memuaskan'];
+        }
+        if ($avg >= 75) {
+            return ['indeks' => 'B+', 'predikat' => 'Memuaskan'];
+        }
+        if ($avg >= 70) {
+            return ['indeks' => 'B',  'predikat' => 'Baik'];
+        }
+        if ($avg >= 65) {
+            return ['indeks' => 'C+', 'predikat' => 'Cukup Baik'];
+        }
+        if ($avg >= 60) {
+            return ['indeks' => 'C',  'predikat' => 'Cukup'];
+        }
+        if ($avg >= 50) {
+            return ['indeks' => 'D',  'predikat' => 'Kurang'];
+        }
+
+        return ['indeks' => 'E', 'predikat' => 'Tidak Lulus'];
     }
 }

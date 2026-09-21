@@ -1,6 +1,11 @@
 /* =========================================
    TOP NAVBAR (Standardized matching Admin Style)
    ========================================= */
+.top-navbar,
+.top-navbar * {
+    font-family: 'Nunito', sans-serif;
+}
+
 .top-navbar {
     background: #FFFFFF;
     border-bottom: 1px solid rgba(3, 159, 250, 0.18);

@@ -52,6 +52,14 @@
                         </button>
                     </div>
                 </div>
+                <div class="course-subnav-right">
+                    <a href="{{ route('dashboard') }}" class="btn-subnav-back">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        <span>Kembali ke Kelas</span>
+                    </a>
+                </div>
             </div>
         </nav>
 
@@ -206,31 +214,31 @@
                                 <div class="meta-list">
                                     <div class="meta-row">
                                         <span>Kode Mata Kuliah</span>
-                                        <span class="meta-chip chip-gold">{{ $mataKuliah['kode'] }}</span>
+                                        <span class="meta-chip chip-cyan">{{ $mataKuliah['kode'] }}</span>
                                     </div>
                                     <div class="meta-row">
                                         <span>Beban Kredit</span>
-                                        <span class="meta-chip chip-cream">{{ $mataKuliah['sks'] }} SKS</span>
+                                        <span class="meta-chip chip-amber">{{ $mataKuliah['sks'] }} SKS</span>
                                     </div>
                                     <div class="meta-row">
                                         <span>Peserta Terdaftar</span>
-                                        <span class="meta-chip chip-coral" style="background:#ECFDF5;color:#16A34A;font-weight:800;">
+                                        <span class="meta-chip chip-green">
                                             {{ $courseDb ? $courseDb->students->count() : 0 }} Mahasiswa
                                         </span>
                                     </div>
                                     <div class="meta-row">
                                         <span>Tugas Terjadwal</span>
-                                        <span class="meta-chip chip-gold">
-                                            {{ $courseDb ? $courseDb->assignments->count() : 0 }} Tugas di Database
+                                        <span class="meta-chip chip-orange">
+                                            {{ $courseDb ? $courseDb->assignments->count() : 0 }} Tugas Terdata
                                         </span>
                                     </div>
                                     <div class="meta-row">
                                         <span>Status Kelas</span>
-                                        <span class="meta-chip chip-gold">{{ ucfirst($mataKuliah['status'] ?? 'Aktif') }}</span>
+                                        <span class="meta-chip chip-green">{{ ucfirst($mataKuliah['status'] ?? 'Aktif') }}</span>
                                     </div>
                                     <div class="meta-row" style="align-items: flex-start;">
                                         <span>Deskripsi</span>
-                                        <span style="font-size:12px;color:#5F3540;text-align:right;max-width:62%;font-weight:600;">{{ $mataKuliah['deskripsi'] }}</span>
+                                        <span style="font-size:12px;color:#0F172A;text-align:right;max-width:62%;font-weight:600;">{{ $mataKuliah['deskripsi'] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -251,12 +259,12 @@
                                 </div>
                                 
                                 <div class="detail-block">
-                                    <span class="detail-block-title">Materi & Berkas Perkuliahan</span>
+                                    <span class="detail-block-title detail-title-materi">Materi & Berkas Perkuliahan</span>
                                     <div class="materi-container" id="materiListContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
                                 </div>
 
                                 <div class="detail-block">
-                                    <span class="detail-block-title" id="tasksHeaderTitle">Aktivitas & Tugas</span>
+                                    <span class="detail-block-title detail-title-tasks" id="tasksHeaderTitle">Aktivitas & Tugas</span>
                                     <div class="tasks-container" id="tasksListContainer"></div>
                                 </div>
                             </div>
@@ -270,14 +278,14 @@
                 <!-- Stat Cards Ringkasan Nilai -->
                 <div class="grades-stat-grid">
                     <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#FFF5E8;color:#B0182D;">
+                        <div class="grade-card-icon" style="background:#E0F2FE;color:#039FFA;">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                         </div>
                         <div class="grade-card-info">
                             <span class="grade-card-label">RATA-RATA NILAI TUGAS</span>
-                            <div class="grade-card-num">{{ $nilaiData['stats']['rata_rata'] }} <span style="font-size:14px;color:#8E6570;font-weight:700;">/ 100</span></div>
+                            <div class="grade-card-num">{{ $nilaiData['stats']['rata_rata'] }} <span style="font-size:14px;color:#64748B;font-weight:700;">/ 100</span></div>
                             <span class="grade-card-sub">Perhitungan kumulatif semester berjalan</span>
                         </div>
                     </div>
@@ -297,7 +305,7 @@
                     </div>
 
                     <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#FFF0DE;color:#C98A1F;">
+                        <div class="grade-card-icon" style="background:#FFF7ED;color:#F96305;">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M9 11l3 3L22 4"></path>
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
@@ -311,7 +319,7 @@
                     </div>
 
                     <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#E8F4FD;color:#1A73E8;">
+                        <div class="grade-card-icon" style="background:#E0F2FE;color:#039FFA;">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M18 20V10"></path>
                                 <path d="M12 20V4"></path>
@@ -320,7 +328,7 @@
                         </div>
                         <div class="grade-card-info">
                             <span class="grade-card-label">BOBOT NILAI TERCAPAI</span>
-                            <div class="grade-card-num" style="color:#1A73E8;">{{ $nilaiData['stats']['bobot_tercapai'] }} <span style="font-size:13px;color:#8E6570;font-weight:700;">/ 100% Total</span></div>
+                            <div class="grade-card-num" style="color:#039FFA;">{{ $nilaiData['stats']['bobot_tercapai'] }} <span style="font-size:13px;color:#64748B;font-weight:700;">/ 100% Total</span></div>
                             <span class="grade-card-sub">Akumulasi persentase SKS mata kuliah</span>
                         </div>
                     </div>
@@ -361,22 +369,11 @@
                                             <div class="task-name-cell">
                                                 <div class="task-info">
                                                     <span class="task-title-text">{{ $item['judul'] }}</span>
-                                                    <div class="task-meta-tags">
-                                                        <span class="task-pill-type {{ strtolower(str_replace(' ', '-', $item['tipe'])) }}">{{ $item['tipe'] }}</span>
-                                                        <span class="task-pill-week">{{ $item['pertemuan'] }}</span>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style="font-size:12px;color:#64748B;white-space:nowrap;">
-                                            <div style="font-weight:700;color:#5F3540;">{{ $item['tanggal_kumpul'] }}</div>
-                                            @if($item['status'] === 'Dinilai' || $item['status'] === 'Menunggu Penilaian')
-                                                <span style="font-size:10px;color:#1B8A5A;font-weight:800;">&bull; Sudah Dikumpulkan</span>
-                                            @elseif($item['status'] === 'Lewat Deadline')
-                                                <span style="font-size:10px;color:#DC2626;font-weight:800;">&bull; Batas Waktu Terlewat</span>
-                                            @elseif($item['status'] === 'Belum Dikumpulkan')
-                                                <span style="font-size:10px;color:#C98A1F;font-weight:800;">&bull; Belum Dikumpulkan</span>
-                                            @endif
+                                        <td style="font-size:12.5px;color:#0F172A;font-weight:700;white-space:nowrap;">
+                                            {{ $item['tanggal_kumpul'] }}
                                         </td>
                                         <td>
                                             @if ($item['status'] === 'Dinilai')
@@ -420,7 +417,7 @@
                                         </td>
                                         <td>
                                             <div class="feedback-bubble">
-                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B0182D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#039FFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
                                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                                 </svg>
                                                 <span>{{ $item['feedback'] }}</span>
@@ -429,8 +426,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" style="text-align: center; padding: 36px 20px; color: #8E6570;">
-                                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">Belum Ada Tugas di Database</div>
+                                        <td colspan="6" style="text-align: center; padding: 36px 20px; color: #64748B;">
+                                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #0F172A;">Belum Ada Tugas di Database</div>
                                             <div style="font-size: 12.5px; color: #64748B;">Mata kuliah ini belum memiliki penugasan atau rekaman nilai aktif.</div>
                                         </td>
                                     </tr>
@@ -506,7 +503,7 @@
             
             if (materiList.length === 0) {
                 materiContainer.innerHTML = `
-                    <div style="padding: 14px 16px; background: #FFFDF8; border: 1px dashed rgba(3, 159, 250, 0.25); border-radius: 10px; color: #8E6570; font-size: 12.5px; text-align: center;">
+                    <div style="padding: 14px 16px; background: #F0F9FF; border: 1px dashed rgba(3, 159, 250, 0.3); border-radius: 12px; color: #0284C7; font-size: 12.5px; text-align: center; font-weight: 600;">
                         Belum ada berkas materi diunggah di database untuk pertemuan ini.
                     </div>
                 `;
@@ -516,10 +513,10 @@
                     resourceCard.className = 'resource-card';
                     resourceCard.innerHTML = `
                         <div class="resource-left">
-                            <span class="resource-icon">&#128196;</span>
+                            <div class="resource-icon">&#128196;</div>
                             <div>
                                 <div class="resource-name">${materi}</div>
-                                <div class="resource-meta">Materi Dosen &middot; PDF</div>
+                                <div class="resource-meta">Materi Dosen &middot; Format Dokumen</div>
                             </div>
                         </div>
                         <button class="btn-mini-download" onclick="alert('Mengunduh ${materi}...')">
@@ -538,7 +535,7 @@
             
             if (tasks.length === 0) {
                 tasksContainer.innerHTML = `
-                    <div style="padding: 14px 16px; background: #FFFDF8; border: 1px dashed rgba(3, 159, 250, 0.25); border-radius: 10px; color: #8E6570; font-size: 12.5px; text-align: center;">
+                    <div style="padding: 14px 16px; background: #FFFBEB; border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: 12px; color: #92400E; font-size: 12.5px; text-align: center; font-weight: 600;">
                         Tidak ada penugasan terjadwal untuk pertemuan ini.
                     </div>
                 `;

@@ -200,58 +200,8 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Akses Cepat + Status Sistem -->
+                <!-- Right Column: Status Sistem -->
                 <div class="admin-side-col">
-                    <!-- Akses Cepat Admin -->
-                    <div class="card-box">
-                        <div class="card-header-clean">
-                            <h3>Akses Cepat Admin</h3>
-                            <span class="card-subtitle-tag">Pintasan</span>
-                        </div>
-                        <div class="quick-actions-grid">
-                            <a href="{{ route('admin.pengguna') }}" class="qa-card">
-                                <div class="qa-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <line x1="19" y1="8" x2="19" y2="14"></line>
-                                        <line x1="22" y1="11" x2="16" y2="11"></line>
-                                    </svg>
-                                </div>
-                                Tambah Pengguna
-                            </a>
-                            <a href="{{ route('admin.matkul') }}" class="qa-card">
-                                <div class="qa-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                    </svg>
-                                </div>
-                                CRUD Mata Kuliah
-                            </a>
-                            <a href="{{ route('admin.pendaftaran') }}" class="qa-card">
-                                <div class="qa-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <polyline points="16 11 18 13 22 9"></polyline>
-                                    </svg>
-                                </div>
-                                Daftarkan Mahasiswa
-                            </a>
-                            <a href="#laporan" class="qa-card">
-                                <div class="qa-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                                    </svg>
-                                </div>
-                                Laporan & Log
-                            </a>
-                        </div>
-                    </div>
-
                     <!-- Status Sistem & Akademik -->
                     <div class="card-box sys-status-card">
                         <div class="card-header-clean">

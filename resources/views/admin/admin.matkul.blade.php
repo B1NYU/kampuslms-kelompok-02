@@ -10,6 +10,7 @@
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/css/admin/admin.dashboard.css', 'resources/js/app.js'])
     @endif
+
 </head>
 <body>
     <div class="bg-shape bg-shape-1"></div>
@@ -137,15 +138,58 @@
 
                         <!-- Tabel Mata Kuliah -->
                         <div class="table-container">
-                            <div class="table-header-tools">
-                                <span class="table-summary-info">Total <strong id="mkTableCount">{{ $matkulList->count() }}</strong> Mata Kuliah</span>
-                                <div class="search-input-box">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                    <input type="text" id="searchMkInput" placeholder="Cari kode / nama MK...">
+                            {{-- Filter & Tools Header (Borderless / Tanpa Outer Card, Auto-Submit) --}}
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+                                {{-- Info Total Data & Badge Filter Aktif --}}
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="table-summary-info">Total <strong id="mkTableCount">{{ $matkulList->total() }}</strong> Mata Kuliah</span>
+                                    @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #FFF5E8; color: #C98A1F; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; border: 1px solid #F4D9C1;">
+                                            Filter Aktif
+                                        </span>
+                                    @endif
                                 </div>
+
+                                {{-- Form Filter Otomatis (Tanpa Card/Frame Luar, Auto-Submit on Change) --}}
+                                <form method="GET" action="{{ url()->current() }}" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    {{-- Input Pencarian dengan Ikon (Cari lalu tekan Enter) --}}
+                                    <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px solid #F2DCD3; border-radius: 8px; padding: 0 10px; height: 36px; transition: border-color 0.2s;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8E6570" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Cari kode / nama MK..." style="border: none; outline: none; background: transparent; font-family: 'Nunito', sans-serif; font-size: 13px; color: #5F3540; width: 160px;">
+                                    </div>
+
+                                    {{-- Dropdown Status (Langsung Terfilter Saat Dipilih) --}}
+                                    <select name="status" onchange="this.form.submit()" style="height: 36px; padding: 0 8px; font-family: 'Nunito', sans-serif; font-size: 12.5px; font-weight: 700; color: #5F3540; background: #FFFFFF; border: 1.5px solid #F2DCD3; border-radius: 8px; outline: none; cursor: pointer;">
+                                        <option value="">Semua Status</option>
+                                        @foreach (['draft', 'active', 'archived'] as $s)
+                                            <option value="{{ $s }}" @selected($filters['status'] === $s)>
+                                                {{ ['draft' => 'Draft', 'active' => 'Aktif', 'archived' => 'Diarsipkan'][$s] ?? ucfirst($s) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    {{-- Dropdown Dosen (Langsung Terfilter Saat Dipilih) --}}
+                                    <select name="lecturer_id" onchange="this.form.submit()" style="height: 36px; padding: 0 8px; font-family: 'Nunito', sans-serif; font-size: 12.5px; font-weight: 700; color: #5F3540; background: #FFFFFF; border: 1.5px solid #F2DCD3; border-radius: 8px; outline: none; cursor: pointer; max-width: 150px;">
+                                        <option value="">Semua Dosen</option>
+                                        @foreach ($dosenList as $d)
+                                            <option value="{{ $d->id }}" @selected($filters['lecturer_id'] === $d->id)>{{ $d->name }}</option>
+                                        @endforeach
+                                    </select>
+
+                                    {{-- Tombol Reset --}}
+                                    @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
+                                        <a href="{{ url()->current() }}" style="display: inline-flex; align-items: center; gap: 4px; height: 36px; font-size: 12px; font-weight: 700; color: #B0182D; text-decoration: none; padding: 0 10px; background: #FFEBEF; border-radius: 8px; border: 1px solid rgba(176, 24, 45, 0.15); transition: all 0.2s;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                            <span>Reset</span>
+                                        </a>
+                                    @endif
+                                </form>
                             </div>
 
                             <div class="table-responsive">
@@ -197,6 +241,11 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {{-- Navigasi Pagination Laravel --}}
+                            <div class="custom-pagination-wrapper">
+                                {{ $matkulList->links() }}
                             </div>
                         </div>
                     </div>
@@ -388,12 +437,15 @@
 
         document.querySelectorAll('#mkTableBody tr[data-id]').forEach(bindRowButtons);
 
-        document.getElementById('searchMkInput').addEventListener('input', function () {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('#mkTableBody tr[data-id]').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        const searchInput = document.getElementById('searchMkInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const q = this.value.toLowerCase();
+                document.querySelectorAll('#mkTableBody tr[data-id]').forEach(row => {
+                    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>

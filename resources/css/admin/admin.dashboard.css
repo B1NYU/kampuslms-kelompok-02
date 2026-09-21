@@ -1147,3 +1147,125 @@ body {
     .admin-navbar { padding: 0 16px; }
     .navbar-nav.admin-nav { display: none; }
 }
+
+/* =========================================
+   CUSTOM PAGINATION STYLES (Admin Dashboard)
+   ========================================= */
+.custom-pagination-wrapper {
+    margin-top: 16px;
+    width: 100%;
+}
+
+.custom-pagination-wrapper nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    padding: 6px 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Sembunyikan bagian mobile bawaan tailwind jika ada */
+.custom-pagination-wrapper nav > div:first-child:not(:only-child) {
+    display: none !important;
+}
+
+/* Bagian desktop wrapper */
+.custom-pagination-wrapper nav > div:last-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+/* Info teks Showing ... results */
+.custom-pagination-wrapper p {
+    margin: 0 !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: var(--admin-muted) !important;
+}
+
+.custom-pagination-wrapper p span {
+    color: var(--admin-primary) !important;
+    font-weight: 800 !important;
+}
+
+/* Container tombol pagination */
+.custom-pagination-wrapper span.relative,
+.custom-pagination-wrapper .shadow-sm {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    border: none !important;
+}
+
+/* Tombol-tombol navigasi (angka & panah) */
+.custom-pagination-wrapper a,
+.custom-pagination-wrapper span[aria-current="page"] > span,
+.custom-pagination-wrapper span[aria-disabled="true"] > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: var(--admin-text) !important;
+    background: #FAF6F3 !important;
+    border: 1px solid var(--admin-border) !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+}
+
+/* Hover tombol non-aktif */
+.custom-pagination-wrapper a:hover {
+    background: #FFF5E8 !important;
+    color: var(--admin-primary) !important;
+    border-color: var(--admin-accent) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Tombol halaman aktif */
+.custom-pagination-wrapper span[aria-current="page"] > span {
+    background: var(--admin-primary) !important;
+    color: #FFFFFF !important;
+    border-color: var(--admin-primary) !important;
+    font-weight: 800 !important;
+    box-shadow: 0 3px 10px rgba(176, 24, 45, 0.25) !important;
+    cursor: default !important;
+}
+
+/* Tombol disabled (panah tidak bisa diklik) */
+.custom-pagination-wrapper span[aria-disabled="true"] > span {
+    color: #CBD5E1 !important;
+    background: #F8FAFC !important;
+    border-color: #E2E8F0 !important;
+    cursor: not-allowed !important;
+}
+
+/* KUNCI: Batasi ukuran ikon panah SVG agar proporsional */
+.custom-pagination-wrapper svg {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
+    max-width: 14px !important;
+    max-height: 14px !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+}
