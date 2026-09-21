@@ -11,7 +11,7 @@
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/dosen/dosen.dashboard.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.dashboard.css', 'resources/js/app.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/dosen/dosen.dashboard.css') }}">
     @endif
@@ -57,7 +57,7 @@
 
             <!-- 3. Kartu Statistik Utama Dosen (4 Cards) -->
             <section class="dosen-stats-grid">
-                <a href="{{ route('dosen.mahasiswa') }}" class="dosen-stat-card" style="text-decoration: none; color: inherit;">
+                <a href="{{ route('dosen.mahasiswa') }}" class="dosen-stat-card text-inherit">
                     <div class="stat-icon-wrap stat-icon-students">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -73,7 +73,7 @@
                     </div>
                 </a>
 
-                <a href="{{ route('dosen.materi') }}" class="dosen-stat-card" style="text-decoration: none; color: inherit;">
+                <a href="{{ route('dosen.materi') }}" class="dosen-stat-card text-inherit">
                     <div class="stat-icon-wrap stat-icon-materials">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
@@ -87,7 +87,7 @@
                     </div>
                 </a>
 
-                <a href="{{ route('dosen.tugas') }}" class="dosen-stat-card" style="text-decoration: none; color: inherit;">
+                <a href="{{ route('dosen.tugas') }}" class="dosen-stat-card text-inherit">
                     <div class="stat-icon-wrap stat-icon-assignments">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -103,7 +103,7 @@
                     </div>
                 </a>
 
-                <a href="{{ route('dosen.penilaian') }}" class="dosen-stat-card" style="text-decoration: none; color: inherit;">
+                <a href="{{ route('dosen.penilaian') }}" class="dosen-stat-card text-inherit">
                     <div class="stat-icon-wrap stat-icon-grading">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -119,7 +119,7 @@
             </section>
 
             <!-- 4. Quick Access Grid ke Halaman-Halaman Terpisah -->
-            <section style="margin-top: 24px;">
+            <section class="margin-top-24">
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
@@ -138,64 +138,64 @@
                         <span class="section-header-badge">Navigasi Terpisah</span>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 10px;">
+                    <div class="grid-container">
                         
                         <!-- Modul 1: Kelola Mahasiswa -->
-                        <div style="background: #FAF6F3; border: 1px solid #F2DCD3; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; transition: all 0.2s ease;">
+                        <div class="modul-card">
                             <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 11px; font-weight: 800; color: #B0182D; background: #FFE2E8; padding: 3px 10px; border-radius: 12px;">Modul 01</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: #8E6570;">38 Peserta Aktif</span>
+                                <div class="modul-card-header">
+                                    <span class="modul-badge-1">Modul 01</span>
+                                    <span class="modul-participants">38 Peserta Aktif</span>
                                 </div>
-                                <h3 style="font-size: 17px; font-weight: 800; color: #5F3540; margin-bottom: 6px;">1. Kelola &amp; Pendaftaran Mahasiswa</h3>
-                                <p style="font-size: 12.5px; color: #8E6570; line-height: 1.5;">Daftarkan mahasiswa baru langsung ke kelas, monitor daftar mahasiswa yang mengambil mata kuliah, dan kelola status kepesertaan.</p>
+                                <h3 class="modul-title">1. Kelola &amp; Pendaftaran Mahasiswa</h3>
+                                <p class="modul-desc">Daftarkan mahasiswa baru langsung ke kelas, monitor daftar mahasiswa yang mengambil mata kuliah, dan kelola status kepesertaan.</p>
                             </div>
-                            <a href="{{ route('dosen.mahasiswa') }}" class="btn-primary-action" style="text-decoration: none; text-align: center; justify-content: center; font-size: 12.5px;">
+                            <a href="{{ route('dosen.mahasiswa') }}" class="btn-primary-action btn-modul">
                                 Buka Kelola Mahasiswa &rarr;
                             </a>
                         </div>
 
                         <!-- Modul 2: Unggah Materi -->
-                        <div style="background: #FAF6F3; border: 1px solid #F2DCD3; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; transition: all 0.2s ease;">
+                        <div class="modul-card">
                             <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 11px; font-weight: 800; color: #C98A1F; background: #FFF0DE; padding: 3px 10px; border-radius: 12px;">Modul 02</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: #8E6570;">6 Modul Terbit</span>
+                                <div class="modul-card-header">
+                                    <span class="modul-badge-2">Modul 02</span>
+                                    <span class="modul-participants">6 Modul Terbit</span>
                                 </div>
-                                <h3 style="font-size: 17px; font-weight: 800; color: #5F3540; margin-bottom: 6px;">2. Unggah &amp; Distribusi Materi</h3>
-                                <p style="font-size: 12.5px; color: #8E6570; line-height: 1.5;">Publikasikan modul perkuliahan terstruktur per pertemuan kuliah dalam bentuk berkas PDF, slide presentasi PPTX, atau tautan artikel web.</p>
+                                <h3 class="modul-title">2. Unggah &amp; Distribusi Materi</h3>
+                                <p class="modul-desc">Publikasikan modul perkuliahan terstruktur per pertemuan kuliah dalam bentuk berkas PDF, slide presentasi PPTX, atau tautan artikel web.</p>
                             </div>
-                            <a href="{{ route('dosen.materi') }}" class="btn-primary-action" style="text-decoration: none; text-align: center; justify-content: center; font-size: 12.5px; background: #C98A1F;">
+                            <a href="{{ route('dosen.materi') }}" class="btn-primary-action btn-modul-2">
                                 Buka Unggah Materi &rarr;
                             </a>
                         </div>
 
                         <!-- Modul 3: Buat Tugas -->
-                        <div style="background: #FAF6F3; border: 1px solid #F2DCD3; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; transition: all 0.2s ease;">
+                        <div class="modul-card">
                             <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 11px; font-weight: 800; color: #B0182D; background: #FFEBEF; padding: 3px 10px; border-radius: 12px;">Modul 03</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: #8E6570;">3 Tugas Berjalan</span>
+                                <div class="modul-card-header">
+                                    <span class="modul-badge-3">Modul 03</span>
+                                    <span class="modul-participants">3 Tugas Berjalan</span>
                                 </div>
-                                <h3 style="font-size: 17px; font-weight: 800; color: #5F3540; margin-bottom: 6px;">3. Pembuatan Tugas &amp; Deadline</h3>
-                                <p style="font-size: 12.5px; color: #8E6570; line-height: 1.5;">Buat penugasan baru dengan instruksi lengkap, tentukan tenggat waktu pengumpulan mahasiswa, dan pantau statistik penyelesaian tugas.</p>
+                                <h3 class="modul-title">3. Pembuatan Tugas &amp; Deadline</h3>
+                                <p class="modul-desc">Buat penugasan baru dengan instruksi lengkap, tentukan tenggat waktu pengumpulan mahasiswa, dan pantau statistik penyelesaian tugas.</p>
                             </div>
-                            <a href="{{ route('dosen.tugas') }}" class="btn-primary-action" style="text-decoration: none; text-align: center; justify-content: center; font-size: 12.5px;">
+                            <a href="{{ route('dosen.tugas') }}" class="btn-primary-action btn-modul">
                                 Buka Buat Tugas &rarr;
                             </a>
                         </div>
 
                         <!-- Modul 4: Penilaian & Feedback -->
-                        <div style="background: #FAF6F3; border: 1px solid #F2DCD3; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; transition: all 0.2s ease;">
+                        <div class="modul-card">
                             <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 11px; font-weight: 800; color: #1B8A5A; background: #EBF9F1; padding: 3px 10px; border-radius: 12px;">Modul 04</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: #1B8A5A;">4 Menunggu Review</span>
+                                <div class="modul-card-header">
+                                    <span class="modul-badge-4">Modul 04</span>
+                                    <span class="modul-participants-green">4 Menunggu Review</span>
                                 </div>
-                                <h3 style="font-size: 17px; font-weight: 800; color: #5F3540; margin-bottom: 6px;">4. Penilaian &amp; Umpan Balik</h3>
-                                <p style="font-size: 12.5px; color: #8E6570; line-height: 1.5;">Evaluasi jawaban dan berkas mahasiswa, berikan skor nilai (skala 0–100), dan sertakan catatan umpan balik yang konstruktif.</p>
+                                <h3 class="modul-title">4. Penilaian &amp; Umpan Balik</h3>
+                                <p class="modul-desc">Evaluasi jawaban dan berkas mahasiswa, berikan skor nilai (skala 0–100), dan sertakan catatan umpan balik yang konstruktif.</p>
                             </div>
-                            <a href="{{ route('dosen.penilaian') }}" class="btn-primary-action" style="text-decoration: none; text-align: center; justify-content: center; font-size: 12.5px; background: #1B8A5A;">
+                            <a href="{{ route('dosen.penilaian') }}" class="btn-primary-action btn-modul-4">
                                 Buka Penilaian &amp; Ulasan &rarr;
                             </a>
                         </div>
@@ -205,19 +205,19 @@
             </section>
 
             <!-- 5. Informasi Jadwal Kuliah & Pengumuman -->
-            <section style="margin-top: 18px;">
-                <div class="section-card" style="background: #FFFDFB; border-color: #F4D9C1;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFF0DE; color: #C98A1F; display: flex; align-items: center; justify-content: center;">
+            <section class="margin-top-18">
+                <div class="section-card schedule-card">
+                    <div class="schedule-container">
+                        <div class="schedule-info-group">
+                            <div class="schedule-icon-box">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                             </div>
                             <div>
-                                <h4 style="font-size: 15px; font-weight: 800; color: #5F3540; margin-bottom: 2px;">Jadwal Perkuliahan Berikutnya</h4>
-                                <span style="font-size: 12px; color: #8E6570;">Senin, 08.00 - 10.30 WIB &bull; Lab Komputer 3 &bull; Pemrograman Web (SI-A)</span>
+                                <h4 class="schedule-title">Jadwal Perkuliahan Berikutnya</h4>
+                                <span class="schedule-desc">Senin, 08.00 - 10.30 WIB &bull; Lab Komputer 3 &bull; Pemrograman Web (SI-A)</span>
                             </div>
                         </div>
-                        <span class="badge-status badge-status-active" style="padding: 6px 14px; font-size: 12px;">Kelas Siap Dimulai</span>
+                        <span class="badge-status badge-status-active schedule-badge">Kelas Siap Dimulai</span>
                     </div>
                 </div>
             </section>

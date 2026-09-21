@@ -7,7 +7,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.dashboard.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/admin/admin.dashboard.css', 'resources/css/admin/admin.pendaftaran.css', 'resources/js/app.js'])
+    @else
+        <link rel="stylesheet" href="{{ asset('css/admin/admin.pendaftaran.css') }}">
     @endif
 </head>
 <body>
@@ -67,11 +69,11 @@
                             <div class="section-header-text">
                                 <h2>Daftarkan Mahasiswa ke Mata Kuliah</h2>
                                 <p>Admin dapat mendaftarkan mahasiswa ke mata kuliah aktif. Sesuai Kriteria 4.4, tiap mata kuliah memiliki &ge; 15 mahasiswa terdaftar.</p>
-                                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                                    <span style="background:#EFF6FF;color:#2563EB;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(37,99,235,0.2);">
+                                <div class="badges-container">
+                                    <span class="badge-blue">
                                         ✓ Tiap MK &ge; 15 Mahasiswa Terdaftar
                                     </span>
-                                    <span style="background:#ECFDF5;color:#16A34A;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(22,163,74,0.2);">
+                                    <span class="badge-green">
                                         Total {{ $allEnrollments->count() }} Pendaftaran Terdata
                                     </span>
                                 </div>
@@ -153,21 +155,21 @@
                             </div>
 
                             <!-- Filter per Mata Kuliah -->
-                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                                <button type="button" class="btn-filter-mk active" data-mk="all" style="padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:800;border:1px solid var(--admin-primary);background:var(--admin-primary);color:#fff;cursor:pointer;">
+                            <div class="filter-mk-container">
+                                <button type="button" class="btn-filter-mk active" data-mk="all">
                                     Semua MK ({{ $allEnrollments->count() }})
                                 </button>
                                 @foreach ($coursesList as $c)
-                                    <button type="button" class="btn-filter-mk" data-mk="{{ $c->code }}" style="padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:700;border:1px solid var(--admin-border);background:var(--admin-white);color:var(--admin-text);cursor:pointer;">
+                                    <button type="button" class="btn-filter-mk" data-mk="{{ $c->code }}">
                                         {{ $c->code }} ({{ $c->students->count() }})
                                     </button>
                                 @endforeach
                             </div>
 
-                            <div class="table-responsive" style="max-height:560px;overflow-y:auto;position:relative;">
+                            <div class="table-responsive table-scrollable">
                                 <table class="custom-admin-table" id="enrollTable">
                                     <thead>
-                                        <tr style="position:sticky;top:0;z-index:10;background:var(--admin-light);box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+                                        <tr class="table-header-sticky">
                                             <th>Mahasiswa</th>
                                             <th>Mata Kuliah</th>
                                             <th>Kelas</th>
@@ -184,7 +186,7 @@
                                         <tr data-mk="{{ $e['mk_code'] }}">
                                             <td>
                                                 <div class="user-cell">
-                                                    <div class="user-avatar" style="background:#ECFDF5;color:#16A34A;">
+                                                    <div class="user-avatar avatar-green">
                                                         {{ $inits }}
                                                     </div>
                                                     <div class="user-meta">
@@ -193,12 +195,12 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style="font-size:12.5px;font-weight:700;">
+                                            <td class="td-mk-name">
                                                 <div>{{ $e['mk'] }}</div>
-                                                <small style="color:#8E6570;font-weight:500;">Dosen: {{ $e['dosen'] }}</small>
+                                                <small class="td-dosen-name">Dosen: {{ $e['dosen'] }}</small>
                                             </td>
-                                            <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $e['kelas'] }}</span></td>
-                                            <td style="font-size:12px;color:#64748B;">{{ $e['smt'] }}</td>
+                                            <td><span class="card-subtitle-tag tag-kelas">{{ $e['kelas'] }}</span></td>
+                                            <td class="td-semester">{{ $e['smt'] }}</td>
                                             <td>
                                                 <div class="btn-actions">
                                                     <button class="btn-icon btn-icon-danger btn-delete-enroll" title="Batalkan pendaftaran">
@@ -209,7 +211,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="5" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada pendaftaran mata kuliah.</td>
+                                            <td colspan="5" class="td-empty">Belum ada pendaftaran mata kuliah.</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -244,14 +246,8 @@
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.btn-filter-mk').forEach(b => {
                     b.classList.remove('active');
-                    b.style.background = 'var(--admin-white)';
-                    b.style.color = 'var(--admin-text)';
-                    b.style.borderColor = 'var(--admin-border)';
                 });
                 this.classList.add('active');
-                this.style.background = 'var(--admin-primary)';
-                this.style.color = '#fff';
-                this.style.borderColor = 'var(--admin-primary)';
 
                 currentMkFilter = this.dataset.mk;
                 applyEnrollFilters();
@@ -274,10 +270,10 @@
             const tbody = document.getElementById('enrollTableBody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><div class="user-cell"><div class="user-avatar" style="background:#FFE2E8;color:#B0182D;">${inits}</div><div class="user-meta"><span class="user-name">${mhs}</span><span class="user-id">${nim}</span></div></div></td>
-                <td style="font-size:12.5px;font-weight:700;">${mk}</td>
-                <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${kelas}</span></td>
-                <td style="font-size:12px;color:#64748B;">${smt}</td>
+                <td><div class="user-cell"><div class="user-avatar avatar-red">${inits}</div><div class="user-meta"><span class="user-name">${mhs}</span><span class="user-id">${nim}</span></div></div></td>
+                <td class="td-mk-name">${mk}</td>
+                <td><span class="card-subtitle-tag tag-kelas">${kelas}</span></td>
+                <td class="td-semester">${smt}</td>
                 <td><div class="btn-actions"><button class="btn-icon btn-icon-danger btn-delete-enroll"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></button></div></td>`;
             tbody.prepend(tr);
             document.getElementById('enrollCount').textContent = tbody.rows.length;
