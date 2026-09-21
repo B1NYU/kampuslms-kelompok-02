@@ -429,7 +429,7 @@
             height: 36px;
             border: 1.5px solid rgba(3, 159, 250, 0.28);
             border-radius: 9px;
-            padding: 0 10px 0 32px;
+            padding: 0 12px;
             outline: none;
             font-family: 'Nunito', sans-serif;
             font-size: 12px;
@@ -756,13 +756,13 @@
                     <!-- Role Switcher: Mahasiswa vs Dosen -->
                     <div class="role-switch-container">
                         <button type="button" class="role-btn active" id="btnRoleMahasiswa" onclick="selectRole('mahasiswa')">
-                            <span>🎓 Mahasiswa</span>
+                            <span>Mahasiswa</span>
                         </button>
                         <button type="button" class="role-btn" id="btnRoleDosen" onclick="selectRole('dosen')">
-                            <span>👨‍🏫 Dosen</span>
+                            <span>Dosen</span>
                         </button>
                         <button type="button" class="role-btn" id="btnRoleAdmin" onclick="selectRole('admin')">
-                            <span>👨‍💼 Admin</span>
+                            <span>Admin</span>
                         </button>
                     </div>
 
@@ -772,10 +772,6 @@
                         </div>
                     @endif
 
-                    <!-- Portal Icon -->
-                    <div class="portal-icon" id="portalIcon">
-                        🎓
-                    </div>
 
                     <!-- Title -->
                     <h2 id="portalTitle">
@@ -799,7 +795,6 @@
                                 Nama Lengkap
                             </label>
                             <div class="input-wrapper">
-                                <span class="input-icon">👤</span>
                                 <input
                                     type="text"
                                     id="nama"
@@ -818,7 +813,6 @@
                                 NIM (Nomor Induk Mahasiswa)
                             </label>
                             <div class="input-wrapper">
-                                <span class="input-icon">🪪</span>
                                 <input
                                     type="text"
                                     id="identifier"
@@ -887,7 +881,6 @@
             const btnDosen = document.getElementById('btnRoleDosen');
             const btnAdmin = document.getElementById('btnRoleAdmin');
             const inputRole = document.getElementById('inputRole');
-            const portalIcon = document.getElementById('portalIcon');
             const portalTitle = document.getElementById('portalTitle');
             const portalSubtitle = document.getElementById('portalSubtitle');
             const labelIdentifier = document.getElementById('labelIdentifier');
@@ -902,7 +895,6 @@
             if (role === 'dosen') {
                 btnDosen.classList.add('active');
                 inputRole.value = 'dosen';
-                portalIcon.textContent = '👨‍🏫';
                 portalTitle.textContent = 'Dosen Portal';
                 portalSubtitle.textContent = 'Selamat datang Dosen! Masukkan identitas Anda untuk mengelola kelas, materi, dan perkuliahan.';
                 labelIdentifier.textContent = 'NIP (Nomor Induk Pegawai)';
@@ -912,7 +904,6 @@
             } else if (role === 'admin') {
                 btnAdmin.classList.add('active');
                 inputRole.value = 'admin';
-                portalIcon.textContent = '👨‍💼';
                 portalTitle.textContent = 'Admin Portal';
                 portalSubtitle.textContent = 'Akses administrator penuh. Masukkan ID Admin Anda untuk melanjutkan.';
                 labelIdentifier.textContent = 'ID Admin';
@@ -922,7 +913,6 @@
             } else {
                 btnMhs.classList.add('active');
                 inputRole.value = 'mahasiswa';
-                portalIcon.textContent = '🎓';
                 portalTitle.textContent = 'Student Portal';
                 portalSubtitle.textContent = 'Selamat datang! Masukkan informasi akun untuk mengakses perkuliahan Anda.';
                 labelIdentifier.textContent = 'NIM (Nomor Induk Mahasiswa)';

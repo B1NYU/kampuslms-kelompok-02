@@ -32,25 +32,11 @@
         <!-- 2. Konten Utama Dashboard -->
         <main class="dashboard-content">
 
-            <!-- Topbar (Hamburger & Profil) -->
+            <!-- Topbar -->
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            OVERVIEW AKADEMIK • KELOMPOK 02
-                        </span>
-                        <h1>Dashboard LMS</h1>
-                    </div>
-                </div>
-
-                <div class="topbar-right">
-                    <div class="user-badge">
-                        <div class="user-badge-avatar">BK</div>
-                        <div class="user-badge-details">
-                            <span class="user-badge-info">Baihaqi & Tim</span>
-                            <span class="user-badge-role">Kelompok 02</span>
-                        </div>
+                        <h1>Selamat Datang</h1>
                     </div>
                 </div>
             </header>

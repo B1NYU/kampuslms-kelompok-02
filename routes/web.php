@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Mahasiswa\CourseController as MahasiswaCourseController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -41,8 +42,8 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 Route::prefix('mata-kuliah')->name('mata-kuliah.')->group(function () {
-    Route::get('/', [AdminCourseController::class, 'studentIndex'])->name('index');
-    Route::get('/{mata_kuliah}', [AdminCourseController::class, 'studentShow'])->name('show');
+    Route::get('/', [MahasiswaCourseController::class, 'index'])->name('index');
+    Route::get('/{mata_kuliah}', [MahasiswaCourseController::class, 'show'])->name('show');
 });
 
 Route::prefix('dosen')->name('dosen.')->group(function () {
