@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 
@@ -16,6 +15,9 @@ class AdminCourseController extends Controller
 {
     private const STATUSES = ['draft', 'active', 'archived'];
 
+    /**
+     * Tampilkan daftar mata kuliah dengan pencarian, filter status & dosen, dan pagination.
+     */
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('q', ''));
