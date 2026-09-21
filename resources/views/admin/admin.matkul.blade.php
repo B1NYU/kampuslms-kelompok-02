@@ -8,7 +8,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.dashboard.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/admin/admin.dashboard.css', 'resources/css/admin/admin.matkul.css', 'resources/js/app.js'])
+    @else
+        <link rel="stylesheet" href="{{ asset('css/admin/admin.matkul.css') }}">
     @endif
 
 </head>
@@ -50,11 +52,11 @@
                             <div class="section-header-text">
                                 <h2>Manajemen Mata Kuliah</h2>
                                 <p>Tambah, ubah, dan hapus mata kuliah serta tetapkan dosen pengampu.</p>
-                                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                                    <span style="background:#EFF6FF;color:#2563EB;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(37,99,235,0.2);">
+                                <div class="badges-container">
+                                    <span class="badge-blue">
                                         ✓ Kriteria 4.4: 5 Mata Kuliah Terdaftar
                                     </span>
-                                    <span style="background:#ECFDF5;color:#16A34A;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(22,163,74,0.2);">
+                                    <span class="badge-green">
                                         ✓ Tiap MK &ge; 15 Mahasiswa Terdaftar
                                     </span>
                                 </div>
@@ -65,8 +67,9 @@
 
                     <div class="two-col-grid">
                         <!-- Form Tambah/Edit Mata Kuliah -->
-                        <form id="formAddMatkul" class="card-form">
-                            <input type="hidden" id="mkId" value="">
+                        <form id="formAddMatkul" class="card-form" method="POST" action="{{ route('admin.matkul.store') }}">
+                            @csrf
+                            <input type="hidden" id="mkId" name="id" value="{{ old('id') }}">
 
                             <h4 class="card-form-title" id="formMkTitle">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,93 +79,107 @@
                                 <span>Form Tambah / Edit MK</span>
                             </h4>
 
-                            <div id="mkFormAlert" style="display:none;margin-bottom:10px;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:8px;"></div>
+                            <div id="mkFormAlert" class="alert-box"></div>
 
                             <div class="form-row-2">
                                 <div class="form-group">
                                     <label for="mkKode">Kode MK <span class="required">*</span></label>
-                                    <input type="text" id="mkKode" class="form-control" placeholder="Contoh: SI2514024" required>
+                                    <input type="text" id="mkKode" name="code" class="form-control" placeholder="Contoh: SI2514024" value="{{ old('code') }}" required>
+                                    @error('code')
+                                        <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="form-group">
                                     <label for="mkSks">Jumlah SKS <span class="required">*</span></label>
-                                    <select id="mkSks" class="form-select" required>
-                                        <option value="2">2 SKS</option>
-                                        <option value="3" selected>3 SKS</option>
-                                        <option value="4">4 SKS</option>
-                                    </select>
+                                    <input type="number" id="mkSks" name="sks" class="form-control" placeholder="Contoh: 3" min="1" value="{{ old('sks', 3) }}" required>
+                                    @error('sks')
+                                        <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="mkNama">Nama Mata Kuliah <span class="required">*</span></label>
-                                <input type="text" id="mkNama" class="form-control" placeholder="Nama lengkap mata kuliah..." required>
+                                <input type="text" id="mkNama" name="name" class="form-control" placeholder="Nama lengkap mata kuliah..." value="{{ old('name') }}" required>
+                                @error('name')
+                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="form-group">
                                 <label for="mkDosen">Dosen Pengampu <span class="required">*</span></label>
-                                <select id="mkDosen" class="form-select" required>
+                                <select id="mkDosen" name="lecturer_id" class="form-select" required>
                                     <option value="">— Pilih Dosen —</option>
                                     @foreach ($dosenList as $dosen)
-                                        <option value="{{ $dosen->id }}">{{ $dosen->name }}</option>
+                                        <option value="{{ $dosen->id }}" {{ old('lecturer_id') == $dosen->id ? 'selected' : '' }}>{{ $dosen->name }}</option>
                                     @endforeach
                                 </select>
+                                @error('lecturer_id')
+                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                @enderror
                                 @if ($dosenList->isEmpty())
-                                    <small style="color:#B91C1C;">Belum ada user dengan role "dosen". Tambahkan lewat Manajemen Pengguna dulu.</small>
+                                    <small class="error-text">Belum ada user dengan role "dosen". Tambahkan lewat Manajemen Pengguna dulu.</small>
                                 @endif
                             </div>
 
                             <div class="form-group">
                                 <label for="mkStatus">Status</label>
-                                <select id="mkStatus" class="form-select">
-                                    <option value="draft">Draft</option>
-                                    <option value="active" selected>Aktif</option>
-                                    <option value="archived">Diarsipkan</option>
+                                <select id="mkStatus" name="status" class="form-select">
+                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Aktif</option>
+                                    <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Diarsipkan</option>
                                 </select>
+                                @error('status')
+                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="form-group">
                                 <label for="mkDeskripsi">Deskripsi Singkat</label>
-                                <textarea id="mkDeskripsi" class="form-textarea" rows="2" placeholder="Gambaran singkat mata kuliah ini..."></textarea>
+                                <textarea id="mkDeskripsi" name="description" class="form-textarea" rows="2" placeholder="Gambaran singkat mata kuliah ini...">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            <div style="display:flex;gap:8px;">
+                            <div class="btn-group-actions">
                                 <button type="submit" class="btn-primary-action" id="mkSubmitBtn">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                     <span>Simpan Mata Kuliah</span>
                                 </button>
-                                <button type="button" id="mkCancelEditBtn" class="btn-icon" style="display:none;padding:0 14px;">Batal Edit</button>
+                                <button type="button" id="mkCancelEditBtn" class="btn-icon btn-cancel-edit">Batal Edit</button>
                             </div>
                         </form>
 
                         <!-- Tabel Mata Kuliah -->
                         <div class="table-container">
                             {{-- Filter & Tools Header (Borderless / Tanpa Outer Card, Auto-Submit) --}}
-                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+                            <div class="filter-header">
                                 {{-- Info Total Data & Badge Filter Aktif --}}
-                                <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="filter-summary-group">
                                     <span class="table-summary-info">Total <strong id="mkTableCount">{{ $matkulList->total() }}</strong> Mata Kuliah</span>
                                     @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
-                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #FFF5E8; color: #C98A1F; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; border: 1px solid #F4D9C1;">
+                                        <span class="badge-filter-active">
                                             Filter Aktif
                                         </span>
                                     @endif
                                 </div>
 
                                 {{-- Form Filter Otomatis (Tanpa Card/Frame Luar, Auto-Submit on Change) --}}
-                                <form method="GET" action="{{ url()->current() }}" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <form method="GET" action="{{ url()->current() }}" class="filter-form">
                                     {{-- Input Pencarian dengan Ikon (Cari lalu tekan Enter) --}}
-                                    <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px solid #F2DCD3; border-radius: 8px; padding: 0 10px; height: 36px; transition: border-color 0.2s;">
+                                    <div class="search-box-container">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8E6570" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
-                                        <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Cari kode / nama MK..." style="border: none; outline: none; background: transparent; font-family: 'Nunito', sans-serif; font-size: 13px; color: #5F3540; width: 160px;">
+                                        <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Cari kode / nama MK..." class="search-input">
                                     </div>
 
                                     {{-- Dropdown Status (Langsung Terfilter Saat Dipilih) --}}
-                                    <select name="status" onchange="this.form.submit()" style="height: 36px; padding: 0 8px; font-family: 'Nunito', sans-serif; font-size: 12.5px; font-weight: 700; color: #5F3540; background: #FFFFFF; border: 1.5px solid #F2DCD3; border-radius: 8px; outline: none; cursor: pointer;">
+                                    <select name="status" onchange="this.form.submit()" class="select-filter">
                                         <option value="">Semua Status</option>
                                         @foreach (['draft', 'active', 'archived'] as $s)
                                             <option value="{{ $s }}" @selected($filters['status'] === $s)>
@@ -172,7 +189,7 @@
                                     </select>
 
                                     {{-- Dropdown Dosen (Langsung Terfilter Saat Dipilih) --}}
-                                    <select name="lecturer_id" onchange="this.form.submit()" style="height: 36px; padding: 0 8px; font-family: 'Nunito', sans-serif; font-size: 12.5px; font-weight: 700; color: #5F3540; background: #FFFFFF; border: 1.5px solid #F2DCD3; border-radius: 8px; outline: none; cursor: pointer; max-width: 150px;">
+                                    <select name="lecturer_id" onchange="this.form.submit()" class="select-filter filter-dosen">
                                         <option value="">Semua Dosen</option>
                                         @foreach ($dosenList as $d)
                                             <option value="{{ $d->id }}" @selected($filters['lecturer_id'] === $d->id)>{{ $d->name }}</option>
@@ -181,7 +198,7 @@
 
                                     {{-- Tombol Reset --}}
                                     @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
-                                        <a href="{{ url()->current() }}" style="display: inline-flex; align-items: center; gap: 4px; height: 36px; font-size: 12px; font-weight: 700; color: #B0182D; text-decoration: none; padding: 0 10px; background: #FFEBEF; border-radius: 8px; border: 1px solid rgba(176, 24, 45, 0.15); transition: all 0.2s;">
+                                        <a href="{{ url()->current() }}" class="btn-reset-filter">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -214,10 +231,10 @@
                                             data-lecturer-name="{{ $mk->lecturer?->name }}"
                                             data-status="{{ $mk->status }}"
                                             data-deskripsi="{{ $mk->description }}">
-                                            <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">{{ $mk->code }}</span></td>
-                                            <td style="font-weight:700;font-size:13px;">{{ $mk->name }}</td>
-                                            <td style="font-size:12px;font-weight:700;color:#B0182D;">{{ $mk->sks }} SKS</td>
-                                            <td style="font-size:12px;color:#64748B;">{{ $mk->lecturer?->name ?? '—' }}</td>
+                                            <td><span class="card-subtitle-tag tag-kode">{{ $mk->code }}</span></td>
+                                            <td class="td-nama">{{ $mk->name }}</td>
+                                            <td class="td-sks">{{ $mk->sks }} SKS</td>
+                                            <td class="td-dosen">{{ $mk->lecturer?->name ?? '—' }}</td>
                                             <td>
                                                 <span class="badge-status {{ $mk->status === 'active' ? 'badge-status-active' : 'badge-status-inactive' }}">
                                                     {{ ['draft' => 'DRAFT', 'active' => 'AKTIF', 'archived' => 'DIARSIPKAN'][$mk->status] }}
@@ -236,7 +253,7 @@
                                         </tr>
                                         @empty
                                         <tr id="mkEmptyRow">
-                                            <td colspan="6" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada data mata kuliah.</td>
+                                            <td colspan="6" class="td-empty">Belum ada data mata kuliah.</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -292,10 +309,10 @@
 
         function rowHtml(mk) {
             return `
-                <td><span class="card-subtitle-tag" style="font-size:10.5px;padding:3px 9px;">${mk.code}</span></td>
-                <td style="font-weight:700;font-size:13px;">${mk.name}</td>
-                <td style="font-size:12px;font-weight:700;color:#B0182D;">${mk.sks} SKS</td>
-                <td style="font-size:12px;color:#64748B;">${mk.lecturer_name ?? '—'}</td>
+                <td><span class="card-subtitle-tag tag-kode">${mk.code}</span></td>
+                <td class="td-nama">${mk.name}</td>
+                <td class="td-sks">${mk.sks} SKS</td>
+                <td class="td-dosen">${mk.lecturer_name ?? '—'}</td>
                 <td><span class="badge-status ${badgeClass(mk.status)}">${statusLabel[mk.status]}</span></td>
                 <td><div class="btn-actions">
                     <button type="button" class="btn-icon btn-icon-edit btn-edit-mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
@@ -427,7 +444,7 @@
                     showAlert(result.message, 'success');
 
                     if (!tbody.querySelector('tr[data-id]')) {
-                        tbody.innerHTML = `<tr id="mkEmptyRow"><td colspan="6" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada data mata kuliah.</td></tr>`;
+                        tbody.innerHTML = `<tr id="mkEmptyRow"><td colspan="6" class="td-empty">Belum ada data mata kuliah.</td></tr>`;
                     }
                 } catch (err) {
                     showAlert('Gagal terhubung ke server.', 'error');
