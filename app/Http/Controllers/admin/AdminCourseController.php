@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
 
-class CourseController extends Controller
+class AdminCourseController extends Controller
 {
     private const STATUSES = ['draft', 'active', 'archived'];
 
@@ -54,19 +57,9 @@ class CourseController extends Controller
         );
     }
 
-
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request)
     {
-        $validated = $request->validate([
-            'code'        => ['required', 'string', 'max:20', 'unique:courses,code'],
-            'name'        => ['required', 'string', 'max:255'],
-            'sks'         => ['required', 'integer', 'min:1', 'max:6'],
-            'lecturer_id' => ['required', 'exists:users,id'],
-            'status'      => ['required', Rule::in(['draft', 'active', 'archived'])],
-            'description' => ['nullable', 'string'],
-        ]);
-
-        $course = Course::create($validated);
+        $course = Course::create($request->validated());
         $course->load('lecturer');
 
         return response()->json([
@@ -75,18 +68,9 @@ class CourseController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, Course $matkul)
+    public function update(UpdateCourseRequest $request, Course $matkul)
     {
-        $validated = $request->validate([
-            'code'        => ['required', 'string', 'max:20', Rule::unique('courses', 'code')->ignore($matkul->id)],
-            'name'        => ['required', 'string', 'max:255'],
-            'sks'         => ['required', 'integer', 'min:1', 'max:6'],
-            'lecturer_id' => ['required', 'exists:users,id'],
-            'status'      => ['required', Rule::in(['draft', 'active', 'archived'])],
-            'description' => ['nullable', 'string'],
-        ]);
-
-        $matkul->update($validated);
+        $matkul->update($request->validated());
         $matkul->load('lecturer');
 
         return response()->json([
@@ -97,7 +81,19 @@ class CourseController extends Controller
 
     public function destroy(Course $matkul)
     {
-        $matkul->delete();
+        try {
+            $matkul->delete();
+        } catch (QueryException $e) {
+            // 23000 = MySQL/MariaDB integrity violation, 23503 = PostgreSQL foreign key violation.
+            if (in_array((string) $e->getCode(), ['23000', '23503'], true)) {
+                return response()->json([
+                    'message' => 'Mata kuliah tidak dapat dihapus karena masih memiliki data terkait '
+                        . '(tugas, materi, atau mahasiswa). Ubah statusnya menjadi archived sebagai gantinya.',
+                ], 409);
+            }
+
+            throw $e;
+        }
 
         return response()->json([
             'message' => 'Mata kuliah berhasil dihapus.',
@@ -117,5 +113,6 @@ class CourseController extends Controller
             'description'   => $course->description,
         ];
     }
-}
 
+
+}

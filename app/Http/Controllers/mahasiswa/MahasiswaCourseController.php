@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class CourseController extends Controller
+class MahasiswaCourseController extends Controller
 {
     /**
      * Tampilkan katalog seluruh mata kuliah untuk mahasiswa.

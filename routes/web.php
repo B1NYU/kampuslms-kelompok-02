@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\CourseController as AdminCourseController;
+use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Mahasiswa\CourseController as MahasiswaCourseController;
+use App\Http\Controllers\Mahasiswa\MahasiswaCourseController;
 use Illuminate\Support\Facades\Route;
 
 
