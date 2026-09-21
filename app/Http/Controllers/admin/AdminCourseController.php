@@ -40,7 +40,7 @@ class AdminCourseController extends Controller
             ->when($lecturerId, fn ($query) => $query->where('lecturer_id', $lecturerId))
             ->orderByDesc('created_at')
             ->orderByDesc('id') // tie-breaker agar urutan antarhalaman stabil
-            ->paginate(15)
+            ->paginate(3)
             ->withQueryString();
 
         $dosenList = User::where('role', 'dosen')->orderBy('name')->get(['id', 'name']);
