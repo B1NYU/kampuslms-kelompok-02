@@ -61,44 +61,54 @@ class AdminCourseController extends Controller
 
     public function store(StoreCourseRequest $request)
     {
-        $course = Course::create($request->validated());
-        $course->load('lecturer');
+        Course::create($request->validated());
 
-        return response()->json([
-            'message' => 'Mata kuliah berhasil ditambahkan.',
-            'data'    => $this->transform($course),
-        ], 201);
+        return redirect()
+            ->action([self::class, 'index'], $this->redirectFilters($request))
+            ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
     public function update(UpdateCourseRequest $request, Course $matkul)
     {
         $matkul->update($request->validated());
-        $matkul->load('lecturer');
 
-        return response()->json([
-            'message' => 'Mata kuliah berhasil diperbarui.',
-            'data'    => $this->transform($matkul),
-        ]);
+        return redirect()
+            ->action([self::class, 'index'], $this->redirectFilters($request))
+            ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
-    public function destroy(Course $matkul)
+    public function destroy(Request $request, Course $matkul)
     {
         try {
             $matkul->delete();
         } catch (QueryException $e) {
             // 23000 = MySQL/MariaDB integrity violation, 23503 = PostgreSQL foreign key violation.
             if (in_array((string) $e->getCode(), ['23000', '23503'], true)) {
-                return response()->json([
-                    'message' => 'Mata kuliah tidak dapat dihapus karena masih memiliki data terkait '
-                        . '(tugas, materi, atau mahasiswa). Ubah statusnya menjadi archived sebagai gantinya.',
-                ], 409);
+                return redirect()
+                    ->action([self::class, 'index'], $this->redirectFilters($request))
+                    ->with('error', 'Mata kuliah tidak dapat dihapus karena masih memiliki data terkait '
+                        . '(tugas, materi, atau mahasiswa). Ubah statusnya menjadi archived sebagai gantinya.');
             }
 
             throw $e;
         }
 
-        return response()->json([
-            'message' => 'Mata kuliah berhasil dihapus.',
+        return redirect()
+            ->action([self::class, 'index'], $this->redirectFilters($request))
+            ->with('success', 'Mata kuliah berhasil dihapus.');
+    }
+
+    /**
+     * Ambil filter yang sedang aktif dari hidden field form (redirect_q,
+     * redirect_status, redirect_lecturer_id), lalu buang yang kosong agar
+     * tidak muncul sebagai ?status=&lecturer_id= di URL hasil redirect.
+     */
+    private function redirectFilters(Request $request): array
+    {
+        return array_filter([
+            'q'           => $request->input('redirect_q'),
+            'status'      => $request->input('redirect_status'),
+            'lecturer_id' => $request->input('redirect_lecturer_id'),
         ]);
     }
 
