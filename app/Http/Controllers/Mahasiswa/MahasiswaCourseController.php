@@ -26,17 +26,24 @@ class MahasiswaCourseController extends Controller
 
     /**
      * Tampilkan rincian alur 16 sesi perkuliahan dan rekapitulasi nilai tugas mahasiswa.
+     *
+     * Hanya mahasiswa yang TERDAFTAR di mata kuliah ini yang boleh membukanya,
+     * dan hanya pengumpulan/nilai MILIKNYA yang dimuat (bukan seluruh angkatan).
      */
     public function show(Course $mata_kuliah): View
     {
-        $course = $mata_kuliah->loadMissing([
+        $student = Auth::user();
+
+        abort_unless($mata_kuliah->isEnrolledBy($student), 403, 'Anda tidak terdaftar di mata kuliah ini.');
+
+        $course = $mata_kuliah->load([
             'lecturer',
             'students',
             'materials',
+            'assignments.submissions' => fn ($q) => $q->where('user_id', $student->id),
             'assignments.submissions.grade',
         ]);
 
-        $student = $this->resolveActiveStudent();
         $mataKuliah = $this->formatCourseMetadata($course);
         $nilaiData = $this->calculateGradesAndTasks($course, $student);
 
@@ -44,30 +51,6 @@ class MahasiswaCourseController extends Controller
             resource_path('views/courses/show.blade.php'),
             compact('course', 'mataKuliah', 'nilaiData', 'student')
         );
-    }
-
-    /**
-     * Helper: Ambil data mahasiswa aktif (Auth, session user_name, atau fallback aman database).
-     */
-    private function resolveActiveStudent(): ?User
-    {
-        try {
-            if (Auth::check()) {
-                return Auth::user();
-            }
-
-            if (session()->has('user_name')) {
-                $user = User::where('name', session('user_name'))->first();
-                if ($user) {
-                    return $user;
-                }
-            }
-
-            return User::where('role', 'mahasiswa')->where('email', 'mahasiswa@kampuslms.test')->first()
-                ?? User::where('role', 'mahasiswa')->first();
-        } catch (\Throwable $e) {
-            return null;
-        }
     }
 
     /**

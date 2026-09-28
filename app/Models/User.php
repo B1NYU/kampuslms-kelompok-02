@@ -31,6 +31,18 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Nama route dashboard sesuai peran pengguna.
+     */
+    public function dashboardRoute(): string
+    {
+        return match ($this->role) {
+            'admin' => 'admin.dashboard',
+            'dosen' => 'dosen.dashboard',
+            default => 'dashboard',
+        };
+    }
+
     public function taughtCourses()
     {
         return $this->hasMany(Course::class, 'lecturer_id');

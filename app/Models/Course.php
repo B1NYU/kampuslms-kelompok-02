@@ -25,6 +25,18 @@ class Course extends Model
         ];
     }
 
+    /** Apakah $user dosen pengampu mata kuliah ini? */
+    public function isTaughtBy(User $user): bool
+    {
+        return $user->role === 'dosen' && $this->lecturer_id === $user->id;
+    }
+
+    /** Apakah $user (mahasiswa) terdaftar di mata kuliah ini? */
+    public function isEnrolledBy(User $user): bool
+    {
+        return $this->students()->whereKey($user->id)->exists();
+    }
+
     public function lecturer()
     {
         return $this->belongsTo(User::class, 'lecturer_id');

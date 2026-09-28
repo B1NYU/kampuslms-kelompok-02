@@ -773,6 +773,12 @@
                     @endif
 
 
+                    @if($errors->any())
+                        <div style="background: #FDECEC; color: #B42318; border: 1px solid #F8C9C4; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 800; margin-bottom: 16px; text-align: center;">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
+
                     <!-- Title -->
                     <h2 id="portalTitle">
                         Student Portal
@@ -789,24 +795,6 @@
                         @csrf
                         <input type="hidden" name="role" id="inputRole" value="mahasiswa">
 
-                        <!-- Nama -->
-                        <div class="form-group">
-                            <label for="nama" class="form-label" id="labelNama">
-                                Nama Lengkap
-                            </label>
-                            <div class="input-wrapper">
-                                <input
-                                    type="text"
-                                    id="nama"
-                                    name="nama"
-                                    class="form-input"
-                                    placeholder="Masukkan nama Anda"
-                                    autocomplete="name"
-                                    required
-                                >
-                            </div>
-                        </div>
-
                         <!-- NIM / NIP -->
                         <div class="form-group">
                             <label for="identifier" class="form-label" id="labelIdentifier">
@@ -817,8 +805,25 @@
                                     type="text"
                                     id="identifier"
                                     name="identifier"
+                                    value="{{ old('identifier') }}"
                                     class="form-input"
                                     placeholder="Contoh: 10241014"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-wrapper">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-input"
+                                    placeholder="Masukkan password"
+                                    autocomplete="current-password"
                                     required
                                 >
                             </div>

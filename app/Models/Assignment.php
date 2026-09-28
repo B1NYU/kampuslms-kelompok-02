@@ -29,6 +29,28 @@ class Assignment extends Model
         ];
     }
 
+    /** Dosen pengampu mata kuliah tugas ini boleh mengelola tugas. */
+    public function isManageableBy(User $user): bool
+    {
+        return $this->course->isTaughtBy($user);
+    }
+
+    /**
+     * Boleh melihat tugas:
+     * - dosen pengampu (termasuk draft)
+     * - mahasiswa terdaftar, hanya bila tugas sudah dipublikasikan
+     */
+    public function isVisibleTo(User $user): bool
+    {
+        if ($user->role === 'dosen') {
+            return $this->isManageableBy($user);
+        }
+
+        return $user->role === 'mahasiswa'
+            && $this->status === 'published'
+            && $this->course->isEnrolledBy($user);
+    }
+
     public function course()
     {
         return $this->belongsTo(Course::class);
