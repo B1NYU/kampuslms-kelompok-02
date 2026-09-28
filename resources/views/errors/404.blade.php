@@ -484,7 +484,7 @@
 
     <!-- Dynamic Session Role Checking -->
     @php
-        $role = session('user_role');
+        $role = auth()->user()?->role;
         $dashUrl = route('dashboard');
         $dashLabel = 'Dashboard Mahasiswa';
 

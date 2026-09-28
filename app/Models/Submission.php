@@ -29,6 +29,17 @@ class Submission extends Model
         ];
     }
 
+    /**
+     * Boleh melihat pengumpulan: pemilik, dosen pengampu, atau admin.
+     * (Versi sementara minggu 5; dipindah ke SubmissionPolicy di minggu 7.)
+     */
+    public function isViewableBy(User $user): bool
+    {
+        return $user->role === 'admin'
+            || $this->user_id === $user->id
+            || $this->assignment->course->isTaughtBy($user);
+    }
+
     public function assignment()
     {
         return $this->belongsTo(Assignment::class);
