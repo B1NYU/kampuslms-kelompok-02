@@ -14,7 +14,7 @@
                 <td>
                     <a href="{{ route('dosen.assignments.edit', $a) }}">Ubah</a>
                     <form action="{{ route('dosen.assignments.destroy', $a) }}" method="POST" style="display:inline"
-                          onsubmit="return confirm('Hapus tugas ini?')">
+                            onsubmit="return confirm('Hapus tugas ini?')">
                         @csrf @method('DELETE')<button type="submit">Hapus</button>
                     </form>
                 </td>
