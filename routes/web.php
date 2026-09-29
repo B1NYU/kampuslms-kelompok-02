@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // ===== Mahasiswa =====
-    Route::middleware('role:mahasiswa')->group(function () {
+    Route::middleware('role:mahasiswa')->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/dashboard', function () {
             return view()->file(resource_path('views/mahasiswa/mahasiswa.dashboard.blade.php'));
         })->name('dashboard');
