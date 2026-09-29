@@ -57,7 +57,7 @@
                         $studentCount = $item->students->count();
                         $assignCount = $item->assignments->count();
                     @endphp
-                    <a href="{{ route('mata-kuliah.show', ['mata_kuliah' => $item->id]) }}" class="course-card">
+                    <a href="{{ route('mahasiswa.mata-kuliah.show', ['mata_kuliah' => $item->id]) }}" class="course-card">
                         <div class="course-banner {{ $warna }}">
                             <span class="course-tag">{{ $studentCount }} Mahasiswa</span>
                             <span class="course-go">
@@ -72,7 +72,7 @@
                             <h3 class="course-name">{{ $item->name }}</h3>
                             <span class="course-dosen">{{ $item->lecturer?->name ?? 'Dosen Pengampu' }} • {{ $item->sks }} SKS</span>
 
-                            <div style="margin-top: 4px; font-size: 11.5px; color: #64748B; font-weight: 700;">
+                            <div style="margin-top: 4px; font-size: 11.5px; color: #8E6570; font-weight: 700;">
                                 📝 {{ $assignCount }} Tugas Terdaftar
                             </div>
                         </div>

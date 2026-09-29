@@ -89,12 +89,12 @@
                             <h3 style="margin:0;">Mata Kuliah yang Diambil</h3>
                             <small style="color:#64748B;font-size:12px;">Data langsung dari database LMS</small>
                         </div>
-                        <a href="{{ route('mata-kuliah.index') }}" class="card-subtitle-tag" style="text-decoration:none;">Lihat Semua &rarr;</a>
+                        <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="card-subtitle-tag" style="text-decoration:none;">Lihat Semua &rarr;</a>
                     </div>
 
                     <div class="mk-list">
                         @forelse ($dbCourses as $mk)
-                            <a href="{{ route('mata-kuliah.show', $mk->id) }}" class="mk-row" style="text-decoration:none;color:inherit;transition:background 0.2s;">
+                            <a href="{{ route('mahasiswa.mata-kuliah.show', $mk->id) }}" class="mk-row" style="text-decoration:none;color:inherit;transition:background 0.2s;">
                                 <span class="mk-code">{{ $mk->code }}</span>
                                 <div class="mk-info">
                                     <span class="mk-name">{{ $mk->name }}</span>
@@ -191,7 +191,7 @@
                 <div class="card-box">
                     <div class="card-header-clean">
                         <h3>Tugas & Pengumuman Terkini</h3>
-                        <a href="{{ route('mata-kuliah.index') }}" class="link-see-all">Semua MK</a>
+                        <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="link-see-all">Semua MK</a>
                     </div>
                     <div class="message-list">
                         @forelse ($dbAssignments->take(3) as $assign)
