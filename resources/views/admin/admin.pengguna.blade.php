@@ -61,16 +61,16 @@
                                 <h2>Manajemen Pengguna</h2>
                                 <p>Kelola seluruh akun pengguna dan role (Admin / Dosen / Mahasiswa) sesuai data database.</p>
                                 <div class="seeder-criteria-badges" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                                    <span style="background:#FFE2E8;color:#B0182D;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(176,24,45,0.2);">
+                                    <span style="background:rgba(249, 99, 5, 0.1);color:#F96305;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(249, 99, 5, 0.25);">
                                         👑 Admin: <span id="badgeCountAdmin">{{ $countAdmin }}</span>
                                     </span>
-                                    <span style="background:#FFF0DE;color:#C98A1F;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(201,138,31,0.2);">
+                                    <span style="background:rgba(249, 184, 4, 0.14);color:#D97706;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(249, 184, 4, 0.3);">
                                         🎓 Dosen: <span id="badgeCountDosen">{{ $countDosen }}</span>
                                     </span>
-                                    <span style="background:#ECFDF5;color:#16A34A;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(22,163,74,0.2);">
+                                    <span style="background:rgba(16, 185, 129, 0.12);color:#10B981;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(16, 185, 129, 0.25);">
                                         👥 Mahasiswa: <span id="badgeCountMhs">{{ $countMahasiswa }}</span>
                                     </span>
-                                    <span style="background:#EFF6FF;color:#2563EB;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(37,99,235,0.2);">
+                                    <span style="background:rgba(3, 159, 250, 0.1);color:#039FFA;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(3, 159, 250, 0.25);">
                                         ✓ Kriteria 4.4 Seeder Terpenuhi (<span id="badgeCountTotal">{{ $countTotal }}</span> Users)
                                     </span>
                                 </div>
@@ -190,9 +190,9 @@
                                             $initials = collect(explode(' ', $u->name))->map(fn($w) => mb_substr($w, 0, 1))->join('');
                                             $initials = strtoupper(mb_substr($initials, 0, 2));
                                             $roleColors = [
-                                                'admin' => ['#FFE2E8', '#B0182D'],
-                                                'dosen' => ['#FFF0DE', '#C98A1F'],
-                                                'mahasiswa' => ['#ECFDF5', '#16A34A'],
+                                                'admin' => ['rgba(249, 99, 5, 0.12)', '#F96305'],
+                                                'dosen' => ['rgba(249, 184, 4, 0.14)', '#D97706'],
+                                                'mahasiswa' => ['rgba(3, 159, 250, 0.12)', '#039FFA'],
                                             ];
                                             [$bg, $c] = $roleColors[$u->role] ?? ['#F1F5F9', '#64748B'];
                                             $isNonAktif = $u->trashed();
@@ -261,9 +261,9 @@
         const passwordHint = document.getElementById('passwordHint');
 
         const roleColors = {
-            admin: ['#FFE2E8', '#B0182D'],
-            dosen: ['#FFF0DE', '#C98A1F'],
-            mahasiswa: ['#ECFDF5', '#16A34A'],
+            admin: ['rgba(249, 99, 5, 0.12)', '#F96305'],
+            dosen: ['rgba(249, 184, 4, 0.14)', '#D97706'],
+            mahasiswa: ['rgba(3, 159, 250, 0.12)', '#039FFA'],
         };
 
         function showAlert(message, type = 'error') {

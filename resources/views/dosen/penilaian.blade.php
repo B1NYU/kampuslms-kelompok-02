@@ -50,16 +50,7 @@
         <main class="dosen-content">
 
             <!-- Topbar Header -->
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PORTAL DOSEN • EVALUASI &amp; GRADING TUGAS
-                        </span>
-                        <h1>4. Penilaian &amp; Umpan Balik (Feedback) Mahasiswa</h1>
-                    </div>
-                </div>
+            <header class="dash-topbar justify-end">
 
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
@@ -108,13 +99,13 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <span style="background: #1B8A5A; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
+                            <span style="background: #10B981; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
                                 ✓ {{ $totalSubmissions }} Total Submission (&ge; 100)
                             </span>
-                            <span style="background: #B0182D; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
+                            <span style="background: #039FFA; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
                                 ✓ {{ $totalGraded }} Dinilai ({{ $persenGraded }}% &sim;60%)
                             </span>
-                            <span style="background: #C98A1F; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
+                            <span style="background: #F9B804; color: #0F172A; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
                                 ⏳ {{ $totalPending }} Menunggu Review
                             </span>
                         </div>
@@ -129,23 +120,23 @@
                         </div>
 
                         <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; background: #FFF9FA; border: 1px solid #EED4DA; border-radius: 8px; padding: 6px 12px; gap: 8px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8E6570" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <div style="display: flex; align-items: center; background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 8px; padding: 6px 12px; gap: 8px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
-                                <input type="text" id="filterSearchInput" placeholder="Cari nama / tugas / berkas..." style="border: none; outline: none; background: transparent; font-size: 12px; color: #5F3540; width: 190px;">
+                                <input type="text" id="filterSearchInput" placeholder="Cari nama / tugas / berkas..." style="border: none; outline: none; background: transparent; font-size: 12px; color: #0F172A; width: 190px;">
                             </div>
-                            <div style="font-size: 12px; font-weight: 800; color: #8E6570;">
-                                Status: <span style="color:#1B8A5A;" id="gradedSummary">{{ $totalGraded }} Dinilai</span> &middot; <span style="color:#C98A1F;" id="ungradedSummary">{{ $totalPending }} Menunggu Review</span>
+                            <div style="font-size: 12px; font-weight: 800; color: #64748B;">
+                                Status: <span style="color:#10B981;" id="gradedSummary">{{ $totalGraded }} Dinilai</span> &middot; <span style="color:#D97706;" id="ungradedSummary">{{ $totalPending }} Menunggu Review</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tabel Pengumpulan & Penilaian -->
-                    <div class="table-responsive" style="max-height: 580px; overflow-y: auto; border: 1px solid #F0D9DF; border-radius: 10px;">
+                    <div class="table-responsive" style="max-height: 580px; overflow-y: auto; border: 1px solid rgba(3, 159, 250, 0.18); border-radius: 10px;">
                         <table class="custom-dosen-table" id="submissionTable">
-                            <thead style="position: sticky; top: 0; z-index: 2; background: #FFF8F9;">
+                            <thead style="position: sticky; top: 0; z-index: 2; background: #F8FAFC;">
                                 <tr>
                                     <th>Mahasiswa</th>
                                     <th>Tugas yang Dikumpulkan</th>
@@ -171,11 +162,11 @@
                                         if (strlen($initials) === 1) $initials .= strtoupper(substr($words[0] ?? 'M', 1, 1));
 
                                         $palette = [
-                                            ['bg' => '#FFE2E8', 'color' => '#B0182D'],
-                                            ['bg' => '#FFF0DE', 'color' => '#C98A1F'],
-                                            ['bg' => '#EBF3FF', 'color' => '#1971C2'],
-                                            ['bg' => '#EBF9F1', 'color' => '#1B8A5A'],
-                                            ['bg' => '#F2EBF9', 'color' => '#8E44AD'],
+                                            ['bg' => 'rgba(3, 159, 250, 0.12)', 'color' => '#039FFA'],
+                                            ['bg' => 'rgba(249, 184, 4, 0.14)', 'color' => '#D97706'],
+                                            ['bg' => 'rgba(50, 179, 241, 0.14)', 'color' => '#0284C7'],
+                                            ['bg' => 'rgba(16, 185, 129, 0.14)', 'color' => '#10B981'],
+                                            ['bg' => 'rgba(249, 99, 5, 0.12)', 'color' => '#F96305'],
                                         ];
                                         $color = $palette[$sub->user_id % 5];
 
@@ -209,7 +200,7 @@
                                         </td>
                                         <td>
                                             <strong>{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</strong>
-                                            <div style="font-size:11px; color:#8E6570; font-weight:600; margin-top:2px;">
+                                            <div style="font-size:11px; color:#64748B; font-weight:600; margin-top:2px;">
                                                 {{ $course?->code }} &bull; {{ $course?->name }}
                                             </div>
                                         </td>
@@ -233,7 +224,7 @@
                                                 <span>{{ $filename }}</span>
                                             </a>
                                             @if($sub->note)
-                                                <div style="font-size:10px; color:#8E6570; font-style:italic; margin-top:2px;" title="{{ $sub->note }}">
+                                                <div style="font-size:10px; color:#64748B; font-style:italic; margin-top:2px;" title="{{ $sub->note }}">
                                                     Catatan: {{ Str::limit($sub->note, 25) }}
                                                 </div>
                                             @endif
@@ -282,7 +273,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" style="text-align:center; padding: 30px; color: #8E6570;">
+                                        <td colspan="7" style="text-align:center; padding: 30px; color: #64748B;">
                                             Tidak ada data submission yang ditemukan di database.
                                         </td>
                                     </tr>
@@ -314,7 +305,7 @@
                     <label for="inputScore">Nilai Akhir (Skala 0 - 100) <span class="required">*</span></label>
                     <input type="number" id="inputScore" class="form-control" placeholder="Masukkan nilai 0-100..." min="0" max="100" required>
                     <div class="score-quick-buttons">
-                        <span style="font-size: 11px; color: #8E6570; align-self: center;">Pintasan Nilai:</span>
+                        <span style="font-size: 11px; color: #64748B; align-self: center;">Pintasan Nilai:</span>
                         <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 95">95 (A)</button>
                         <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 88">88 (A-)</button>
                         <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 82">82 (B+)</button>
@@ -347,10 +338,10 @@
                 const container = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
                 toast.className = 'dosen-toast';
-                if (!isSuccess) toast.style.borderLeftColor = '#E23C64';
+                if (!isSuccess) toast.style.borderLeftColor = '#EF4444';
 
                 toast.innerHTML = `
-                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#1B8A5A' : '#E23C64'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#10B981' : '#EF4444'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span>${message}</span>
@@ -436,7 +427,7 @@
 
                     const feedbackElem = targetRow.querySelector('.item-feedback');
                     if (feedbackElem) {
-                        feedbackElem.style.color = '#5F3540';
+                        feedbackElem.style.color = '#0F172A';
                         feedbackElem.style.fontStyle = 'normal';
                         feedbackElem.title = feedback;
                         feedbackElem.textContent = `"${feedback.length > 60 ? feedback.substring(0, 60) + '...' : feedback}"`;
@@ -444,7 +435,7 @@
 
                     const actionBtn = targetRow.querySelector('.btn-grade-action');
                     if (actionBtn) {
-                        actionBtn.style.background = '#B0182D';
+                        actionBtn.style.background = 'linear-gradient(135deg, #039FFA 0%, #0284C7 100%)';
                         actionBtn.textContent = 'Edit Nilai';
                         actionBtn.setAttribute('data-score', score);
                         actionBtn.setAttribute('data-feedback', feedback);
