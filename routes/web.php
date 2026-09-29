@@ -69,9 +69,8 @@ Route::middleware('auth')->group(function () {
             return view()->file(resource_path('views/dosen/materi.blade.php'));
         })->name('materi');
 
-        Route::get('/tugas', function () {
-            return view()->file(resource_path('views/dosen/tugas.blade.php'));
-        })->name('tugas');
+        // Pintu masuk menu "Buat Tugas": diarahkan ke mata kuliah pertama yang diampu.
+        Route::get('/tugas', [DosenAssignmentController::class, 'landing'])->name('tugas');
 
         Route::get('/penilaian', function () {
             return view()->file(resource_path('views/dosen/penilaian.blade.php'));
