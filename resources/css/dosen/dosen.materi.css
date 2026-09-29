@@ -1,0 +1,220 @@
+/* ==========================================================================
+   DOSEN.MATERI.CSS - Unggah & Distribusi Modul Perkuliahan
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
+
+@import './dosen.common.css';
+
+/* Custom Segmented Buttons / Pill Radios */
+.type-selector-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.type-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 8px;
+    background: #FFFFFF;
+    border: 1.5px solid rgba(3, 159, 250, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--dosen-muted);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.type-pill:hover {
+    border-color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.06);
+    color: var(--dosen-primary);
+}
+
+.type-pill.active {
+    background: rgba(3, 159, 250, 0.1);
+    border-color: var(--dosen-primary);
+    color: var(--dosen-primary);
+    box-shadow: 0 2px 8px rgba(3, 159, 250, 0.18);
+}
+
+/* File Dropzone Area */
+.file-dropzone {
+    border: 2px dashed rgba(3, 159, 250, 0.35);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.file-dropzone:hover,
+.file-dropzone.dragover {
+    border-color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.04);
+}
+
+.file-dropzone-icon {
+    color: var(--dosen-primary);
+}
+
+.file-dropzone-text {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--dosen-text);
+}
+
+.file-dropzone-sub {
+    font-size: 11px;
+    color: var(--dosen-muted);
+}
+
+.file-selected-info {
+    display: none;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--dosen-success);
+    background: #ECFDF5;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px solid #A7F3D0;
+}
+
+/* Materials Published Grid */
+.materials-published-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.material-card {
+    background: #F8FAFC;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.material-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(3, 159, 250, 0.35);
+    background: #FFFFFF;
+    box-shadow: 0 10px 24px rgba(3, 159, 250, 0.10);
+}
+
+.material-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.material-type-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 3px 9px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.tag-pdf {
+    background: #FEF2F2;
+    color: #EF4444;
+    border: 1px solid #FECACA;
+}
+
+.tag-pptx {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+}
+
+.tag-link {
+    background: #EFF6FF;
+    color: var(--dosen-primary);
+    border: 1px solid #BAE6FD;
+}
+
+.material-card-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--dosen-text);
+    line-height: 1.35;
+}
+
+.material-card-desc {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dosen-muted);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.material-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(3, 159, 250, 0.18);
+    margin-top: auto;
+}
+
+.material-meta-date {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dosen-muted);
+}
+
+.material-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-open-resource {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--dosen-primary);
+    text-decoration: none;
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    padding: 5px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-open-resource:hover {
+    background: var(--dosen-primary);
+    color: #FFFFFF;
+    border-color: var(--dosen-primary);
+}

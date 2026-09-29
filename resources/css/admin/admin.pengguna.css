@@ -1,0 +1,78 @@
+/* ==========================================================================
+   ADMIN.PENGGUNA.CSS - Fitur Manajemen Pengguna (CRUD & Role)
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
+
+@import './admin.common.css';
+
+/* Role Filter Group Buttons */
+.role-filter-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.role-filter-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    background: #FFFFFF;
+    color: var(--admin-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.role-filter-btn:hover {
+    background: rgba(3, 159, 250, 0.08);
+    color: var(--admin-primary);
+    border-color: var(--admin-primary);
+}
+
+.role-filter-btn.active {
+    background: var(--admin-primary) !important;
+    color: #FFFFFF !important;
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 3px 10px rgba(3, 159, 250, 0.3) !important;
+}
+
+/* User Form specifics */
+#userCancelEditBtn {
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    color: var(--admin-muted);
+    font-weight: 800;
+    font-size: 13px;
+    height: 42px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+}
+
+#userCancelEditBtn:hover {
+    background: #F1F5F9;
+    color: var(--admin-text);
+    border-color: #94A3B8;
+}
+
+/* Scrollable Table Container */
+.table-responsive {
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.custom-admin-table thead tr {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #F8FAFC !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}

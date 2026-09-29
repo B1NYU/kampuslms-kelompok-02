@@ -79,6 +79,60 @@ body.poster-page {
     border: none;
 }
 
+/* Top Action Bar (Back to Login) */
+.anggota-topbar {
+    width: 100%;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 20px 36px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 20;
+}
+
+.btn-back-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    color: #039FFA;
+    border: 1.5px solid rgba(3, 159, 250, 0.25);
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(3, 159, 250, 0.08);
+    transition: all 0.25s ease;
+}
+
+.btn-back-login:hover {
+    background: #039FFA;
+    color: #FFFFFF;
+    border-color: #039FFA;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(3, 159, 250, 0.25);
+}
+
+.anggota-brand-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    padding: 6px 14px;
+    border-radius: 30px;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.anggota-brand-name {
+    font-size: 13px;
+    font-weight: 900;
+    color: #039FFA;
+    letter-spacing: 0.05em;
+}
+
 /* Top Navbar Style (Matching Navbar Utama) */
 .poster-page .top-navbar {
     background: #FFFFFF;

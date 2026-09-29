@@ -1,0 +1,133 @@
+/* ==========================================================================
+   DOSEN.TUGAS.CSS - Pembuatan Tugas & Monitoring Deadline
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
+
+@import './dosen.common.css';
+
+/* Assignments List Wrapper & Grid */
+.assignments-list-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.assignments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    max-height: 540px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.assignment-card {
+    background: #F8FAFC;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-left: 4px solid var(--dosen-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.25s ease;
+}
+
+.assignment-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(3, 159, 250, 0.35);
+    border-left-color: var(--dosen-dark);
+    background: #FFFFFF;
+    box-shadow: 0 10px 24px rgba(3, 159, 250, 0.10);
+}
+
+.assignment-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.assignment-card-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--dosen-text);
+    line-height: 1.35;
+}
+
+.assignment-weight-tag,
+.assignment-type-tag {
+    font-size: 10.5px;
+    font-weight: 900;
+    color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.1);
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.assignment-deadline-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    padding: 10px 14px;
+    border-radius: 12px;
+}
+
+.deadline-icon {
+    color: var(--dosen-secondary);
+    flex-shrink: 0;
+}
+
+.deadline-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.deadline-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--dosen-muted);
+    text-transform: uppercase;
+}
+
+.deadline-value {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--dosen-text);
+}
+
+.submission-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.submission-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--dosen-muted);
+}
+
+.submission-progress-labels strong {
+    color: var(--dosen-primary);
+}
+
+.submission-progress-track {
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.submission-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #32B3F1, #039FFA);
+    border-radius: 6px;
+    transition: width 0.4s ease;
+}

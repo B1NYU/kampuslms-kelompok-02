@@ -22,8 +22,23 @@
     <!-- Main Window Canvas -->
     <div class="app-window">
         
-        <!-- 1. Panggil Komponen Navbar -->
-        <x-layout />
+        <!-- Tombol Back ke Halaman Login (Tanpa Navbar) -->
+        <header class="anggota-topbar">
+            <a href="{{ url('/') }}" class="btn-back-login" title="Kembali ke Halaman Login">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Kembali ke Halaman Login</span>
+            </a>
+            <div class="anggota-brand-badge">
+                <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="20" r="11" stroke="#039FFA" stroke-width="3.5" fill="none" opacity="0.95" />
+                    <circle cx="24" cy="20" r="11" stroke="#F9B804" stroke-width="3.5" fill="none" opacity="0.95" />
+                </svg>
+                <span class="anggota-brand-name">KAMPUS LMS</span>
+            </div>
+        </header>
 
         <!-- 2. Konten Utama Laman Anggota -->
         <main class="page-wrapper">

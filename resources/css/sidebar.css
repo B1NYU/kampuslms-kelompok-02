@@ -1,12 +1,18 @@
-/* =========================================
-   TOP NAVBAR (Standardized matching Admin Style)
-   ========================================= */
+/* ==========================================================================
+   SIDEBAR.CSS (Standardized Global Top Navbar for Mahasiswa, Dosen & Admin)
+   Selaras dengan tema Mahasiswa: aksen biru (#039FFA / #32B3F1)
+   ========================================================================== */
+
 .top-navbar,
-.top-navbar * {
+.admin-navbar,
+.top-navbar *,
+.admin-navbar * {
     font-family: 'Nunito', sans-serif;
+    box-sizing: border-box;
 }
 
-.top-navbar {
+.top-navbar,
+.admin-navbar {
     background: #FFFFFF;
     border-bottom: 1px solid rgba(3, 159, 250, 0.18);
     padding: 0 36px;
@@ -20,6 +26,13 @@
     top: 0;
     z-index: 100;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.admin-navbar-inner {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .navbar-left-group {
@@ -67,19 +80,33 @@
     color: #FFFFFF;
 }
 
-/* Nav Menu Mahasiswa */
+.portal-badge-dosen {
+    background: linear-gradient(90deg, #0284C7, #039FFA);
+    color: #FFFFFF;
+}
+
+.portal-badge-admin {
+    background: linear-gradient(90deg, #0369A1, #0284C7);
+    color: #FFFFFF;
+}
+
+/* Nav Menu (Mahasiswa, Dosen, Admin) */
 .navbar-nav,
-.navbar-nav.mhs-nav {
+.navbar-nav.mhs-nav,
+.navbar-nav.dosen-nav,
+.navbar-nav.admin-nav {
     display: flex;
     align-items: center;
     list-style: none;
-    gap: 2px;
+    gap: 4px;
     margin: 0;
     padding: 0;
 }
 
 .navbar-nav li a,
-.nav-link-mhs {
+.nav-link-mhs,
+.nav-link-dosen,
+.nav-link-admin {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -94,15 +121,19 @@
 }
 
 .navbar-nav li a:hover,
-.nav-link-mhs:hover {
+.nav-link-mhs:hover,
+.nav-link-dosen:hover,
+.nav-link-admin:hover {
     color: #039FFA;
-    background: #FFFDF8;
+    background: #F0F9FF;
 }
 
 .navbar-nav li.active a,
-.nav-link-mhs.active {
+.nav-link-mhs.active,
+.nav-link-dosen.active,
+.nav-link-admin.active {
     color: #039FFA;
-    background: #FFFDF8;
+    background: #F0F9FF;
     font-weight: 800;
 }
 
@@ -114,8 +145,10 @@
     gap: 12px;
 }
 
-/* Avatar Badge Mahasiswa */
-.mhs-avatar-badge {
+/* Avatar Badges */
+.mhs-avatar-badge,
+.dosen-avatar-badge,
+.admin-avatar-badge {
     display: flex;
     align-items: center;
     gap: 9px;
@@ -123,9 +156,12 @@
     padding: 5px 13px 5px 5px;
     border-radius: 30px;
     border: 1px solid rgba(3, 159, 250, 0.25);
+    box-shadow: 0 1px 4px rgba(3, 159, 250, 0.06);
 }
 
-.mhs-avatar {
+.mhs-avatar,
+.dosen-avatar,
+.admin-avatar {
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -139,19 +175,25 @@
     flex-shrink: 0;
 }
 
-.mhs-badge-info {
+.mhs-badge-info,
+.dosen-badge-info,
+.admin-badge-info {
     display: flex;
     flex-direction: column;
 }
 
-.mhs-name {
+.mhs-name,
+.dosen-name,
+.admin-name {
     font-size: 12.5px;
     font-weight: 800;
     color: #0F172A;
     line-height: 1.2;
 }
 
-.mhs-role {
+.mhs-role,
+.dosen-role-tag,
+.admin-role-tag {
     font-size: 10.5px;
     font-weight: 600;
     color: #F96305;
@@ -188,9 +230,23 @@
 /* Focus reset */
 .nav-link-mhs:focus,
 .nav-link-mhs:focus-visible,
+.nav-link-dosen:focus,
+.nav-link-dosen:focus-visible,
+.nav-link-admin:focus,
+.nav-link-admin:focus-visible,
 .btn-logout:focus,
 .btn-logout:focus-visible {
     outline: none !important;
     border-color: #039FFA !important;
     box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.2) !important;
+}
+
+@media (max-width: 900px) {
+    .top-navbar,
+    .admin-navbar {
+        padding: 0 16px;
+    }
+    .navbar-nav {
+        display: none !important;
+    }
 }

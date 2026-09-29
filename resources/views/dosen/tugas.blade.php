@@ -11,9 +11,9 @@
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/dosen/dosen.dashboard.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.tugas.css', 'resources/js/app.js'])
     @else
-        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.dashboard.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.tugas.css') }}">
     @endif
 </head>
 
@@ -217,6 +217,7 @@
             </section>
 
         </main>
+        <x-footer />
     </div>
 
     <!-- Toast Notification Container -->

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.dashboard.css', 'resources/css/admin/admin.pendaftaran.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/admin/admin.pendaftaran.css', 'resources/js/app.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/admin/admin.pendaftaran.css') }}">
     @endif
