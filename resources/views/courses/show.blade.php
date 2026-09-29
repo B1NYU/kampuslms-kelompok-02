@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="course-subnav-right">
-                    <a href="{{ route('dashboard') }}" class="btn-subnav-back">
+                    <a href="{{ route('mahasiswa.dashboard') }}" class="btn-subnav-back">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
@@ -65,7 +65,7 @@
 
         <!-- 3. KONTEN MATA KULIAH -->
         <main class="course-main-content">
-            
+
             <!-- VIEW 1: DETAIL (Alur 16 Sesi & Info Matkul) -->
             <div id="panelCourseDetail" style="{{ request('tab') === 'nilai' ? 'display: none;' : '' }}">
                 <div class="split-layout">
@@ -173,7 +173,7 @@
                                         <div class="timeline-node-inner"></div>
                                     </div>
                                     <div class="session-card" id="cardWeek{{ $minggu }}"
-                                         onclick="switchRightToDetail({{ $minggu }}, '{{ addslashes($item['judul']) }}', '{!! $materiJson !!}', '{!! $tasksJson !!}')">                               
+                                         onclick="switchRightToDetail({{ $minggu }}, '{{ addslashes($item['judul']) }}', '{!! $materiJson !!}', '{!! $tasksJson !!}')">
                                         <div class="session-left">
                                             <div class="session-icon-circle {{ $item['status'] }} {{ $isExam ? 'exam-icon' : '' }}">
                                                 {{ $minggu }}
@@ -257,7 +257,7 @@
                                     <span class="detail-badge-session">Rincian Pertemuan</span>
                                     <h3 id="detailHeading">Minggu 1</h3>
                                 </div>
-                                
+
                                 <div class="detail-block">
                                     <span class="detail-block-title detail-title-materi">Materi & Berkas Perkuliahan</span>
                                     <div class="materi-container" id="materiListContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
@@ -492,15 +492,15 @@
             document.getElementById('defaultRightPanel').style.display = 'none';
             const detailPanel = document.getElementById('detailRightPanel');
             detailPanel.style.display = 'block';
-            
+
             document.getElementById('detailBadgeSession').innerText = 'Minggu ' + minggu;
             document.getElementById('detailHeading').innerText = judul;
-            
+
             // Render Materi
             const materiList = JSON.parse(materiJsonStr);
             const materiContainer = document.getElementById('materiListContainer');
             materiContainer.innerHTML = '';
-            
+
             if (materiList.length === 0) {
                 materiContainer.innerHTML = `
                     <div style="padding: 14px 16px; background: #F0F9FF; border: 1px dashed rgba(3, 159, 250, 0.3); border-radius: 12px; color: #0284C7; font-size: 12.5px; text-align: center; font-weight: 600;">
@@ -532,7 +532,7 @@
             const tasksContainer = document.getElementById('tasksListContainer');
             tasksContainer.innerHTML = '';
             document.getElementById('tasksHeaderTitle').innerText = 'Aktivitas & Tugas (' + tasks.length + ' Penugasan)';
-            
+
             if (tasks.length === 0) {
                 tasksContainer.innerHTML = `
                     <div style="padding: 14px 16px; background: #FFFBEB; border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: 12px; color: #92400E; font-size: 12.5px; text-align: center; font-weight: 600;">
@@ -547,7 +547,7 @@
                     else if (typeLower.includes('praktikum') || typeLower.includes('latihan')) badgeClass = 'praktikum';
                     else if (typeLower.includes('milestone')) badgeClass = 'milestone';
                     else if (typeLower.includes('ujian') || typeLower.includes('uts') || typeLower.includes('uas')) badgeClass = 'exam';
-                    
+
                     const isLihatNilai = task.btn.includes('Lihat Nilai');
                     const clickAction = isLihatNilai ? "switchCourseTab('nilai')" : "alert('Penugasan: " + task.judul.replace(/'/g, "\\'") + "')";
 
