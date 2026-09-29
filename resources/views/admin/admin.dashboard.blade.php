@@ -140,12 +140,12 @@
                     <div class="activity-list">
                         @php
                             $activities = [
-                                ['dot' => '#B0182D', 'title' => 'Pengguna baru didaftarkan', 'desc' => 'Baihaqi Abimanyu (Mahasiswa) &mdash; NIM 10241014', 'time' => '2 mnt lalu'],
-                                ['dot' => '#22C55E', 'title' => 'Mata kuliah ditambahkan', 'desc' => 'SI104 &bull; Pemrograman Mobile (3 SKS)', 'time' => '14 mnt lalu'],
+                                ['dot' => '#039FFA', 'title' => 'Pengguna baru didaftarkan', 'desc' => 'Baihaqi Abimanyu (Mahasiswa) &mdash; NIM 10241014', 'time' => '2 mnt lalu'],
+                                ['dot' => '#10B981', 'title' => 'Mata kuliah ditambahkan', 'desc' => 'SI104 &bull; Pemrograman Mobile (3 SKS)', 'time' => '14 mnt lalu'],
                                 ['dot' => '#F59E0B', 'title' => 'Pendaftaran mahasiswa', 'desc' => 'Calvin Adithya didaftarkan ke SI101', 'time' => '31 mnt lalu'],
                                 ['dot' => '#EF4444', 'title' => 'Pengguna dinonaktifkan', 'desc' => 'Akun mahasiswa IF312-C dibekukan admin', 'time' => '1 jam lalu'],
-                                ['dot' => '#B0182D', 'title' => 'Role diperbarui', 'desc' => 'Dr. Rina Marlina &mdash; role diubah menjadi Dosen', 'time' => '2 jam lalu'],
-                                ['dot' => '#22C55E', 'title' => 'Data mata kuliah diperbarui', 'desc' => 'IF305 &bull; Kecerdasan Buatan &mdash; SKS diubah ke 4', 'time' => '3 jam lalu'],
+                                ['dot' => '#F96305', 'title' => 'Role diperbarui', 'desc' => 'Dr. Rina Marlina &mdash; role diubah menjadi Dosen', 'time' => '2 jam lalu'],
+                                ['dot' => '#10B981', 'title' => 'Data mata kuliah diperbarui', 'desc' => 'IF305 &bull; Kecerdasan Buatan &mdash; SKS diubah ke 4', 'time' => '3 jam lalu'],
                             ];
                         @endphp
                         @foreach ($activities as $act)

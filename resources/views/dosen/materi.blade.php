@@ -32,16 +32,7 @@
         <main class="dosen-content">
 
             <!-- Topbar Header -->
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PORTAL DOSEN • DISTRIBUSI MATERI &amp; MODUL
-                        </span>
-                        <h1>2. Unggah Materi Kuliah (PDF / PPTX / Link)</h1>
-                    </div>
-                </div>
+            <header class="dash-topbar justify-end">
 
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
@@ -271,10 +262,10 @@
                 const container = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
                 toast.className = 'dosen-toast';
-                if (!isSuccess) toast.style.borderLeftColor = '#E23C64';
+                if (!isSuccess) toast.style.borderLeftColor = '#EF4444';
 
                 toast.innerHTML = `
-                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#1B8A5A' : '#E23C64'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#10B981' : '#EF4444'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span>${message}</span>

@@ -32,16 +32,7 @@
         <main class="dosen-content">
 
             <!-- Topbar Header -->
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PORTAL DOSEN • MANAJEMEN KELAS & PESERTA
-                        </span>
-                        <h1>1. Pendaftaran & Kelola Mahasiswa</h1>
-                    </div>
-                </div>
+            <header class="dash-topbar justify-end">
 
                 @php
                     $dosenCourses = \App\Models\Course::with(['students', 'lecturer'])->get();
@@ -171,11 +162,11 @@
                                                     $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
                                                     $initials = strtoupper(mb_substr($initials, 0, 2));
                                                     $colors = [
-                                                        ['#FFE2E8', '#B0182D'],
-                                                        ['#EBF3FF', '#1971C2'],
-                                                        ['#EBF9F1', '#1B8A5A'],
-                                                        ['#FFF0DE', '#C98A1F'],
-                                                        ['#F2EBF9', '#8E44AD']
+                                                        ['rgba(3, 159, 250, 0.12)', '#039FFA'],
+                                                        ['rgba(50, 179, 241, 0.14)', '#0284C7'],
+                                                        ['rgba(16, 185, 129, 0.14)', '#10B981'],
+                                                        ['rgba(249, 184, 4, 0.14)', '#D97706'],
+                                                        ['rgba(249, 99, 5, 0.12)', '#F96305']
                                                     ];
                                                     [$bg, $c] = $colors[$mhs->id % count($colors)];
                                                 @endphp
@@ -229,10 +220,10 @@
                 const container = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
                 toast.className = 'dosen-toast';
-                if (!isSuccess) toast.style.borderLeftColor = '#E23C64';
+                if (!isSuccess) toast.style.borderLeftColor = '#EF4444';
 
                 toast.innerHTML = `
-                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#1B8A5A' : '#E23C64'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#10B981' : '#EF4444'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span>${message}</span>
@@ -266,11 +257,11 @@
 
                 const initials = nama.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
                 const colors = [
-                    { bg: '#FFE2E8', text: '#B0182D' },
-                    { bg: '#EBF3FF', text: '#1971C2' },
-                    { bg: '#EBF9F1', text: '#1B8A5A' },
-                    { bg: '#FFF0DE', text: '#C98A1F' },
-                    { bg: '#F2EBF9', text: '#8E44AD' }
+                    { bg: 'rgba(3, 159, 250, 0.12)', text: '#039FFA' },
+                    { bg: 'rgba(50, 179, 241, 0.14)', text: '#0284C7' },
+                    { bg: 'rgba(16, 185, 129, 0.14)', text: '#10B981' },
+                    { bg: 'rgba(249, 184, 4, 0.14)', text: '#D97706' },
+                    { bg: 'rgba(249, 99, 5, 0.12)', text: '#F96305' }
                 ];
                 const pickedColor = colors[Math.floor(Math.random() * colors.length)];
 

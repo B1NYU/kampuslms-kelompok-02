@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Halaman Tidak Ditemukan | Kampus LMS</title>
+    <title>403 - Akses Ditolak | Kampus LMS</title>
 
     <!-- Google Fonts Nunito -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -228,10 +228,10 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
-        .badge-404 {
+        .badge-403 {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -249,22 +249,22 @@
         .badge-pulse-dot {
             width: 8px;
             height: 8px;
-            background: var(--secondary);
+            background: var(--primary);
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 0 0 rgba(226, 60, 100, 0.7);
+            box-shadow: 0 0 0 0 rgba(176, 24, 45, 0.7);
             animation: pulseDot 2s infinite;
         }
 
         @keyframes pulseDot {
             0% {
-                box-shadow: 0 0 0 0 rgba(226, 60, 100, 0.7);
+                box-shadow: 0 0 0 0 rgba(176, 24, 45, 0.7);
             }
             70% {
-                box-shadow: 0 0 0 8px rgba(226, 60, 100, 0);
+                box-shadow: 0 0 0 8px rgba(176, 24, 45, 0);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(226, 60, 100, 0);
+                box-shadow: 0 0 0 0 rgba(176, 24, 45, 0);
             }
         }
 
@@ -279,7 +279,7 @@
             justify-content: center;
             gap: 8px;
             text-shadow: 0 4px 18px rgba(176, 24, 45, 0.12);
-            margin-bottom: 6px;
+            margin-bottom: 12px;
         }
 
         .error-number .digit-accent {
@@ -310,8 +310,38 @@
             font-size: clamp(13px, 2vw, 15px);
             line-height: 1.6;
             color: var(--text-muted);
-            max-width: 520px;
+            max-width: 540px;
+            margin: 0 auto 20px;
+        }
+
+        /* Informative safe notice box */
+        .info-notice-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #FFF9F2;
+            border: 1px solid var(--tag-border);
+            border-radius: 12px;
+            padding: 12px 18px;
             margin: 0 auto 28px;
+            max-width: 520px;
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .info-notice-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(176, 24, 45, 0.1);
+            color: var(--primary);
+            flex-shrink: 0;
         }
 
         /* Action Buttons */
@@ -452,6 +482,12 @@
             $dashUrl = url('/');
             $dashLabel = 'Halaman Utama';
         }
+
+        // Pesan aman yang informatif tanpa membocorkan identitas pemilik data
+        $rawMessage = isset($exception) ? $exception->getMessage() : null;
+        $safeMessage = ($rawMessage && !in_array($rawMessage, ['', 'Forbidden', 'This action is unauthorized.']))
+            ? $rawMessage
+            : 'Peran atau akun Anda saat ini tidak memiliki izin untuk mengakses sumber daya ini.';
     @endphp
 
     <!-- Top Navbar -->
@@ -486,23 +522,34 @@
             <div class="card-circle-bottom"></div>
 
             <!-- Error Status Pill -->
-            <div class="badge-404">
+            <div class="badge-403">
                 <span class="badge-pulse-dot"></span>
-                <span>STATUS 404 • NOT FOUND</span>
+                <span>STATUS 403 • AKSES DITOLAK</span>
             </div>
 
             <!-- Big Number -->
             <div class="error-number">
                 <span>4</span>
                 <span class="digit-accent">0</span>
-                <span>4</span>
+                <span>3</span>
             </div>
 
             <!-- Title & Description -->
-            <h1 class="error-title">Oops! Halaman Tidak Ditemukan</h1>
+            <h1 class="error-title">Akses Tidak Diizinkan</h1>
             <p class="error-desc">
-                Halaman atau konten akademik yang Anda tuju tidak tersedia, telah dipindahkan, atau alamat tautan yang dimasukkan kurang tepat.
+                Anda tidak memiliki hak akses atau wewenang untuk melihat maupun mengelola halaman atau sumber daya ini.
             </p>
+
+            <!-- Safe Informative Reason / Tip Box -->
+            <div class="info-notice-box">
+                <div class="info-notice-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <span>{{ $safeMessage }}</span>
+            </div>
 
             <!-- Action Buttons -->
             <div class="error-actions">
@@ -514,7 +561,7 @@
                     <span>Ke {{ $dashLabel }}</span>
                 </a>
 
-                <button type="button" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ url('/') }}'; }" class="btn btn-secondary">
+                <button type="button" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ $dashUrl }}'; }" class="btn btn-secondary">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>

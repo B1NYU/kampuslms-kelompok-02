@@ -296,6 +296,11 @@ body {
     gap: 16px;
 }
 
+.dash-topbar.justify-end,
+.dash-topbar:not(:has(.topbar-left)) {
+    justify-content: flex-end;
+}
+
 .topbar-left {
     display: flex;
     align-items: center;
