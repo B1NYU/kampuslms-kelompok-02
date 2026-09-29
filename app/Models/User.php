@@ -39,7 +39,7 @@ class User extends Authenticatable
         return match ($this->role) {
             'admin' => 'admin.dashboard',
             'dosen' => 'dosen.dashboard',
-            default => 'dashboard',
+            default => 'mahasiswa.dashboard',
         };
     }
 
