@@ -1,5 +1,11 @@
-/* admin.pendaftaran.css */
+/* ==========================================================================
+   ADMIN.PENDAFTARAN.CSS - Fitur Pendaftaran Mahasiswa ke MK (Enrollment)
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
 
+@import './admin.common.css';
+
+/* Badges Header */
 .badges-container {
     display: flex;
     gap: 8px;
@@ -9,95 +15,111 @@
 
 .badge-blue {
     background: #EFF6FF;
-    color: #2563EB;
-    padding: 3px 10px;
-    border-radius: 12px;
+    color: var(--admin-primary);
+    padding: 4px 12px;
+    border-radius: 20px;
     font-size: 11.5px;
     font-weight: 800;
-    border: 1px solid rgba(37,99,235,0.2);
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    display: inline-flex;
+    align-items: center;
 }
 
 .badge-green {
     background: #ECFDF5;
-    color: #16A34A;
-    padding: 3px 10px;
-    border-radius: 12px;
+    color: var(--admin-success);
+    padding: 4px 12px;
+    border-radius: 20px;
     font-size: 11.5px;
     font-weight: 800;
-    border: 1px solid rgba(22,163,74,0.2);
+    border: 1px solid #A7F3D0;
+    display: inline-flex;
+    align-items: center;
 }
 
+/* Filter per Mata Kuliah Buttons */
 .filter-mk-container {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
 }
 
 .btn-filter-mk {
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 11.5px;
-    font-weight: 700;
-    border: 1px solid var(--admin-border);
-    background: var(--admin-white);
-    color: var(--admin-text);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    background: #FFFFFF;
+    color: var(--admin-muted);
     cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-filter-mk:hover {
+    background: rgba(3, 159, 250, 0.08);
+    color: var(--admin-primary);
+    border-color: var(--admin-primary);
 }
 
 .btn-filter-mk.active {
-    font-weight: 800;
-    border-color: var(--admin-primary);
-    background: var(--admin-primary);
-    color: #fff;
+    background: var(--admin-primary) !important;
+    color: #FFFFFF !important;
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 3px 10px rgba(3, 159, 250, 0.3) !important;
 }
 
+/* Table Scrollable & Sticky Header */
 .table-scrollable {
     max-height: 560px;
     overflow-y: auto;
     position: relative;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
 }
 
 .table-header-sticky {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: var(--admin-light);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    background: #F8FAFC !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
+/* Specific Cells */
 .avatar-green {
-    background: #ECFDF5;
-    color: #16A34A;
-}
-
-.avatar-red {
-    background: #FFE2E8;
-    color: #B0182D;
+    background: rgba(16, 185, 129, 0.14) !important;
+    color: #059669 !important;
 }
 
 .td-mk-name {
-    font-size: 12.5px;
-    font-weight: 700;
+    font-weight: 800 !important;
+    color: var(--admin-text) !important;
 }
 
 .td-dosen-name {
-    color: #8E6570;
-    font-weight: 500;
+    font-size: 11px !important;
+    color: var(--admin-muted) !important;
+    font-weight: 600 !important;
+    display: block;
+    margin-top: 2px;
 }
 
 .tag-kelas {
-    font-size: 10.5px;
-    padding: 3px 9px;
+    background: rgba(3, 159, 250, 0.08) !important;
+    color: var(--admin-primary) !important;
+    border: 1px solid rgba(3, 159, 250, 0.2) !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    padding: 3px 10px !important;
+    border-radius: 12px !important;
+    display: inline-block;
 }
 
 .td-semester {
-    font-size: 12px;
-    color: #64748B;
-}
-
-.td-empty {
-    text-align: center;
-    padding: 20px;
-    color: #94A3B8;
+    font-size: 12px !important;
+    color: var(--admin-muted) !important;
+    font-weight: 700 !important;
 }

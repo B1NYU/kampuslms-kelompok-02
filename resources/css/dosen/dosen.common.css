@@ -1,0 +1,963 @@
+/* ==========================================================================
+   DOSEN.COMMON.CSS - Shared Foundation & Design System for Dosen Portal
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+:root {
+    --dosen-primary:    #039FFA;
+    --dosen-accent:     #32B3F1;
+    --dosen-secondary:  #F96305;
+    --dosen-gold:       #F9B804;
+    --dosen-dark:       #0284C7;
+    --dosen-text:       #0F172A;
+    --dosen-muted:      #64748B;
+    --dosen-border:     rgba(3, 159, 250, 0.18);
+    --dosen-bg:         #F8FAFC;
+    --dosen-white:      #FFFFFF;
+    --dosen-danger:     #EF4444;
+    --dosen-success:    #10B981;
+    --dosen-warning:    #F59E0B;
+}
+
+body {
+    background-color: #F1F5F9;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(3, 159, 250, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(50, 179, 241, 0.10) 0px, transparent 45%),
+        radial-gradient(at 100% 100%, rgba(249, 99, 5, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(249, 184, 4, 0.08) 0px, transparent 50%),
+        linear-gradient(170deg, #EEF4FA 0%, #F4F8FC 45%, #FAF7F2 100%);
+    background-attachment: fixed;
+    color: var(--dosen-text);
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* =========================================
+   BACKGROUND DECORATIVE SHAPES (Soft Atmospheric Glow)
+   ========================================= */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(75px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 440px;
+    height: 440px;
+    background: #38BDF8;
+    top: -140px;
+    right: -100px;
+    opacity: 0.35;
+}
+
+.bg-shape-2 {
+    width: 380px;
+    height: 380px;
+    background: #F9B804;
+    bottom: -100px;
+    left: -100px;
+    opacity: 0.28;
+}
+
+.bg-shape-3 {
+    width: 280px;
+    height: 280px;
+    background: #F96305;
+    top: 45%;
+    right: 25%;
+    opacity: 0.14;
+}
+
+/* =========================================
+   MAIN APP WINDOW CANVAS
+   ========================================= */
+.app-window {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+    border: none;
+}
+
+/* =========================================
+   NAVBAR KHUSUS DOSEN
+   ========================================= */
+.top-navbar.dosen-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 36px;
+    height: 64px;
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.18);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.navbar-left-group {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.brand-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-brand h2 {
+    font-size: 14px;
+    font-weight: 900;
+    margin: 0;
+    color: #0F172A;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+
+.portal-badge-dosen {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background: linear-gradient(90deg, #039FFA, #32B3F1);
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-top: 2px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.navbar-nav.dosen-nav {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-nav.dosen-nav li a,
+.nav-link-dosen {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--dosen-muted);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.navbar-nav.dosen-nav li a:hover,
+.nav-link-dosen:hover {
+    color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.08);
+}
+
+.navbar-nav.dosen-nav li.active a,
+.nav-link-dosen.active {
+    color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.12);
+    font-weight: 800;
+}
+
+.navbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dosen-avatar-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #FFFFFF;
+    padding: 5px 14px 5px 5px;
+    border-radius: 30px;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    box-shadow: 0 1px 3px rgba(3, 159, 250, 0.06);
+}
+
+.dosen-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #039FFA, #32B3F1);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.dosen-badge-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.dosen-name {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--dosen-text);
+    line-height: 1.2;
+}
+
+.dosen-role-tag {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--dosen-primary);
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FEF2F2;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: var(--dosen-danger);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 7px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: var(--dosen-danger);
+    color: #FFFFFF;
+    border-color: var(--dosen-danger);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   KONTEN UTAMA DOSEN
+   ========================================= */
+.dosen-content {
+    flex: 1;
+    width: 100%;
+    padding: 28px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+/* Topbar Header */
+.dash-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.page-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    color: var(--dosen-primary);
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.85rem;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    border-radius: 999px;
+    background: rgba(3, 159, 250, 0.08);
+}
+
+.page-eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--dosen-primary);
+    box-shadow: 0 0 6px rgba(3, 159, 250, 0.6);
+    flex-shrink: 0;
+}
+
+.page-title h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+    color: var(--dosen-text);
+    line-height: 1.1;
+}
+
+/* Course Selector Filter di Topbar */
+.course-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    box-shadow: 0 2px 8px rgba(3, 159, 250, 0.05);
+}
+
+.course-filter-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--dosen-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.course-select {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--dosen-text);
+    background: #F8FAFC;
+    border: 1.5px solid rgba(3, 159, 250, 0.2);
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+}
+
+.course-select:focus {
+    border-color: var(--dosen-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.12);
+}
+
+/* =========================================
+   FEATURE SECTION CARDS & GRID
+   ========================================= */
+.section-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 24px 26px;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    box-shadow: 0 4px 20px rgba(3, 159, 250, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.10);
+    padding-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.section-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.section-header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(3, 159, 250, 0.1);
+    color: var(--dosen-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    flex-shrink: 0;
+}
+
+.section-header-text h2 {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--dosen-text);
+    letter-spacing: -0.2px;
+}
+
+.section-header-text p {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--dosen-muted);
+}
+
+.section-header-badge {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.08);
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    white-space: nowrap;
+}
+
+/* Two Column Split Inside Sections */
+.two-col-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.65fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .two-col-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   FORM STYLING & INPUTS
+   ========================================= */
+.card-form {
+    background: #F8FAFC;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid rgba(3, 159, 250, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.card-form-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--dosen-text);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--dosen-text);
+}
+
+.form-group label span.required,
+.required {
+    color: var(--dosen-danger);
+    font-weight: 800;
+}
+
+.form-control,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dosen-text);
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+    box-sizing: border-box;
+}
+
+.form-control {
+    height: 40px;
+}
+
+.form-select {
+    height: 40px;
+    cursor: pointer;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: var(--dosen-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.form-control::placeholder,
+.form-textarea::placeholder {
+    color: #94A3B8;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Primary Action Buttons */
+.btn-primary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #039FFA 0%, #0284C7 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(3, 159, 250, 0.28);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-primary-action:hover {
+    box-shadow: 0 8px 20px rgba(3, 159, 250, 0.38);
+    transform: translateY(-1px);
+}
+
+.btn-primary-action:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button */
+.btn-secondary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #FFFFFF;
+    color: var(--dosen-primary);
+    border: 1px solid rgba(3, 159, 250, 0.3);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-secondary-action:hover {
+    border-color: var(--dosen-primary);
+    background: rgba(3, 159, 250, 0.08);
+}
+
+/* =========================================
+   TABLES (Mahasiswa & Pengumpulan)
+   ========================================= */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.custom-dosen-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.custom-dosen-table th {
+    font-size: 11px;
+    font-weight: 900;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.16);
+}
+
+.custom-dosen-table td {
+    padding: 12px 14px;
+    background: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--dosen-text);
+    border-top: 1px solid rgba(3, 159, 250, 0.14);
+    border-bottom: 1px solid rgba(3, 159, 250, 0.14);
+    transition: background 0.2s;
+}
+
+.custom-dosen-table tr td:first-child {
+    border-left: 1px solid rgba(3, 159, 250, 0.14);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.custom-dosen-table tr td:last-child {
+    border-right: 1px solid rgba(3, 159, 250, 0.14);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.custom-dosen-table tr:hover td {
+    background: rgba(3, 159, 250, 0.04);
+    border-color: rgba(3, 159, 250, 0.25);
+}
+
+/* Table Student Card Cell */
+.student-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.student-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(3, 159, 250, 0.12);
+    color: var(--dosen-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.student-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-name {
+    font-weight: 800;
+    color: var(--dosen-text);
+    font-size: 13px;
+}
+
+.student-nim {
+    font-size: 11px;
+    color: var(--dosen-muted);
+    font-weight: 600;
+}
+
+/* Badges Status */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.badge-status-active {
+    color: #059669;
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+}
+
+.badge-status-warning {
+    color: #D97706;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+}
+
+.badge-status-danger {
+    color: #DC2626;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+}
+
+/* Delete / Small Action Buttons */
+.btn-icon-danger {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: #FEF2F2;
+    color: var(--dosen-danger);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon-danger:hover {
+    background: var(--dosen-danger);
+    color: #FFFFFF;
+    border-color: var(--dosen-danger);
+    transform: scale(1.05);
+}
+
+/* Table Search Header */
+.table-header-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.search-input-box {
+    position: relative;
+    width: 220px;
+}
+
+.search-input-box input {
+    width: 100%;
+    padding: 8px 12px 8px 34px;
+    font-size: 12px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(3, 159, 250, 0.22);
+    background: #FFFFFF;
+    outline: none;
+    font-family: 'Nunito', sans-serif;
+    color: var(--dosen-text);
+}
+
+.search-input-box input:focus {
+    border-color: var(--dosen-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.12);
+}
+
+.search-input-box svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dosen-muted);
+}
+
+/* =========================================
+   MODAL & TOAST STYLES
+   ========================================= */
+.dosen-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.dosen-modal-overlay.active {
+    display: flex;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.dosen-modal-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 520px;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dosen-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    background: #F8FAFC;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.14);
+}
+
+.dosen-modal-header h3 {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--dosen-text);
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--dosen-muted);
+    font-size: 20px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.btn-close-modal:hover {
+    color: var(--dosen-danger);
+}
+
+.dosen-modal-body {
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.submission-info-box {
+    background: #F8FAFC;
+    border: 1px solid rgba(3, 159, 250, 0.14);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.submission-info-title {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--dosen-text);
+}
+
+.submission-info-student {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dosen-muted);
+}
+
+.score-quick-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.btn-score-quick {
+    padding: 4px 10px;
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--dosen-text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-score-quick:hover {
+    background: rgba(3, 159, 250, 0.1);
+    border-color: var(--dosen-primary);
+    color: var(--dosen-primary);
+}
+
+.dosen-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    background: #F8FAFC;
+    border-top: 1px solid rgba(3, 159, 250, 0.14);
+}
+
+.dosen-toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dosen-toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFFFFF;
+    color: var(--dosen-text);
+    border-radius: 14px;
+    padding: 12px 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    border-left: 4px solid var(--dosen-success);
+    font-size: 12.5px;
+    font-weight: 800;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dosen-toast.show {
+    transform: translateX(0);
+}
+
+.toast-icon {
+    color: var(--dosen-success);
+    flex-shrink: 0;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 900px) {
+    .dosen-content { padding: 20px 16px; }
+    .top-navbar.dosen-navbar { padding: 12px 18px; }
+    .navbar-nav.dosen-nav { display: none; }
+}

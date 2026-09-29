@@ -11,7 +11,7 @@
 
     <!-- Memuat CSS via Vite sesuai lokasi resources/css/index.css -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/index.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.matkul.css', 'resources/js/app.js'])
     @endif
 </head>
 <body>

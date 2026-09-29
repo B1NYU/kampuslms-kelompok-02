@@ -1,40 +1,48 @@
 /* =========================================
-   FOOTER.CSS (Global Footer - Light Coral Theme)
+   FOOTER.CSS (Global Harmonized Footer)
+   Selaras dengan mode Mahasiswa
    ========================================= */
-.app-footer {
+.app-footer,
+.app-window .app-footer {
     text-align: center;
     padding: 20px 36px;
-    background: transparent;
-    border-top: 1px solid rgba(3, 159, 250, 0.18);
-    color: rgba(15, 23, 42, 0.7);
+    background: #FFFFFF !important;
+    border-top: 1px solid rgba(3, 159, 250, 0.18) !important;
+    color: #64748B !important;
     font-size: 12px;
     font-weight: 700;
     flex-shrink: 0;
-    margin: 0 auto;
+    margin-top: auto;
     width: 100%;
-    max-width: 1380px;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
 }
 
-.footer-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.footer-content,
+.app-window .app-footer .footer-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     gap: 12px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .social-links {
     display: flex;
     gap: 16px;
+    align-items: center;
 }
 
 .ig-link {
-    color: #039FFA;
+    color: #039FFA !important;
     text-decoration: none;
     font-weight: 800;
-    transition: color 0.3s;
+    transition: all 0.25s ease;
 }
 
 .ig-link:hover {
-    color: #F96305;
+    color: #F96305 !important;
+    transform: translateY(-1px);
 }

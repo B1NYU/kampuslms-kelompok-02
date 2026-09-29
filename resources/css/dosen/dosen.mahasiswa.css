@@ -1,0 +1,13 @@
+/* ==========================================================================
+   DOSEN.MAHASISWA.CSS - Kelola Mahasiswa & Pendaftaran Kelas Dosen
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
+
+@import './dosen.common.css';
+
+/* Specific Mahasiswa Management styles */
+.feature-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

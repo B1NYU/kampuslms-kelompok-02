@@ -223,6 +223,7 @@
             </section>
 
         </main>
+        <x-footer />
     </div>
 
 </body>

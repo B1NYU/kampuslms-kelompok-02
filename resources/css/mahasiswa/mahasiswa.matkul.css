@@ -1,0 +1,1829 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: #FFFDF8;
+    color: #0F172A;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* =========================================
+   BACKGROUND DECORATIVE SHAPES (Matching Login Page)
+   ========================================= */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 340px;
+    height: 340px;
+    background: #32B3F1;
+    top: -120px;
+    right: -70px;
+    opacity: 0.85;
+}
+
+.bg-shape-2 {
+    width: 250px;
+    height: 250px;
+    background: #F9B804;
+    bottom: -80px;
+    left: -70px;
+    opacity: 0.35;
+}
+
+.bg-shape-3 {
+    width: 130px;
+    height: 130px;
+    background: #F96305;
+    top: 48%;
+    right: 35%;
+    opacity: 0.16;
+}
+
+/* =========================================
+   MAIN APP CONTAINER
+   ========================================= */
+.app-window {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+    border: none;
+}
+
+/* Penyesuaian Navbar Atas di dalam App Window */
+.app-window .top-navbar {
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.18);
+    padding: 0 36px;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Penyesuaian Footer di dalam App Window */
+.app-window .app-footer {
+    background: #FFFFFF;
+    border-top: 1px solid rgba(3, 159, 250, 0.18);
+    color: #64748B;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 36px;
+    margin-top: auto;
+}
+
+/* =========================================
+   MAIN CONTENT MATA KULIAH
+   ========================================= */
+.courses-content {
+    flex: 1;
+    width: 100%;
+    padding: 28px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: transparent;
+}
+
+/* ---------- Topbar ---------- */
+.dash-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-hamburger {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(3, 159, 250, 0.05);
+}
+
+.btn-hamburger:hover {
+    background: #FFFDF8;
+    border-color: #039FFA;
+    transform: translateY(-2px);
+}
+
+.btn-hamburger span {
+    width: 18px;
+    height: 2.5px;
+    background: #039FFA;
+    border-radius: 4px;
+}
+
+.page-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    color: #039FFA;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    border-radius: 999px;
+    background: #FFFDF8;
+}
+
+.page-eyebrow-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #F96305;
+    box-shadow: 0 0 6px rgba(249, 99, 5, 0.4);
+    flex-shrink: 0;
+}
+
+.page-title h1 {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    color: #039FFA;
+    background: none;
+    -webkit-text-fill-color: initial;
+}
+
+/* ---------- Tombol Kembali ---------- */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    color: #039FFA;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    padding: 0.6rem 1.15rem 0.6rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    background: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(3, 159, 250, 0.05);
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.btn-back:hover {
+    color: #F96305;
+    border-color: #039FFA;
+    background: #FFFDF8;
+    transform: translateX(-3px);
+    box-shadow: 0 6px 16px rgba(3, 159, 250, 0.12);
+}
+
+.btn-back-icon {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.btn-back:hover .btn-back-icon {
+    transform: translateX(-2px);
+}
+
+/* =========================================
+   GRID KARTU MATA KULIAH
+   ========================================= */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.course-card {
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 16px rgba(3, 159, 250, 0.05);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.course-card:hover {
+    transform: translateY(-6px);
+    border-color: #039FFA;
+    box-shadow: 0 16px 36px rgba(3, 159, 250, 0.12);
+}
+
+/* Banner warna-warni tetap cerah & kontras */
+.course-banner {
+    position: relative;
+    height: 96px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px;
+    background-image:
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.banner-violet {
+    background-color: #039FFA;
+    background-image: linear-gradient(135deg, #039FFA, #32B3F1), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.banner-gold {
+    background-color: #F9B804;
+    background-image: linear-gradient(135deg, #F9B804, #F96305), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.banner-rose {
+    background-color: #F96305;
+    background-image: linear-gradient(135deg, #F96305, #039FFA), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.banner-teal {
+    background-color: #32B3F1;
+    background-image: linear-gradient(135deg, #32B3F1, #F96305), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.banner-blue {
+    background-color: #039FFA;
+    background-image: linear-gradient(135deg, #039FFA, #F9B804), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.banner-plum {
+    background-color: #F96305;
+    background-image: linear-gradient(135deg, #F96305, #D19F1F), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 12px, transparent 12px 24px);
+}
+
+.course-tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #FFFFFF;
+    background: rgba(0, 0, 0, 0.22);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.course-go {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    transition: all 0.25s ease;
+}
+
+.course-card:hover .course-go {
+    background: #FFFFFF;
+    color: #039FFA;
+    border-color: #FFFFFF;
+    transform: translateX(2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Isi kartu */
+.course-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px 20px;
+    background: #FFFFFF;
+}
+
+.course-code {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #F96305;
+}
+
+.course-name {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+
+.course-dosen {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #64748B;
+    margin-bottom: 10px;
+}
+
+.course-progress-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: #FFFDF8;
+    border: 1px solid rgba(3, 159, 250, 0.15);
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.course-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #F9B804, #039FFA);
+}
+
+.course-progress-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748B;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN (Tetap Sama)
+   ========================================= */
+@media (max-width: 1100px) {
+    .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        padding: 0;
+    }
+
+    .app-window {
+        border-radius: 0;
+    }
+
+    .app-window .top-navbar {
+        padding: 12px 18px;
+        height: auto;
+    }
+
+    .courses-content {
+        padding: 20px 16px;
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Fix browser default black focus ring */
+a:focus-visible,
+button:focus-visible,
+.filter-btn:focus-visible,
+.btn-enroll:focus-visible {
+    outline: none !important;
+    border-color: #039FFA !important;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.2) !important;
+}
+/* ============================================================
+   KAMPUS LMS - COURSE SHOW STYLES (STANDALONE LAYOUT)
+   Kombinasi Warna Modern Selaras Welcome & Portal Mahasiswa:
+   1. #FFFDF8 - Background Canvas Hangat
+   2. #FFFFFF - Kartu Konten Bersih & Cerah
+   3. rgba(3, 159, 250, 0.18) - Garis Batas / Border Halus Biru Cyan
+   4. #039FFA - Warna Judul Utama & Brand
+   5. #0F172A - Warna Teks Gelap Utama (Slate 900)
+   6. #64748B - Warna Teks Keterangan & Subtitle
+   7. #F96305 - Aksen Oranye & Tombol Aksi
+   8. #32B3F1 - Aksen Biru Langit
+   9. #F9B804 - Aksen Kuning Emas Dekoratif
+   10. #E0F2FE - Background Chip Highlight Cyan Soft
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: #F1F5F9;
+    background-image:
+        radial-gradient(at 0% 0%, rgba(3, 159, 250, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(50, 179, 241, 0.10) 0px, transparent 45%),
+        radial-gradient(at 100% 100%, rgba(249, 99, 5, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(249, 184, 4, 0.08) 0px, transparent 50%),
+        linear-gradient(170deg, #EEF4FA 0%, #F4F8FC 45%, #FAF7F2 100%);
+    background-attachment: fixed;
+    color: #0F172A;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* =========================================
+   BACKGROUND DECORATIVE SHAPES (Soft Atmospheric Glow)
+   ========================================= */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(75px);
+    pointer-events: none;
+}
+
+.bg-shape-1 {
+    width: 440px;
+    height: 440px;
+    background: #38BDF8;
+    top: -140px;
+    right: -100px;
+    opacity: 0.35;
+}
+
+.bg-shape-2 {
+    width: 380px;
+    height: 380px;
+    background: #F9B804;
+    bottom: -100px;
+    left: -100px;
+    opacity: 0.28;
+}
+
+.bg-shape-3 {
+    width: 280px;
+    height: 280px;
+    background: #F96305;
+    top: 45%;
+    right: 25%;
+    opacity: 0.14;
+}
+
+/* =========================================
+   APP WINDOW & MAIN LAYOUT
+   ========================================= */
+.app-window {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================================
+   SUB-NAVBAR MATA KULIAH (Detail & Nilai)
+   ========================================= */
+.course-subnav {
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.18);
+    width: 100%;
+    height: 52px;
+    position: sticky;
+    top: 64px;
+    z-index: 90;
+    box-shadow: 0 1px 4px rgba(3, 159, 250, 0.05);
+}
+
+.course-subnav-inner {
+    width: 100%;
+    height: 100%;
+    padding: 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.course-subnav-left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    height: 100%;
+}
+
+.course-title-crumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.crumb-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #FFF7ED;
+    color: #F96305;
+    border: 1px solid rgba(249, 99, 5, 0.28);
+}
+
+.crumb-course-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0F172A;
+    white-space: nowrap;
+}
+
+.course-subnav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+}
+
+.subnav-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 52px;
+    padding: 0 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #64748B;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.subnav-tab-btn:hover {
+    color: #039FFA;
+    background: #FFFDF8;
+}
+
+.subnav-tab-btn.active {
+    color: #039FFA;
+    font-weight: 800;
+    border-bottom-color: #039FFA;
+    background: #FFFDF8;
+}
+
+.subnav-tab-btn:focus,
+.subnav-tab-btn:focus-visible,
+.btn-subnav-back:focus,
+.btn-subnav-back:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(3, 159, 250, 0.25) !important;
+}
+
+.tab-badge-pill {
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #EBF9F1;
+    color: #1B8A5A;
+    border: 1px solid rgba(27, 138, 90, 0.2);
+}
+
+.course-subnav-right {
+    display: flex;
+    align-items: center;
+}
+
+.btn-subnav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #F96305;
+    background: #FFF7ED;
+    border: 1px solid rgba(249, 99, 5, 0.3);
+    padding: 6px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-subnav-back:hover {
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(249, 99, 5, 0.28);
+    transform: translateX(-2px);
+}
+
+/* =========================================
+   KONTEN UTAMA MATA KULIAH
+   ========================================= */
+.course-main-content {
+    flex: 1;
+    width: 100%;
+    padding: 28px 36px 40px;
+}
+
+/* =========================================
+   TATA LETAK 2 KOLOM
+   ========================================= */
+.split-layout {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ============================================================
+   KOLOM KIRI: PANEL RENCANA PERTEMUAN (SCROLLBAR INTERNAL)
+   ============================================================ */
+.left-panel {
+    background: #FFFFFF;
+    border-radius: 26px;
+    padding: 24px 22px 24px 26px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.panel-header h2 {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0F172A;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-header h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    border-radius: 4px;
+    background: #F96305;
+}
+
+.header-pill {
+    font-size: 11px;
+    font-weight: 800;
+    color: #D97706;
+    background: #FFFBEB;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+/* WADAH SCROLL INTERNAL */
+.timeline-scroll-box {
+    max-height: 540px;
+    overflow-y: auto;
+    padding-right: 8px;
+    padding-left: 36px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-scroll-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.timeline-scroll-box::-webkit-scrollbar-track {
+    background: #FFFDF8;
+    border-radius: 10px;
+}
+
+.timeline-scroll-box::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.15);
+    border-radius: 10px;
+}
+
+.timeline-scroll-box::-webkit-scrollbar-thumb:hover {
+    background: #F96305;
+}
+
+.timeline-scroll-box::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 20px;
+    bottom: 25px;
+    width: 2.5px;
+    background: linear-gradient(to bottom, #10B981 0%, #039FFA 35%, #F9B804 70%, #F96305 100%);
+    border-radius: 2px;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+.timeline-node {
+    position: absolute;
+    left: -36px;
+    top: 16px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid rgba(15, 23, 42, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: all 0.2s;
+}
+
+.timeline-node-inner {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.2);
+}
+
+.timeline-node.done {
+    border-color: #10B981;
+}
+
+.timeline-node.done .timeline-node-inner {
+    background: #10B981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.timeline-node.active {
+    border-color: #039FFA;
+}
+
+.timeline-node.active .timeline-node-inner {
+    background: #039FFA;
+    box-shadow: 0 0 8px rgba(3, 159, 250, 0.5);
+}
+
+.timeline-node.exam {
+    border-color: #F96305;
+}
+
+.timeline-node.exam .timeline-node-inner {
+    background: #F96305;
+    box-shadow: 0 0 8px rgba(249, 99, 5, 0.5);
+}
+
+/* KARTU SESI (BERSIH, PUTIH & ELEGAN) */
+.session-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 13px 15px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+}
+
+.session-card:hover {
+    transform: translateX(4px);
+    background: #FFFDF8;
+    border-color: rgba(249, 99, 5, 0.35);
+    box-shadow: 0 6px 18px rgba(249, 99, 5, 0.08);
+}
+
+.session-card.selected-active {
+    border-color: #F96305;
+    border-left: 4px solid #F96305;
+    background: #FFF7ED;
+    box-shadow: 0 4px 16px rgba(249, 99, 5, 0.12);
+}
+
+.session-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.session-icon-circle {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    background: #F8FAFC;
+    color: #64748B;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #E2E8F0;
+}
+
+.session-icon-circle.done {
+    background: #EBF9F1;
+    color: #10B981;
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+.session-icon-circle.active {
+    background: linear-gradient(135deg, #039FFA, #32B3F1);
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 3px 10px rgba(3, 159, 250, 0.35);
+}
+
+.session-icon-circle.exam-icon {
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 3px 10px rgba(249, 99, 5, 0.35);
+}
+
+.session-text h4 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+
+.session-text p {
+    font-size: 11.5px;
+    color: #64748B;
+    line-height: 1.3;
+}
+
+.session-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-status {
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.badge-status.done {
+    background: #EBF9F1;
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-status.active {
+    background: #E0F2FE;
+    color: #0284C7;
+    border: 1px solid rgba(3, 159, 250, 0.3);
+}
+
+.badge-status.exam {
+    background: #FFF7ED;
+    color: #F96305;
+    border: 1px solid rgba(249, 99, 5, 0.3);
+}
+
+.badge-status.locked {
+    background: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
+.arrow-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #F8FAFC;
+    color: #94A3B8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    border: 1px solid #E2E8F0;
+    transition: all 0.2s;
+}
+
+.session-card:hover .arrow-btn,
+.session-card.selected-active .arrow-btn {
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border-color: transparent;
+    box-shadow: 0 2px 6px rgba(249, 99, 5, 0.3);
+}
+
+/* ============================================================
+   KOLOM KANAN: PANEL STICKY BERSIH
+   ============================================================ */
+.right-panel {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.content-fade {
+    animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Kartu Info & CPMK */
+.card-course-info,
+.card-cpmk-premium,
+.card-week-detail-panel {
+    background: #FFFFFF;
+    border-radius: 26px;
+    padding: 24px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card-course-info h3,
+.card-cpmk-premium h3,
+.card-week-detail-panel h3 {
+    font-size: 17px;
+    font-weight: 900;
+    color: #0F172A;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    padding-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-course-info h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    border-radius: 4px;
+    background: #039FFA;
+}
+
+.lecturer-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFFBEB;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.lecturer-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(249, 99, 5, 0.25);
+}
+
+.lecturer-info h5 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0F172A;
+}
+
+.lecturer-info span {
+    font-size: 11px;
+    color: #D97706;
+    font-weight: 700;
+}
+
+.meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.meta-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.meta-row span {
+    color: #64748B;
+    font-weight: 600;
+}
+
+/* Chip Indikator Selaras Color Palette Welcome & Portal */
+.meta-chip {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+
+.chip-cyan {
+    background: #E0F2FE;
+    color: #0284C7;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+}
+
+.chip-amber {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.chip-green {
+    background: #EBF9F1;
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.chip-orange {
+    background: #FFF7ED;
+    color: #F96305;
+    border: 1px solid rgba(249, 99, 5, 0.25);
+}
+
+.chip-gold {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.chip-cream {
+    background: #FFFDF8;
+    color: #0F172A;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+}
+
+.chip-coral {
+    background: #FFF7ED;
+    color: #F96305;
+    border: 1px solid rgba(249, 99, 5, 0.25);
+}
+
+.chip-crimson {
+    background: #E0F2FE;
+    color: #039FFA;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+}
+
+.cpmk-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cpmk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    color: #334155;
+    line-height: 1.45;
+}
+
+.check-icon {
+    color: #10B981;
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.btn-gradient-action {
+    width: 100%;
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(249, 99, 5, 0.28);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-gradient-action:hover {
+    background: linear-gradient(135deg, #EA580C, #D97706);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(249, 99, 5, 0.35);
+}
+
+/* Detail Panel Elements */
+.detail-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    padding-bottom: 10px;
+}
+
+.btn-restore-info {
+    background: #FFF7ED;
+    color: #F96305;
+    border: 1px solid rgba(249, 99, 5, 0.28);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-restore-info:hover {
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(249, 99, 5, 0.25);
+}
+
+.card-week-detail-panel h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    border-radius: 4px;
+    background: #F96305;
+}
+
+.detail-title-group h3 {
+    font-size: 17px;
+    font-weight: 900;
+    color: #0F172A;
+    line-height: 1.3;
+    margin-top: 3px;
+}
+
+.detail-badge-session {
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #F96305;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-block-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-title-materi {
+    color: #0284C7;
+}
+
+.detail-title-tasks {
+    color: #F96305;
+}
+
+.detail-desc-box {
+    background: #FFFDF8;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #334155;
+}
+
+.resource-card {
+    background: #F0F9FF;
+    padding: 11px 13px;
+    border-radius: 12px;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.resource-card:hover {
+    background: #E0F2FE;
+    border-color: rgba(3, 159, 250, 0.35);
+}
+
+.resource-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resource-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #0284C7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 1px 3px rgba(3, 159, 250, 0.15);
+}
+
+.resource-name {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #0F172A;
+}
+
+.resource-meta {
+    font-size: 11px;
+    color: #0284C7;
+    font-weight: 700;
+}
+
+.btn-mini-download {
+    background: linear-gradient(135deg, #039FFA, #32B3F1);
+    color: #FFFFFF;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(3, 159, 250, 0.25);
+}
+
+.btn-mini-download:hover {
+    background: #0284C7;
+    box-shadow: 0 4px 10px rgba(3, 159, 250, 0.35);
+    transform: translateY(-1px);
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-card-box {
+    background: #FFFDF8;
+    border-radius: 14px;
+    padding: 13px 15px;
+    border: 1px solid rgba(249, 99, 5, 0.2);
+    border-left: 4px solid #F96305;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(249, 99, 5, 0.05);
+}
+
+.task-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.task-badge-tag {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 5px;
+}
+
+.task-badge-tag.quiz {
+    color: #D97706;
+    background: #FFFBEB;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.task-badge-tag.praktikum {
+    color: #0284C7;
+    background: #E0F2FE;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+}
+
+.task-badge-tag.milestone {
+    color: #F96305;
+    background: #FFF7ED;
+    border: 1px solid rgba(249, 99, 5, 0.25);
+}
+
+.task-badge-tag.exam {
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #F96305, #F9B804);
+}
+
+.task-card-title {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #0F172A;
+}
+
+.task-deadline {
+    font-size: 11px;
+    color: #64748B;
+}
+
+.btn-task-action {
+    width: 100%;
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border: none;
+    padding: 10px;
+    border-radius: 9px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 3px;
+    box-shadow: 0 2px 8px rgba(249, 99, 5, 0.2);
+}
+
+.btn-task-action:hover {
+    background: linear-gradient(135deg, #EA580C, #D97706);
+    box-shadow: 0 4px 14px rgba(249, 99, 5, 0.3);
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   NILAI & EVALUASI PANEL
+   ========================================= */
+.grades-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.grade-summary-card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 18px 20px;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    box-shadow: 0 2px 10px rgba(3, 159, 250, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s ease;
+}
+
+.grade-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(3, 159, 250, 0.1);
+}
+
+.grade-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.grade-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.grade-card-label {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #64748B;
+    text-transform: uppercase;
+}
+
+.grade-card-num {
+    font-size: 22px;
+    font-weight: 900;
+    color: #039FFA;
+    line-height: 1.1;
+}
+
+.grade-card-sub {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+}
+
+/* Tabel Rincian Nilai Card */
+.grade-table-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    box-shadow: 0 2px 12px rgba(3, 159, 250, 0.04);
+}
+
+.grade-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.grade-table-title {
+    font-size: 17px;
+    font-weight: 900;
+    color: #039FFA;
+    margin-bottom: 4px;
+}
+
+.grade-table-desc {
+    font-size: 12.5px;
+    color: #64748B;
+    font-weight: 600;
+}
+
+.grade-search-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFDF8;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    border-radius: 10px;
+    padding: 7px 14px;
+    transition: all 0.2s ease;
+}
+
+.grade-search-box:focus-within {
+    border-color: #039FFA;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.18);
+}
+
+.grade-search-box svg {
+    color: #039FFA;
+    flex-shrink: 0;
+}
+
+.grade-search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 12.5px;
+    font-family: 'Nunito', sans-serif;
+    color: #0F172A;
+    width: 200px;
+}
+
+.custom-grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Nunito', sans-serif;
+}
+
+.custom-grade-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748B;
+    padding: 12px 14px;
+    background: #FFFDF8;
+    border-top: 1px solid rgba(3, 159, 250, 0.15);
+    border-bottom: 1px solid rgba(3, 159, 250, 0.15);
+    white-space: nowrap;
+}
+
+.custom-grade-table th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.custom-grade-table th:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.custom-grade-table td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(3, 159, 250, 0.08);
+    vertical-align: middle;
+}
+
+.custom-grade-table tr:hover td {
+    background: #FFFDF8;
+}
+
+.task-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-title-text {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.3;
+}
+
+.task-meta-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.task-pill-type {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: #E0F2FE;
+    color: #039FFA;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+}
+
+.task-pill-type.tugas\ mandiri {
+    background: #E0F2FE;
+    color: #039FFA;
+    border-color: rgba(3, 159, 250, 0.25);
+}
+
+.task-pill-type.milestone\ 1,
+.task-pill-type.milestone {
+    background: #FFF7ED;
+    color: #F96305;
+    border-color: rgba(249, 99, 5, 0.25);
+}
+
+.task-pill-type.kuis\ teori,
+.task-pill-type.kuis {
+    background: #EBF9F1;
+    color: #1B8A5A;
+    border-color: rgba(27, 138, 90, 0.25);
+}
+
+.task-pill-type.ujian\ uts,
+.task-pill-type.ujian {
+    background: linear-gradient(135deg, #F96305, #F9B804);
+    color: #FFFFFF;
+    border-color: transparent;
+}
+
+.task-pill-week {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748B;
+    background: #FFFDF8;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    padding: 2px 7px;
+    border-radius: 5px;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 11px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.status-pill-success {
+    background: #EBF9F1;
+    color: #1B8A5A;
+    border: 1px solid rgba(27, 138, 90, 0.2);
+}
+
+.status-pill-warning {
+    background: #FFF0DE;
+    color: #C98A1F;
+    border: 1px solid rgba(201, 138, 31, 0.2);
+}
+
+.status-pill-muted {
+    background: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
+.status-pill-danger {
+    background: #FEE2E2;
+    color: #DC2626;
+    border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.status-dot-green {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1B8A5A;
+    display: inline-block;
+}
+
+.status-dot-orange {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #C98A1F;
+    display: inline-block;
+}
+
+.status-dot-red {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #DC2626;
+    display: inline-block;
+}
+
+.weight-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #039FFA;
+    background: #E0F2FE;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    padding: 3px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.score-display {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    font-weight: 900;
+}
+
+.score-number {
+    font-size: 16px;
+    color: #039FFA;
+}
+
+.score-max {
+    font-size: 11px;
+    color: #64748B;
+    font-weight: 700;
+}
+
+.score-pending {
+    font-size: 14px;
+    color: #94A3B8;
+    font-weight: 800;
+}
+
+.feedback-bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    background: #FFFDF8;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: #334155;
+    max-width: 420px;
+}
+
+@media (max-width: 1080px) {
+    .grades-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 960px) {
+    .split-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-scroll-box {
+        max-height: 420px;
+    }
+
+    .right-panel {
+        position: static;
+    }
+
+    .course-subnav-inner {
+        padding: 0 20px;
+    }
+
+    .course-main-content {
+        padding: 20px;
+    }
+
+    .grades-stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Fix browser default black focus ring */
+a:focus-visible,
+button:focus-visible,
+.btn-back:focus-visible,
+.btn-task-action:focus-visible {
+    outline: none !important;
+    border-color: #039FFA !important;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.2) !important;
+}

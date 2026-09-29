@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     <!-- CSS via Vite -->
-    @vite(['resources/css/app.css', 'resources/css/course-show.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.matkul.css', 'resources/js/app.js'])
 </head>
 <body>
     <!-- Background Decorative Elements (Matching Dashboard & Login) -->

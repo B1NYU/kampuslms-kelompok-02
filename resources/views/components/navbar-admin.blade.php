@@ -4,8 +4,8 @@
         <div class="navbar-left-group">
             <div class="navbar-brand">
                 <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="16" cy="20" r="11" stroke="#B0182D" stroke-width="3.5" fill="none" opacity="0.95" />
-                    <circle cx="24" cy="20" r="11" stroke="#FFD464" stroke-width="3.5" fill="none" opacity="0.95" />
+                    <circle cx="16" cy="20" r="11" stroke="#039FFA" stroke-width="3.5" fill="none" opacity="0.95" />
+                    <circle cx="24" cy="20" r="11" stroke="#F9B804" stroke-width="3.5" fill="none" opacity="0.95" />
                 </svg>
                 <div class="brand-info">
                     <h2>KAMPUS LMS</h2>
@@ -54,16 +54,6 @@
                             <polyline points="16 11 18 13 22 9"></polyline>
                         </svg>
                         Pendaftaran MK
-                    </a>
-                </li>
-                <li>
-                    <a href="#laporan" class="nav-link-admin">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                        Laporan & Log
                     </a>
                 </li>
             </ul>
