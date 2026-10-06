@@ -27,6 +27,7 @@ export default defineConfig({
                 'resources/css/admin/admin.matkul.css',
                 'resources/css/admin/admin.pendaftaran.css',
                 // Fallbacks & JS
+                'resources/css/welcome.css',
                 'resources/css/index.css',
                 'resources/css/course-show.css',
                 'resources/js/app.js'
