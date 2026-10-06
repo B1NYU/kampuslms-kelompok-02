@@ -75,11 +75,14 @@ class AuthController extends Controller
     }
 
     /** POST /api/v1/auth/logout — mencabut token yang sedang dipakai. */
-    public function logout(Request $request): Response
+    public function logout(Request $request)
     {
+        // Revoke token yang sedang digunakan
         $request->user()->currentAccessToken()->delete();
 
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Berhasil keluar.'
+        ]);
     }
 
     /** GET /api/v1/me — profil + role milik pemanggil. */
