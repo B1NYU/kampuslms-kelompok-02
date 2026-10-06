@@ -58,4 +58,13 @@ class Course extends Model
     {
         return $this->hasMany(Assignment::class);
     }
+    public function isViewableBy(User $user): bool
+    {
+        return match ($user->role) {
+            'admin'     => true,
+            'dosen'     => $this->isTaughtBy($user),
+            'mahasiswa' => $this->isEnrolledBy($user),
+            default     => false,
+        };
+    }
 }
