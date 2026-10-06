@@ -19,22 +19,30 @@
         }
 
         :root {
-            --bg-page: #FCEDD8;
-            --primary: #B0182D;
-            --primary-dark: #8F1223;
-            --secondary: #E23C64;
-            --accent-coral: #FF5E5E;
-            --accent-yellow: #FFD464;
-            --text-dark: #5A2F39;
-            --text-muted: #8E6570;
+            --bg-page: #FFFDF8;
+            --primary: #039FFA;
+            --primary-dark: #0284C7;
+            --secondary: #F96305;
+            --accent-coral: #F96305;
+            --accent-yellow: #F9B804;
+            --accent-sky: #32B3F1;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
             --card-bg: #FFFFFF;
-            --card-border: #F2DCD3;
-            --tag-bg: #FFF5E8;
-            --tag-border: #F4D9C1;
+            --card-border: rgba(3, 159, 250, 0.18);
+            --tag-bg: rgba(3, 159, 250, 0.08);
+            --tag-border: rgba(3, 159, 250, 0.22);
         }
 
         body {
             background-color: var(--bg-page);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(3, 159, 250, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(50, 179, 241, 0.10) 0px, transparent 45%),
+                radial-gradient(at 100% 100%, rgba(249, 99, 5, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(249, 184, 4, 0.08) 0px, transparent 50%),
+                linear-gradient(170deg, #F8FAFD 0%, #FDFBF7 45%, #FFFDF8 100%);
+            background-attachment: fixed;
             color: var(--text-dark);
             min-height: 100vh;
             display: flex;
@@ -56,7 +64,7 @@
             position: fixed;
             border-radius: 50%;
             z-index: 0;
-            filter: blur(1px);
+            filter: blur(40px);
             pointer-events: none;
             animation: floatShape 8s ease-in-out infinite alternate;
         }
@@ -64,17 +72,17 @@
         .bg-shape-1 {
             width: 360px;
             height: 360px;
-            background: var(--accent-yellow);
+            background: var(--accent-sky);
             top: -130px;
             right: -80px;
-            opacity: 0.85;
+            opacity: 0.45;
             animation-duration: 9s;
         }
 
         .bg-shape-2 {
             width: 280px;
             height: 280px;
-            background: var(--accent-coral);
+            background: var(--accent-yellow);
             bottom: -90px;
             left: -80px;
             opacity: 0.35;
@@ -87,7 +95,7 @@
             background: var(--secondary);
             top: 45%;
             left: 10%;
-            opacity: 0.16;
+            opacity: 0.20;
             animation-duration: 7s;
         }
 
@@ -126,7 +134,7 @@
             background: #FFFFFF;
             padding: 6px;
             border-radius: 12px;
-            box-shadow: 0 4px 14px rgba(176, 24, 45, 0.08);
+            box-shadow: 0 4px 14px rgba(3, 159, 250, 0.12);
             border: 1px solid var(--card-border);
         }
 
@@ -145,27 +153,6 @@
             color: var(--secondary);
             letter-spacing: 0.5px;
             margin-top: 2px;
-        }
-
-        .nav-home-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 10px;
-            background: #FFFFFF;
-            border: 1px solid var(--tag-border);
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(176, 24, 45, 0.05);
-            transition: all 0.25s ease;
-        }
-
-        .nav-home-link:hover {
-            background: var(--accent-yellow);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(176, 24, 45, 0.12);
         }
 
         /* =========================================
@@ -190,8 +177,8 @@
             padding: 44px 36px 38px;
             border: 1px solid var(--card-border);
             box-shadow:
-                0 20px 50px rgba(176, 24, 45, 0.08),
-                0 6px 18px rgba(176, 24, 45, 0.04);
+                0 20px 50px rgba(3, 159, 250, 0.08),
+                0 6px 18px rgba(3, 159, 250, 0.04);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -202,11 +189,11 @@
             position: absolute;
             width: 70px;
             height: 70px;
-            background: var(--accent-yellow);
+            background: var(--accent-sky);
             border-radius: 50%;
             top: -20px;
             right: -15px;
-            opacity: 0.8;
+            opacity: 0.25;
             pointer-events: none;
         }
 
@@ -214,11 +201,11 @@
             position: absolute;
             width: 44px;
             height: 44px;
-            background: var(--accent-coral);
+            background: var(--accent-yellow);
             border-radius: 50%;
             bottom: -15px;
             left: -15px;
-            opacity: 0.6;
+            opacity: 0.35;
             pointer-events: none;
         }
 
@@ -249,22 +236,22 @@
         .badge-pulse-dot {
             width: 8px;
             height: 8px;
-            background: var(--primary);
+            background: var(--secondary);
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 0 0 rgba(176, 24, 45, 0.7);
+            box-shadow: 0 0 0 0 rgba(249, 99, 5, 0.7);
             animation: pulseDot 2s infinite;
         }
 
         @keyframes pulseDot {
             0% {
-                box-shadow: 0 0 0 0 rgba(176, 24, 45, 0.7);
+                box-shadow: 0 0 0 0 rgba(249, 99, 5, 0.7);
             }
             70% {
-                box-shadow: 0 0 0 8px rgba(176, 24, 45, 0);
+                box-shadow: 0 0 0 8px rgba(249, 99, 5, 0);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(176, 24, 45, 0);
+                box-shadow: 0 0 0 0 rgba(249, 99, 5, 0);
             }
         }
 
@@ -278,7 +265,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            text-shadow: 0 4px 18px rgba(176, 24, 45, 0.12);
+            text-shadow: 0 4px 18px rgba(3, 159, 250, 0.15);
             margin-bottom: 12px;
         }
 
@@ -301,7 +288,7 @@
         .error-title {
             font-size: clamp(22px, 3.5vw, 30px);
             font-weight: 900;
-            color: var(--primary);
+            color: var(--text-dark);
             letter-spacing: -0.6px;
             margin-bottom: 10px;
         }
@@ -320,8 +307,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: #FFF9F2;
-            border: 1px solid var(--tag-border);
+            background: #F0F9FF;
+            border: 1px solid rgba(3, 159, 250, 0.22);
             border-radius: 12px;
             padding: 12px 18px;
             margin: 0 auto 28px;
@@ -339,7 +326,7 @@
             width: 28px;
             height: 28px;
             border-radius: 8px;
-            background: rgba(176, 24, 45, 0.1);
+            background: rgba(3, 159, 250, 0.12);
             color: var(--primary);
             flex-shrink: 0;
         }
@@ -370,27 +357,30 @@
         }
 
         .btn-primary {
-            background: var(--secondary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: #FFFFFF;
-            box-shadow: 0 6px 18px rgba(226, 60, 100, 0.28);
+            box-shadow: 0 6px 18px rgba(3, 159, 250, 0.28);
         }
 
         .btn-primary:hover {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0369A1 100%);
             transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(176, 24, 45, 0.32);
+            box-shadow: 0 10px 22px rgba(3, 159, 250, 0.35);
         }
 
         .btn-secondary {
-            background: var(--tag-bg);
+            background: #FFFFFF;
             color: var(--primary);
-            border: 1.5px solid var(--tag-border);
+            border: 1.5px solid var(--card-border);
+            box-shadow: 0 2px 8px rgba(3, 159, 250, 0.06);
         }
 
         .btn-secondary:hover {
-            background: var(--accent-yellow);
-            border-color: #EAC250;
+            background: #F0F9FF;
+            border-color: var(--primary);
+            color: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 159, 250, 0.12);
         }
 
         .btn:active {
@@ -469,19 +459,18 @@
     <!-- Dynamic Session Role Checking -->
     @php
         $role = auth()->user()?->role;
-        $dashUrl = route('dashboard');
-        $dashLabel = 'Dashboard Mahasiswa';
-
-        if ($role === 'dosen') {
-            $dashUrl = route('dosen.dashboard');
-            $dashLabel = 'Dashboard Dosen';
-        } elseif ($role === 'admin') {
-            $dashUrl = route('admin.dashboard');
-            $dashLabel = 'Dashboard Admin';
-        } elseif (!$role) {
-            $dashUrl = url('/');
-            $dashLabel = 'Halaman Utama';
-        }
+        $dashUrl = match ($role) {
+            'dosen' => route('dosen.dashboard'),
+            'admin' => route('admin.dashboard'),
+            'mahasiswa' => route('mahasiswa.dashboard'),
+            default => url('/'),
+        };
+        $dashLabel = match ($role) {
+            'dosen' => 'Dashboard Dosen',
+            'admin' => 'Dashboard Admin',
+            'mahasiswa' => 'Dashboard Mahasiswa',
+            default => 'Halaman Utama',
+        };
 
         // Pesan aman yang informatif tanpa membocorkan identitas pemilik data
         $rawMessage = isset($exception) ? $exception->getMessage() : null;
@@ -495,8 +484,8 @@
         <div class="brand">
             <div class="brand-logo">
                 <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="16" cy="20" r="11" stroke="#B0182D" stroke-width="3.5" fill="none" opacity="0.95" />
-                    <circle cx="24" cy="20" r="11" stroke="#FFD464" stroke-width="3.5" fill="none" opacity="0.95" />
+                    <circle cx="16" cy="20" r="11" stroke="#039FFA" stroke-width="3.5" fill="none" opacity="0.95" />
+                    <circle cx="24" cy="20" r="11" stroke="#F9B804" stroke-width="3.5" fill="none" opacity="0.95" />
                 </svg>
             </div>
             <div class="brand-info">
@@ -504,14 +493,6 @@
                 <span class="brand-badge">PORTAL AKADEMIK</span>
             </div>
         </div>
-
-        <a href="{{ $dashUrl }}" class="nav-home-link">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-            <span>{{ $role ? 'Dashboard' : 'Beranda' }}</span>
-        </a>
     </header>
 
     <!-- Main Content Card -->
@@ -569,8 +550,6 @@
                     <span>Kembali ke Halaman Sebelumnya</span>
                 </button>
             </div>
-
-
         </div>
     </main>
 

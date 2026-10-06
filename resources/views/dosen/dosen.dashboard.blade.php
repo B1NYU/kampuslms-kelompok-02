@@ -36,10 +36,6 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PORTAL AKADEMIK DOSEN &bull; KELOMPOK 02
-                        </span>
                         <h1>Dashboard Manajemen Perkuliahan</h1>
                     </div>
                 </div>

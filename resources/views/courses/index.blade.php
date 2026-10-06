@@ -34,10 +34,6 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            SEMESTER GENAP 2026 • KELOMPOK 02
-                        </span>
                         <h1>Mata Kuliah Saya</h1>
                     </div>
                 </div>
