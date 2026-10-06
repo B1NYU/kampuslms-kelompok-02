@@ -11,3 +11,190 @@
     flex-direction: column;
     gap: 16px;
 }
+
+.page-title .table-summary-info {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+}
+
+.page-title .table-summary-info strong {
+    color: #039FFA;
+    font-weight: 800;
+}
+
+/* Toolbar Row: Search di Kiri, Filter MK di sebelah kiri Tombol Daftarkan Mahasiswa */
+.table-toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.table-toolbar-row .search-input-box {
+    flex: 1;
+    max-width: 380px;
+    min-width: 260px;
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 0 16px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.table-toolbar-row .search-input-box:focus-within {
+    border-color: #039FFA;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.12);
+}
+
+.table-toolbar-row .search-input-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0F172A;
+}
+
+.toolbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.toolbar-right-group .course-filter-bar {
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.toolbar-right-group .course-select {
+    height: 44px;
+    padding: 0 16px;
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F172A;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.toolbar-right-group .course-select:focus {
+    border-color: #039FFA;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.12);
+    outline: none;
+}
+
+.toolbar-right-group .btn-primary-action {
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Style Tabel Pemisah Garis Sesuai Gambar Referensi (Tanpa Efek Kartu) */
+.table-clean-style {
+    width: 100%;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    background: #FFFFFF;
+}
+
+.table-clean-style th {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    color: #64748B !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 16px 18px !important;
+    text-align: left !important;
+    border: none !important;
+    border-bottom: 1.5px solid #E2E8F0 !important;
+    background: transparent !important;
+}
+
+.table-clean-style td {
+    padding: 18px 18px !important;
+    background: transparent !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #0F172A !important;
+    border: none !important;
+    border-bottom: 1px solid #EDF2F7 !important;
+    border-radius: 0 !important;
+    transition: background 0.15s ease !important;
+    vertical-align: middle !important;
+}
+
+.table-clean-style tbody tr:hover td {
+    background: #F8FAFC !important;
+}
+
+.table-clean-style tr td:first-child,
+.table-clean-style tr td:last-child {
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+}
+
+.student-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.student-name {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0F172A;
+    display: block;
+}
+
+.student-nim {
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+}
+
+.badge-status-active {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #059669 !important;
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    display: inline-block;
+}
+

@@ -80,7 +80,6 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Daftar Tugas &amp; Manajemen Deadline</h2>
-                                <p>Pantau tugas perkuliahan, progres pengumpulan mahasiswa, dan batas waktu akhir pengumpulan.</p>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">

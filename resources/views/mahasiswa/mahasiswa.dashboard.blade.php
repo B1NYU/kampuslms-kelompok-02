@@ -42,23 +42,21 @@
             </header>
 
             @php
-                $mhsUser = \App\Models\User::where('role', 'mahasiswa')->where('email', 'mahasiswa@kampuslms.test')->first()
-                    ?? \App\Models\User::where('role', 'mahasiswa')->first();
+                $mhsUser = auth()->user();
 
-                // Mata kuliah dari database
+                // Mata kuliah dari database khusus mahasiswa yang sedang login
                 $dbCourses = $mhsUser ? $mhsUser->courses()->with('lecturer')->get() : collect();
-                if ($dbCourses->isEmpty()) {
-                    $dbCourses = \App\Models\Course::with('lecturer')->get();
-                }
                 $totalCourseCount = $dbCourses->count();
                 $totalSks = $dbCourses->sum('sks');
 
-                // Tugas aktif & pending
-                $dbAssignments = \App\Models\Assignment::whereIn('course_id', $dbCourses->pluck('id'))
-                    ->where('status', 'published')
-                    ->with('course')
-                    ->orderBy('due_at')
-                    ->get();
+                // Tugas aktif & pending dari mata kuliah yang diikuti
+                $dbAssignments = $dbCourses->isNotEmpty()
+                    ? \App\Models\Assignment::whereIn('course_id', $dbCourses->pluck('id'))
+                        ->where('status', 'published')
+                        ->with('course')
+                        ->orderBy('due_at')
+                        ->get()
+                    : collect();
                 $tugasPending = $dbAssignments->where('due_at', '>=', now())->count();
                 $tugasSelesai = $mhsUser ? \App\Models\Submission::where('user_id', $mhsUser->id)->count() : 0;
             @endphp

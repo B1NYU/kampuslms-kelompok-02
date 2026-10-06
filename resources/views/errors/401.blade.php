@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Halaman Tidak Ditemukan | Kampus LMS</title>
+    <title>401 - Autentikasi Dibutuhkan | Kampus LMS</title>
 
     <!-- Google Fonts Nunito -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -215,10 +215,10 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
-        .badge-404 {
+        .badge-401 {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -266,7 +266,7 @@
             justify-content: center;
             gap: 8px;
             text-shadow: 0 4px 18px rgba(3, 159, 250, 0.15);
-            margin-bottom: 6px;
+            margin-bottom: 12px;
         }
 
         .error-number .digit-accent {
@@ -297,8 +297,38 @@
             font-size: clamp(13px, 2vw, 15px);
             line-height: 1.6;
             color: var(--text-muted);
-            max-width: 520px;
+            max-width: 540px;
+            margin: 0 auto 20px;
+        }
+
+        /* Informative safe notice box */
+        .info-notice-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #F0F9FF;
+            border: 1px solid rgba(3, 159, 250, 0.22);
+            border-radius: 12px;
+            padding: 12px 18px;
             margin: 0 auto 28px;
+            max-width: 520px;
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .info-notice-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(3, 159, 250, 0.12);
+            color: var(--primary);
+            flex-shrink: 0;
         }
 
         /* Action Buttons */
@@ -428,19 +458,11 @@
 
     <!-- Dynamic Session Role Checking -->
     @php
-        $role = auth()->user()?->role;
-        $dashUrl = match ($role) {
-            'dosen' => route('dosen.dashboard'),
-            'admin' => route('admin.dashboard'),
-            'mahasiswa' => route('mahasiswa.dashboard'),
-            default => url('/'),
-        };
-        $dashLabel = match ($role) {
-            'dosen' => 'Dashboard Dosen',
-            'admin' => 'Dashboard Admin',
-            'mahasiswa' => 'Dashboard Mahasiswa',
-            default => 'Halaman Utama',
-        };
+        $rawMessage = isset($exception) ? $exception->getMessage() : null;
+        $safeMessage = ($rawMessage && !in_array($rawMessage, ['', 'Unauthorized', 'Unauthenticated.', 'This action is unauthorized.']))
+            ? $rawMessage
+            : 'Sesi Anda telah kedaluwarsa atau belum terautentikasi. Silakan masuk terlebih dahulu.';
+        $loginUrl = route('login');
     @endphp
 
     <!-- Top Navbar -->
@@ -467,32 +489,44 @@
             <div class="card-circle-bottom"></div>
 
             <!-- Error Status Pill -->
-            <div class="badge-404">
+            <div class="badge-401">
                 <span class="badge-pulse-dot"></span>
-                <span>STATUS 404 • NOT FOUND</span>
+                <span>STATUS 401 • AUTENTIKASI DIBUTUHKAN</span>
             </div>
 
             <!-- Big Number -->
             <div class="error-number">
                 <span>4</span>
                 <span class="digit-accent">0</span>
-                <span>4</span>
+                <span>1</span>
             </div>
 
             <!-- Title & Description -->
-            <h1 class="error-title">Oops! Halaman Tidak Ditemukan</h1>
+            <h1 class="error-title">Sesi Berakhir atau Belum Masuk</h1>
             <p class="error-desc">
-                Halaman atau konten akademik yang Anda tuju tidak tersedia, telah dipindahkan, atau alamat tautan yang dimasukkan kurang tepat.
+                Halaman akademik ini memerlukan autentikasi akun terdaftar. Silakan masuk dengan kredensial Anda untuk melanjutkan aktivitas perkuliahan.
             </p>
+
+            <!-- Safe Informative Reason / Tip Box -->
+            <div class="info-notice-box">
+                <div class="info-notice-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <span>{{ $safeMessage }}</span>
+            </div>
 
             <!-- Action Buttons -->
             <div class="error-actions">
-                <a href="{{ $dashUrl }}" class="btn btn-primary">
+                <a href="{{ $loginUrl }}" class="btn btn-primary">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
                     </svg>
-                    <span>Ke {{ $dashLabel }}</span>
+                    <span>Masuk ke Akun Anda</span>
                 </a>
 
                 <button type="button" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ url('/') }}'; }" class="btn btn-secondary">

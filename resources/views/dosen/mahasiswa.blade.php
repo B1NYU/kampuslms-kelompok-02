@@ -31,118 +31,67 @@
         <!-- Konten Utama Kelola Mahasiswa -->
         <main class="dosen-content">
 
-            <!-- Topbar Header -->
-            <header class="dash-topbar justify-end">
+            @php
+                $dosenUser = auth()->user();
+                $dosenCourses = $dosenUser
+                    ? $dosenUser->taughtCourses()->with('students')->get()
+                    : collect();
+                $firstCourse = $dosenCourses->first();
+            @endphp
 
-                @php
-                    $dosenCourses = \App\Models\Course::with(['students', 'lecturer'])->get();
-                    $firstCourse = $dosenCourses->first();
-                @endphp
-                <div class="course-filter-bar">
-                    <span class="course-filter-label">Mata Kuliah Aktif:</span>
-                    <select id="selectCurrentCourse" class="course-select">
-                        @foreach ($dosenCourses as $idx => $c)
-                            <option value="{{ $c->code }}" {{ $idx === 0 ? 'selected' : '' }}>
-                                {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)
-                            </option>
-                        @endforeach
-                    </select>
+            <!-- Topbar Header / Judul di Luar Container Utama -->
+            <header class="dash-topbar">
+                <div class="topbar-left">
+                    <div class="page-title">
+                        <h1>Pendaftaran Mahasiswa ke Mata Kuliah</h1>
+                        <span class="table-summary-info">Menampilkan <strong id="studentTableCount">{{ $firstCourse?->students?->count() ?? 0 }}</strong> Mahasiswa Terdaftar</span>
+                    </div>
                 </div>
             </header>
 
             <!-- Section: Form & Tabel Mahasiswa -->
             <section class="feature-section" id="kelola-mahasiswa">
                 <div class="section-card">
-                    <div class="section-header">
-                        <div class="section-header-left">
-                            <div class="section-header-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <polyline points="16 11 18 13 22 9"></polyline>
-                                </svg>
-                            </div>
-                            <div class="section-header-text">
-                                <h2>Pendaftaran Mahasiswa ke Mata Kuliah</h2>
-                                <p>Dosen dapat menambahkan mahasiswa baru ke kelas dan memantau seluruh peserta aktif yang terdaftar di database.</p>
-                            </div>
+
+                    <!-- Toolbar Kontrol: Pencarian di Kiri, Filter MK di sebelah kiri Tombol Daftarkan Mahasiswa -->
+                    <div class="table-toolbar-row">
+                        <!-- Kolom Mencari Mahasiswa (Kiri) -->
+                        <div class="search-input-box">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="searchStudentInput" placeholder="Cari mahasiswa / NIM...">
                         </div>
-                        <span class="section-header-badge">Kelola Peserta Kelas</span>
+
+                        <!-- Sisi Kanan: Filter MK Aktif di sebelah kiri Button Daftarkan Mahasiswa -->
+                        <div class="toolbar-right-group">
+                            <div class="course-filter-bar">
+                                <select id="selectCurrentCourse" class="course-select" {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
+                                    @forelse ($dosenCourses as $idx => $c)
+                                        <option value="{{ $c->code }}" {{ $idx === 0 ? 'selected' : '' }}>
+                                            {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)
+                                        </option>
+                                    @empty
+                                        <option value="">Belum ada mata kuliah yang diampu</option>
+                                    @endforelse
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn-primary-action" id="btnOpenAddStudentModal">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>+ Daftarkan Mahasiswa</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="two-col-grid">
-                        <!-- Form Tambah / Daftarkan Mahasiswa -->
-                        <form id="formAddStudent" class="card-form">
-                            <h4 class="card-form-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                                </svg>
-                                Form Pendaftaran Mahasiswa
-                            </h4>
-
-                            <div class="form-group">
-                                <label for="mhsMatkul">Mata Kuliah Target <span class="required">*</span></label>
-                                <select id="mhsMatkul" class="form-select" required>
-                                    @foreach ($dosenCourses as $c)
-                                        <option value="{{ $c->code }} - {{ $c->name }}">{{ $c->code }} - {{ $c->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-row-2">
-                                <div class="form-group">
-                                    <label for="mhsNim">Nomor Induk (NIM) <span class="required">*</span></label>
-                                    <input type="text" id="mhsNim" class="form-control" placeholder="Contoh: 10241022" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="mhsKelas">Kelas <span class="required">*</span></label>
-                                    <select id="mhsKelas" class="form-select" required>
-                                        <option value="SI-A">SI-A</option>
-                                        <option value="SI-B">SI-B</option>
-                                        <option value="TI-A">TI-A</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="mhsNama">Nama Lengkap Mahasiswa <span class="required">*</span></label>
-                                <input type="text" id="mhsNama" class="form-control" placeholder="Nama mahasiswa..." required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="mhsProdi">Program Studi</label>
-                                <select id="mhsProdi" class="form-select">
-                                    <option value="Sistem Informasi">Sistem Informasi</option>
-                                    <option value="Teknologi Informasi">Teknologi Informasi</option>
-                                    <option value="Informatika">Informatika</option>
-                                </select>
-                            </div>
-
-                            <button type="submit" class="btn-primary-action">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                Daftarkan Mahasiswa
-                            </button>
-                        </form>
-
-                        <!-- Tabel Mahasiswa Terdaftar -->
-                        <div class="table-container">
-                            <div class="table-header-tools">
-                                <span class="table-summary-info">Menampilkan <strong id="studentTableCount">5</strong> Mahasiswa Terdaftar</span>
-                                <div class="search-input-box">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                    <input type="text" id="searchStudentInput" placeholder="Cari mahasiswa/NIM...">
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="custom-dosen-table" id="studentTable">
+                    <!-- Tabel Mahasiswa Terdaftar (Full Width) -->
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="custom-dosen-table table-clean-style" id="studentTable">
                                     <thead>
                                         <tr>
                                             <th>Mahasiswa</th>
@@ -155,58 +104,152 @@
                                     <tbody id="studentTableBody">
                                         @php
                                             $selectedCourseCode = $firstCourse?->code ?? '';
+                                            $hasStudentsInFirstCourse = $firstCourse && $firstCourse->students->isNotEmpty();
                                         @endphp
-                                        @forelse ($dosenCourses as $course)
-                                            @foreach ($course->students as $mhs)
-                                                @php
-                                                    $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
-                                                    $initials = strtoupper(mb_substr($initials, 0, 2));
-                                                    $colors = [
-                                                        ['rgba(3, 159, 250, 0.12)', '#039FFA'],
-                                                        ['rgba(50, 179, 241, 0.14)', '#0284C7'],
-                                                        ['rgba(16, 185, 129, 0.14)', '#10B981'],
-                                                        ['rgba(249, 184, 4, 0.14)', '#D97706'],
-                                                        ['rgba(249, 99, 5, 0.12)', '#F96305']
-                                                    ];
-                                                    [$bg, $c] = $colors[$mhs->id % count($colors)];
-                                                @endphp
-                                                <tr data-mk="{{ $course->code }}" style="{{ $course->code === $selectedCourseCode ? '' : 'display:none;' }}">
-                                                    <td>
-                                                        <div class="student-cell">
-                                                            <div class="student-avatar" style="background:{{ $bg }}; color:{{ $c }};">{{ $initials }}</div>
-                                                            <div class="student-meta">
-                                                                <span class="student-name">{{ $mhs->name }}</span>
-                                                                <span class="student-nim">{{ $mhs->nim_nip }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>Sistem Informasi</td>
-                                                    <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
-                                                    <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                                    <td style="text-align: right;">
-                                                        <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                            </svg>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @empty
+                                        @if ($dosenCourses->isEmpty())
                                             <tr>
-                                                <td colspan="5" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada mahasiswa terdaftar.</td>
+                                                <td colspan="5" style="text-align:center;padding:36px 20px;color:#64748B;">
+                                                    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                                        </svg>
+                                                        <strong style="color:#0F172A;font-size:14px;">Anda belum mengampu mata kuliah apa pun</strong>
+                                                        <span style="font-size:12.5px;color:#64748B;">Hubungi Administrator untuk penugasan mata kuliah ke akun Anda.</span>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        @endforelse
+                                        @else
+                                            <tr id="emptyCourseRow" style="{{ $hasStudentsInFirstCourse ? 'display:none;' : '' }}">
+                                                <td colspan="5" style="text-align:center;padding:32px 20px;color:#94A3B8;">
+                                                    Belum ada mahasiswa yang terdaftar di kelas mata kuliah ini.
+                                                </td>
+                                            </tr>
+                                            @foreach ($dosenCourses as $course)
+                                                @foreach ($course->students as $mhs)
+                                                    @php
+                                                        $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
+                                                        $initials = strtoupper(mb_substr($initials, 0, 2));
+                                                        $colors = [
+                                                            ['rgba(3, 159, 250, 0.12)', '#039FFA'],
+                                                            ['rgba(50, 179, 241, 0.14)', '#0284C7'],
+                                                            ['rgba(16, 185, 129, 0.14)', '#10B981'],
+                                                            ['rgba(249, 184, 4, 0.14)', '#D97706'],
+                                                            ['rgba(249, 99, 5, 0.12)', '#F96305']
+                                                        ];
+                                                        [$bg, $c] = $colors[$mhs->id % count($colors)];
+                                                    @endphp
+                                                    <tr data-mk="{{ $course->code }}" style="{{ $course->code === $selectedCourseCode ? '' : 'display:none;' }}">
+                                                        <td>
+                                                            <div class="student-cell">
+                                                                <div class="student-avatar" style="background:{{ $bg }}; color:{{ $c }};">{{ $initials }}</div>
+                                                                <div class="student-meta">
+                                                                    <span class="student-name">{{ $mhs->name }}</span>
+                                                                    <span class="student-nim">{{ $mhs->nim_nip }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>Sistem Informasi</td>
+                                                        <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
+                                                        <td><span class="badge-status badge-status-active">Aktif</span></td>
+                                                        <td style="text-align: right;">
+                                                            <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @endforeach
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                </div>
             </section>
 
         </main>
+
+        <!-- MODAL FORM DAFTARKAN MAHASISWA -->
+        <div class="dosen-modal-overlay" id="studentModalOverlay">
+            <div class="dosen-modal-card" style="max-width: 580px; width: 95%;">
+                <div class="dosen-modal-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="section-header-icon" style="width: 36px; height: 36px; background: rgba(3, 159, 250, 0.1); color: #039FFA;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <polyline points="16 11 18 13 22 9"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Pendaftaran Mahasiswa Baru</h3>
+                            <span style="font-size: 11px; color: #64748B; font-weight: 600;">Daftarkan peserta ke kelas mata kuliah</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-modal" id="btnCloseStudentModal" aria-label="Tutup modal">&times;</button>
+                </div>
+
+                <form id="formAddStudent" style="margin: 0; display: flex; flex-direction: column;">
+                    <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
+                        <div class="form-group">
+                            <label for="mhsMatkul">Mata Kuliah Target <span class="required">*</span></label>
+                            <select id="mhsMatkul" class="form-select" required {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
+                                @forelse ($dosenCourses as $c)
+                                    <option value="{{ $c->code }} - {{ $c->name }}">{{ $c->code }} - {{ $c->name }}</option>
+                                @empty
+                                    <option value="">Belum ada mata kuliah yang diampu</option>
+                                @endforelse
+                            </select>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="mhsNim">Nomor Induk (NIM) <span class="required">*</span></label>
+                                <input type="text" id="mhsNim" class="form-control" placeholder="Contoh: 10241022" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="mhsKelas">Kelas <span class="required">*</span></label>
+                                <select id="mhsKelas" class="form-select" required>
+                                    <option value="SI-A">SI-A</option>
+                                    <option value="SI-B">SI-B</option>
+                                    <option value="TI-A">TI-A</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mhsNama">Nama Lengkap Mahasiswa <span class="required">*</span></label>
+                            <input type="text" id="mhsNama" class="form-control" placeholder="Nama mahasiswa..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mhsProdi">Program Studi</label>
+                            <select id="mhsProdi" class="form-select">
+                                <option value="Sistem Informasi">Sistem Informasi</option>
+                                <option value="Teknologi Informasi">Teknologi Informasi</option>
+                                <option value="Informatika">Informatika</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="dosen-modal-footer">
+                        <button type="button" class="btn-secondary-action" id="btnCancelStudentModal">Batal</button>
+                        <button type="submit" class="btn-primary-action">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Daftarkan Mahasiswa
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <x-footer />
     </div>
 
@@ -243,12 +286,46 @@
             const studentTableCount = document.getElementById('studentTableCount');
             const searchStudentInput = document.getElementById('searchStudentInput');
 
+            // Modal Controls
+            const studentModal = document.getElementById('studentModalOverlay');
+            const btnOpenAddStudent = document.getElementById('btnOpenAddStudentModal');
+            const btnCloseStudentModal = document.getElementById('btnCloseStudentModal');
+            const btnCancelStudentModal = document.getElementById('btnCancelStudentModal');
+
+            function openStudentModal() {
+                if (!selectCurrentCourse || !selectCurrentCourse.value) {
+                    alert('Anda belum memiliki mata kuliah yang diampu untuk mendaftarkan mahasiswa.');
+                    return;
+                }
+                if (studentModal) studentModal.classList.add('active');
+            }
+
+            function closeStudentModal() {
+                if (studentModal) studentModal.classList.remove('active');
+            }
+
+            if (btnOpenAddStudent) btnOpenAddStudent.addEventListener('click', openStudentModal);
+            if (btnCloseStudentModal) btnCloseStudentModal.addEventListener('click', closeStudentModal);
+            if (btnCancelStudentModal) btnCancelStudentModal.addEventListener('click', closeStudentModal);
+            if (studentModal) {
+                studentModal.addEventListener('click', (e) => {
+                    if (e.target === studentModal) closeStudentModal();
+                });
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && studentModal && studentModal.classList.contains('active')) {
+                    closeStudentModal();
+                }
+            });
+
             formAddStudent.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const nim = document.getElementById('mhsNim').value.trim();
                 const nama = document.getElementById('mhsNama').value.trim();
                 const kelas = document.getElementById('mhsKelas').value;
                 const prodi = document.getElementById('mhsProdi').value;
+                const matkulSelect = document.getElementById('mhsMatkul').value;
+                const currentMkVal = selectCurrentCourse ? selectCurrentCourse.value : '';
 
                 if (!nim || !nama) {
                     alert('Harap lengkapi data NIM dan Nama Mahasiswa!');
@@ -266,6 +343,9 @@
                 const pickedColor = colors[Math.floor(Math.random() * colors.length)];
 
                 const newRow = document.createElement('tr');
+                if (currentMkVal) {
+                    newRow.setAttribute('data-mk', currentMkVal);
+                }
                 newRow.innerHTML = `
                     <td>
                         <div class="student-cell">
@@ -291,7 +371,8 @@
 
                 studentTableBody.prepend(newRow);
                 formAddStudent.reset();
-                updateStudentCount();
+                closeStudentModal();
+                applyCourseFilter();
                 attachDeleteStudentEvents();
                 showToast(`Mahasiswa ${nama} (${nim}) berhasil didaftarkan ke kelas!`);
             });
@@ -318,6 +399,11 @@
                 });
 
                 if (studentTableCount) studentTableCount.textContent = visibleCount;
+
+                const emptyRow = document.getElementById('emptyCourseRow');
+                if (emptyRow) {
+                    emptyRow.style.display = visibleCount === 0 ? '' : 'none';
+                }
             }
 
             if (selectCurrentCourse) {
