@@ -14,7 +14,14 @@ class StoreCourseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $course = Course::find($this->course_id);
+
+        if (! $course) {
+            return true; // Biarkan rules() melempar 422/404 jika course tidak ditemukan
+        }
+
+        // Pastikan user adalah Dosen pemilik Course
+        return $this->user()->role === 'dosen' && $course->lecturer_id === $user->id;
     }
 
     protected function prepareForValidation(): void

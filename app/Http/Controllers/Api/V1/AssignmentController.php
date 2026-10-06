@@ -55,9 +55,20 @@ class AssignmentController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // Cek peran DULU, sebelum validasi: mahasiswa harus dapat 403, bukan 422.
+        // 1. Cek peran dasar
         abort_unless($request->user()->role === 'dosen', 403);
 
+        // 2. Cek kepemilikan Course TERLEBIH DAHULU jika course_id dikirimkan
+        if ($courseId = $request->input('course_id')) {
+            $course = Course::find($courseId);
+            
+            // Jika course ditemukan tetapi tidak diampu oleh dosen yang login -> AUTO 403!
+            if ($course) {
+                abort_unless($course->isTaughtBy($request->user()), 403);
+            }
+        }
+
+        // 3. BARU JALANKAN VALIDASI DATA
         $data = $request->validate([
             'course_id'    => ['required', 'integer', 'exists:courses,id'],
             'title'        => ['required', 'string', 'max:255'],
@@ -68,12 +79,10 @@ class AssignmentController extends Controller
             'status'       => ['sometimes', Rule::in(['draft', 'published'])],
         ]);
 
+        // Ambil ulang instance course dari data yang ter-validasi
         $course = Course::findOrFail($data['course_id']);
 
-        // Dosen hanya boleh membuat tugas di MK yang ia ampu.
-        abort_unless($course->isTaughtBy($request->user()), 403);
-
-        // course_id diisi oleh relasi, created_by dari server — bukan dari input pengguna.
+        // 4. Simpan assignment
         $assignment = $course->assignments()->create([
             'created_by'   => $request->user()->id,
             'title'        => $data['title'],
@@ -81,11 +90,7 @@ class AssignmentController extends Controller
             'due_at'       => $data['due_at'],
             'status'       => $data['status'] ?? 'draft',
         ] + Arr::only($data, ['max_score', 'allow_late']));
-        // max_score & allow_late yang tidak dikirim memakai default database.
 
-        // TODO (modul notifikasi F9): bila status 'published', dispatch notifikasi lewat queue di sini.
-
-        // refresh() agar nilai default database (max_score, allow_late) ikut terbaca.
         return (new AssignmentResource($assignment->refresh()))
             ->response()
             ->setStatusCode(201);

@@ -6,34 +6,39 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Menjawab pertanyaan "boleh masuk area ini?" berdasarkan peran.
- *
- * Pemakaian: ->middleware('role:admin') atau ->middleware('role:admin,dosen')
- *
- * - Belum login            -> 401 (atau redirect ke login untuk request web biasa)
- * - Login, peran tidak cocok -> 403
- *
- * CATATAN: middleware ini TIDAK memeriksa kepemilikan data. Untuk itu
- * dibutuhkan pengecekan per-objek (scoped binding / Policy).
- */
 class EnsureUserHasRole
 {
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
+        // 1. Jika belum login (User NULL)
         if (! $user) {
-            // Request JSON/AJAX (mis. fetch di halaman admin pengguna) mendapat 401.
-            // Request browser biasa diarahkan ke halaman login.
-            if ($request->expectsJson()) {
-                abort(401, 'Anda belum login.');
+            // Jika request ditujukan ke endpoint API (/api/*) atau meminta JSON, paksa kembalikan JSON 401
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Unauthenticated.'
+                ], 401);
             }
 
             return redirect()->guest(route('login'));
         }
 
-        abort_unless(in_array($user->role, $roles, true), 403, 'Peran Anda tidak diizinkan mengakses halaman ini.');
+        // 2. Jika sudah login, tetapi role tidak sesuai (403 Forbidden)
+        if (! in_array($user->role, $roles, true)) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Anda tidak memiliki akses ke sumber daya ini.'
+                ], 403);
+            }
+
+            abort(403, 'Peran Anda tidak diizinkan mengakses halaman ini.');
+        }
 
         return $next($request);
     }
