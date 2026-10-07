@@ -16,7 +16,7 @@ class CourseResource extends JsonResource
             'description' => $this->description,
             'sks'         => $this->sks,
             'status'      => $this->status,
-            'lecturer'    => new UserSummaryResource($this->whenLoaded('lecturer')),
+            'lecturer'    => new UserResource($this->whenLoaded('lecturer')),
 
             // Hanya muncul di GET /courses/{id} (loadCount).
             'materials_count'   => $this->whenCounted('materials'),

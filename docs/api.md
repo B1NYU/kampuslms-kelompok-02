@@ -1,236 +1,244 @@
 # Dokumentasi API KampusLMS v1
 
-- **Base URL:** `http://127.0.0.1:8000/api/v1`
-- **Autentikasi:** Bearer token (Laravel Sanctum), didapat dari `POST /auth/login`
-- **Header:** `Accept: application/json` (dan `Content-Type: application/json` untuk request ber-body)
-- Contoh `curl` memakai format Windows CMD, sama seperti saat pengujian.
-
-## Akun uji
-
-| Nama | ID | Role | `identifier` | Password |
-|---|---|---|---|---|
-| Mahasiswa Demo | 3 | `mahasiswa` | `10240000` | `password` |
-| Dosen Demo (Dosen A) | 2 | `dosen` | `NIP-000` | `password` |
-
-Selain dua akun di atas, **Dosen B** didaftarkan secara manual lewat `php artisan tinker` dengan NIP `NIP-999` (ID 35, email `dosenB@kampuslms.test`, password `password123`) untuk keperluan uji otorisasi antar-dosen:
+- **Base URL:** `http://127.0.0.1:8000/api/v1` (`php artisan serve`)
+- **Autentikasi:** Bearer token Laravel Sanctum dari `POST /auth/login` (berlaku 12 jam)
+- **Header wajib:** `Accept: application/json`; tambahkan `Content-Type: application/json` untuk request ber-body
+- **Format sukses:** objek tunggal `{"data": {...}}`; koleksi `{"data": [...], "meta": {"current_page", "last_page", "total"}}`
+- **Format gagal:** selalu JSON `{"message": "..."}` (422 menambahkan `errors`)
+- Contoh `curl` memakai sintaks bash (Git Bash / WSL / Linux / macOS). Di terminal, simpan token ke variabel:
 
 ```bash
-php artisan tinker --execute="\App\Models\User::create(['name' => 'Dosen B', 'email' => 'dosenB@kampuslms.test', 'role' => 'dosen', 'nim_nip' => 'NIP-999', 'password' => bcrypt('password123')]);"
+BASE=http://127.0.0.1:8000/api/v1
+TOKEN=$(curl -s -X POST $BASE/auth/login -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"identifier":"10240000","password":"password"}' | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
 ```
 
-Login Dosen B memakai `identifier` = `NIP-999`.
+## Akun demo (`php artisan migrate:fresh --seed`)
 
-Pada contoh, `<TOKEN_MAHASISWA>` adalah token Mahasiswa Demo dan `<TOKEN_DOSEN_A>` adalah token Dosen Demo.
-
-## Hasil pengujian
-
-Setiap endpoint diuji dengan empat kondisi. Hasilnya:
-
-| # | Kondisi | Endpoint yang diuji | Harapan | Hasil |
+| Nama | Role | `identifier` | Password | Keterangan |
 |---|---|---|---|---|
-| 1 | Tanpa token | `GET /me` | 401 | **401** ✅ |
-| 2 | Token mahasiswa mengakses endpoint dosen | `POST /assignments` | 403 | **403** ✅ |
-| 3 | Token Dosen A mengakses data dosen lain | `PUT /assignments/1` | 403 | **403** ✅ |
-| 4 | Token dan hak yang benar | `POST /assignments` (course 2), `PUT /assignments/16` | 200/201 | **sukses** ✅ (PUT `200`, POST mengembalikan tugas ID 16) |
+| Super Administrator | `admin` | `ADMIN-000` | `password` | |
+| Dosen Demo (Dosen A) | `dosen` | `NIP-000` | `password` | mengampu MK ID 1 |
+| Dosen B | `dosen` | `NIP-999` | `password` | mengampu MK ID 2 |
+| Mahasiswa Demo | `mahasiswa` | `10240000` | `password` | terdaftar di MK 1, **tidak** di MK 2 |
 
-Arti hasilnya:
-
-- **401:** semua endpoint selain login berada di bawah `auth:sanctum`, jadi request tanpa token ditolak sebelum menyentuh controller.
-- **403 (mahasiswa):** membuat tugas hanya boleh untuk role `dosen`. Mahasiswa ditolak dengan pesan `Anda tidak memiliki akses ke sumber daya ini.`
-- **403 (Dosen A):** role-nya benar, tetapi tugas ID 1 bukan milik mata kuliah yang diampu Dosen A. Jadi otorisasi mengecek peran sekaligus kepemilikan.
-- **200/201:** dosen pengampu (Dosen A, mata kuliah ID 2) boleh membuat dan mengubah tugas miliknya.
-
-Dua temuan tambahan dari pengujian:
-
-- Otorisasi (`403`) dicek lebih dulu daripada validasi (`422`).
-- `PUT` bersifat penuh: semua field wajib dikirim. Mengirim hanya `title` atau hanya sebagian field menghasilkan `422`.
+`identifier` boleh berupa email atau NIM/NIP.
 
 ## Ringkasan endpoint
 
-| Method | URI | Peran |
-|---|---|---|
-| `POST` | `/auth/login` | Publik |
-| `GET` | `/me` | Semua yang login |
-| `POST` | `/assignments` | `dosen` pengampu |
-| `PUT` / `PATCH` | `/assignments/{assignment}` | `dosen` pengampu |
+| Method | URI | Peran | Sukses |
+|---|---|---|---|
+| POST | `/auth/login` | Publik (5/menit) | 200 |
+| POST | `/auth/logout` | Login | 200 |
+| GET | `/me` | Login | 200 |
+| GET | `/courses` | Login | 200 |
+| GET | `/courses/{course}` | Dosen pengampu, mahasiswa terdaftar, admin | 200 |
+| GET | `/courses/{course}/assignments` | Dosen pengampu, mahasiswa terdaftar, admin | 200 |
+| POST | `/assignments` | Dosen pengampu MK tujuan | 201 |
+| PUT / PATCH | `/assignments/{assignment}` | Dosen pengampu | 200 |
+| DELETE | `/assignments/{assignment}` | Dosen pengampu | 204 |
 
-Dokumentasi ini hanya mencakup empat endpoint di atas, sesuai yang diuji.
+## Kode status
+
+| Kode | Arti di API ini |
+|---|---|
+| 200 / 201 / 204 | Berhasil / berhasil membuat / berhasil tanpa isi |
+| 401 | Token tidak ada, salah, kedaluwarsa, atau sudah dicabut |
+| 403 | Sudah login tetapi tidak berhak (peran salah atau bukan pemilik data) |
+| 404 | Data tidak ditemukan |
+| 405 | Metode HTTP tidak didukung endpoint |
+| 409 | Konflik: tugas yang sudah punya pengumpulan tidak bisa dihapus |
+| 422 | Validasi gagal |
+| 429 | Terlalu banyak permintaan (login 5/menit per IP; endpoint lain 60/menit) |
+
+Otorisasi (403) selalu dicek **sebelum** validasi (422).
+
+## Keamanan yang diterapkan
+
+- **API Resource = daftar putih.** Tidak ada model mentah yang dikembalikan. `password`, `remember_token`, `email_verified_at`, `file_path` tidak pernah keluar.
+- **Data pengampu** pada daftar/detail MK hanya `id` dan `name`.
+- **Login** memberi satu pesan yang sama untuk identitas tidak terdaftar dan password salah (mencegah *user enumeration*) dan menjalankan `Hash::check` di kedua kasus.
+- **Rate limiting:** `throttle:5,1` pada login (ditambah pembatas per identitas+IP), `throttle:60,1` pada endpoint terlindungi.
+- **Eager loading:** `with('lecturer:id,name')` dan `withCount`/filter submissions agar tidak ada N+1.
+- **Tugas draft** tidak terlihat dan tidak dihitung bagi mahasiswa.
 
 ---
 
 ## POST `/auth/login`
 
-**Peran:** Publik.
-
 | Field | Tipe | Wajib | Keterangan |
 |---|---|---|---|
-| `identifier` | string | Ya | NIM atau NIP (bukan `nim_nip`) |
+| `identifier` | string | Ya | Email atau NIM/NIP |
 | `password` | string | Ya | |
 
-**Request**
-
 ```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/auth/login" -H "Accept: application/json" -H "Content-Type: application/json" -d "{\"identifier\": \"10240000\", \"password\": \"password\"}"
+curl -X POST $BASE/auth/login -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"identifier":"10240000","password":"password"}'
 ```
 
-**Sukses (`200`)**
-
+**200**
 ```json
 {
   "data": {
-    "token": "1|ZucRvuGPYUMONKB5AdZNtwvQkjEoLd7zCjl6f0m2...",
+    "token": "1|suQhrjjHacSZzmRWPOH65jb0LsE963qcFW5BuZgHcc0da9cb",
     "token_type": "Bearer",
-    "expires_at": "2026-10-06T20:57:46+00:00",
-    "user": {
-      "id": 3,
-      "name": "Mahasiswa Demo",
-      "email": "mahasiswa@kampuslms.test",
-      "role": "mahasiswa",
-      "nim_nip": "10240000"
-    }
+    "expires_at": "2026-10-07T09:07:45+00:00",
+    "user": { "id": 3, "name": "Mahasiswa Demo", "email": "mahasiswa@kampuslms.test", "role": "mahasiswa", "nim_nip": "10240000" }
   }
 }
 ```
 
-Login Dosen A (`NIP-000`) menghasilkan `user.id = 2`, `role = "dosen"`.
-
-**Gagal (`422`)** — field `nim_nip` dikirim, padahal yang benar `identifier`:
-
+**422** (sama untuk identitas tidak ada maupun password salah)
 ```json
-{
-  "message": "Data yang diberikan tidak valid.",
-  "errors": {
-    "identifier": ["The identifier field is required."],
-    "password": ["The password field is required."]
-  }
-}
+{ "message": "Data yang diberikan tidak valid.", "errors": { "identifier": ["NIM/NIP atau password salah."] } }
 ```
 
----
+**429** (percobaan ke-6 dalam semenit)
+```json
+{ "message": "Terlalu banyak permintaan. Coba lagi nanti." }
+```
+Header `Retry-After` berisi sisa detik.
+
+## POST `/auth/logout`
+
+Mencabut token yang sedang dipakai.
+
+```bash
+curl -X POST $BASE/auth/logout -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
+```
+**200** `{ "message": "Berhasil keluar." }`. Setelah itu token yang sama menghasilkan 401.
 
 ## GET `/me`
 
-**Peran:** Semua pengguna yang login. Tidak ada parameter.
+```bash
+curl $BASE/me -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
+```
+**200**
+```json
+{ "data": { "id": 3, "name": "Mahasiswa Demo", "email": "mahasiswa@kampuslms.test", "role": "mahasiswa", "nim_nip": "10240000" } }
+```
+**401** `{ "message": "Tidak terautentikasi." }`
 
-**Request tanpa token (kondisi 1)**
+## GET `/courses`
+
+Dosen: MK yang diampu. Mahasiswa: MK yang diikuti (memuat `enrolled_at`). Admin: semua.
+
+| Query | Tipe | Keterangan |
+|---|---|---|
+| `page` | integer | Halaman, default 1 |
+| `per_page` | integer | 1 sampai 50, default 15 |
 
 ```bash
-curl -s -o /dev/null -w "Status: %{http_code}\n" -H "Accept: application/json" "http://127.0.0.1:8000/api/v1/me"
+curl "$BASE/courses?per_page=10" -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
+```
+**200**
+```json
+{
+  "data": [
+    {
+      "id": 1, "code": "SI2216", "name": "Pariatur quam iste", "description": "Nam qui soluta ...",
+      "sks": 4, "status": "active",
+      "lecturer": { "id": 2, "name": "Dosen Demo" },
+      "enrolled_at": "2026-08-05 21:07:38"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "total": 3 }
+}
 ```
 
-**Gagal**
+## GET `/courses/{course}`
 
-```
-Status: 401
-```
+Detail beserta jumlah materi dan tugas. Untuk mahasiswa, tugas draft tidak dihitung.
 
----
+```bash
+curl $BASE/courses/1 -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
+```
+**200**
+```json
+{ "data": { "id": 1, "code": "SI2216", "name": "Pariatur quam iste", "description": "Nam qui soluta ...", "sks": 4, "status": "active",
+  "lecturer": { "id": 2, "name": "Dosen Demo" }, "materials_count": 0, "assignments_count": 2 } }
+```
+**403** `{ "message": "Anda tidak memiliki akses ke sumber daya ini." }` (mahasiswa tidak terdaftar atau dosen bukan pengampu)
+**404** `{ "message": "Sumber daya tidak ditemukan." }`
+
+## GET `/courses/{course}/assignments`
+
+| Query | Tipe | Keterangan |
+|---|---|---|
+| `status` | `draft` atau `published` | Filter; mahasiswa selalu hanya `published` |
+| `page`, `per_page` | integer | Seperti `/courses` |
+
+```bash
+curl "$BASE/courses/1/assignments?status=published" -H "Accept: application/json" -H "Authorization: Bearer $TOKEN_DOSEN_A"
+```
+**200 (dosen/admin)** menyertakan `submissions_count`:
+```json
+{
+  "data": [
+    { "id": 1, "course_id": 1, "created_by": 2, "title": "Tugas At aut dicta", "instructions": "Sit beatae ...",
+      "due_at": "2026-09-16T06:23:52+00:00", "max_score": 100, "allow_late": true, "status": "published", "submissions_count": 21 }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "total": 2 }
+}
+```
+**200 (mahasiswa)** menyertakan `submission_status` (`belum` / `terkumpul` / `terlambat`) milik mahasiswa itu sendiri sebagai pengganti `submissions_count`.
 
 ## POST `/assignments`
-
-**Peran:** `dosen` pengampu mata kuliah tujuan.
 
 | Field | Tipe | Wajib | Default |
 |---|---|---|---|
 | `course_id` | integer | Ya | |
-| `title` | string | Ya | |
+| `title` | string (maks 255) | Ya | |
 | `instructions` | string | Ya | |
-| `due_at` | datetime (`YYYY-MM-DD HH:MM:SS`) | Ya | |
-| `max_score` | integer | Tidak | `100` |
-| `allow_late` | boolean | Tidak | `true` |
-| `status` | string | Tidak | `draft` |
-
-**Request sukses (kondisi 4, Dosen A, course 2)**
+| `due_at` | datetime | Ya | |
+| `max_score` | integer 1 sampai 100 | Tidak | 100 |
+| `allow_late` | boolean | Tidak | true |
+| `status` | `draft` / `published` | Tidak | `draft` |
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/assignments" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN_DOSEN_A>" -d "{\"course_id\": 2, \"title\": \"Tugas Uji Dosen A\", \"instructions\": \"Tes Status 200\", \"due_at\": \"2026-10-25 23:59:00\"}"
+curl -X POST $BASE/assignments -H "Accept: application/json" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN_DOSEN_A" \
+  -d '{"course_id":1,"title":"Tugas Baru","instructions":"Kerjakan soal 1-5","due_at":"2030-01-01 23:59:00"}'
 ```
-
-**Sukses**
-
+**201**
 ```json
-{
-  "data": {
-    "id": 16,
-    "course_id": 2,
-    "created_by": 2,
-    "title": "Tugas Uji Dosen A",
-    "instructions": "Tes Status 200",
-    "due_at": "2026-10-25T23:59:00+00:00",
-    "max_score": 100,
-    "allow_late": true,
-    "status": "draft"
-  }
-}
+{ "data": { "id": 16, "course_id": 1, "created_by": 2, "title": "Tugas Baru", "instructions": "Kerjakan soal 1-5",
+  "due_at": "2030-01-01T23:59:00+00:00", "max_score": 100, "allow_late": true, "status": "draft" } }
 ```
+**403** token mahasiswa, atau dosen yang bukan pengampu `course_id`
+**422** `{ "message": "Data yang diberikan tidak valid.", "errors": { "title": ["The title field is required."] } }`
 
-**Gagal `403` — token mahasiswa (kondisi 2)**
+## PUT / PATCH `/assignments/{assignment}`
+
+`PUT` mewajibkan semua field (`title`, `instructions`, `due_at`, `max_score`, `allow_late`, `status`); `PATCH` hanya memvalidasi field yang dikirim. `course_id` tidak bisa diubah (tugas tidak boleh pindah mata kuliah).
 
 ```bash
-curl -s -o /dev/null -w "Status: %{http_code}\n" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN_MAHASISWA>" -X POST -d "{\"title\":\"Tugas\",\"course_id\":1}" "http://127.0.0.1:8000/api/v1/assignments"
+curl -X PATCH $BASE/assignments/16 -H "Accept: application/json" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN_DOSEN_A" -d '{"title":"Judul Revisi","status":"published"}'
 ```
+**200** objek tugas seperti pada POST. **403** bukan dosen pengampu. **422** validasi gagal (misalnya `PUT` tidak lengkap).
 
+## DELETE `/assignments/{assignment}`
+
+```bash
+curl -X DELETE $BASE/assignments/16 -H "Accept: application/json" -H "Authorization: Bearer $TOKEN_DOSEN_A"
 ```
-Status: 403
-```
-
-Body-nya:
-
-```json
-{ "message": "Anda tidak memiliki akses ke sumber daya ini." }
-```
-
-**Gagal `422` — field salah nama** (`description` dan `due_date` dikirim, bukan `instructions` dan `due_at`):
-
-```json
-{
-  "message": "Data yang diberikan tidak valid.",
-  "errors": {
-    "instructions": ["The instructions field is required."],
-    "due_at": ["The due at field is required."]
-  }
-}
-```
+**204** tanpa isi. **403** bukan dosen pengampu.
+**409** `{ "message": "Tugas tidak dapat dihapus karena sudah ada pengumpulan mahasiswa." }`
 
 ---
 
-## PUT `/assignments/{assignment}`
+## Pengujian
 
-**Peran:** `dosen` pengampu mata kuliah dari tugas tersebut. `PATCH` memakai rute yang sama.
+- **Skrip curl (server sungguhan):** `bash scripts/test-api.sh`. Login otomatis, empat kondisi otorisasi per endpoint, plus cek user enumeration dan kebocoran `password`. Hasil terakhir: **42 lulus, 0 gagal**.
+- **PHPUnit:** `php artisan test` (termasuk `tests/Feature/ApiV1Test.php`: 401/403/404/422/429, N+1, draft tersembunyi, token dicabut). Hasil terakhir: **50 lulus**.
 
-Semua field wajib dikirim: `course_id`, `title`, `instructions`, `due_at`, `max_score`, `allow_late`, `status`.
+### Matriks otorisasi
 
-**Request sukses (kondisi 4, Dosen A, tugas ID 16)**
-
-```bash
-curl -s -o /dev/null -w "Status: %{http_code}\n" -X PUT "http://127.0.0.1:8000/api/v1/assignments/16" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN_DOSEN_A>" -d "{\"course_id\": 2, \"title\": \"Revisi Tugas Uji Dosen A\", \"instructions\": \"Tes Status 200\", \"due_at\": \"2026-10-25 23:59:00\", \"max_score\": 100, \"allow_late\": true, \"status\": \"draft\"}"
-```
-
-**Sukses**
-
-```
-Status: 200
-```
-
-**Gagal `403` — tugas milik dosen lain (kondisi 3)**
-
-```bash
-curl -s -o /dev/null -w "Status: %{http_code}\n" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN_DOSEN_A>" -X PUT -d "{\"title\":\"Edit B\"}" "http://127.0.0.1:8000/api/v1/assignments/1"
-```
-
-```
-Status: 403
-```
-
-**Gagal `422` — field tidak lengkap** (hanya `course_id`, `title`, `instructions`, `due_at`):
-
-```json
-{
-  "message": "Data yang diberikan tidak valid.",
-  "errors": {
-    "max_score": ["The max score field is required."],
-    "allow_late": ["The allow late field is required."],
-    "status": ["The status field is required."]
-  }
-}
-```
+| Endpoint | 1. Tanpa token | 2. Mahasiswa (endpoint dosen / bukan peserta) | 3. Dosen A ke data Dosen B | 4. Hak benar |
+|---|---|---|---|---|
+| `GET /courses/{id}` | 401 | 403 | 403 | 200 |
+| `GET /courses/{id}/assignments` | 401 | 403 | 403 | 200 |
+| `POST /assignments` | 401 | 403 | 403 | 201 |
+| `PUT/PATCH /assignments/{id}` | 401 | 403 | 403 | 200 |
+| `DELETE /assignments/{id}` | 401 | 403 | 403 | 204 |

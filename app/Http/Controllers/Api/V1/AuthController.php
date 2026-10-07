@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserSummaryResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -69,7 +69,7 @@ class AuthController extends Controller
                 'token'      => $token->plainTextToken,
                 'token_type' => 'Bearer',
                 'expires_at' => $token->accessToken->expires_at?->toIso8601String(),
-                'user'       => (new UserSummaryResource($user))->resolve(),
+                'user'       => (new UserResource($user))->resolve(),
             ],
         ]);
     }
@@ -86,8 +86,8 @@ class AuthController extends Controller
     }
 
     /** GET /api/v1/me — profil + role milik pemanggil. */
-    public function me(Request $request): UserSummaryResource
+    public function me(Request $request): UserResource
     {
-        return new UserSummaryResource($request->user());
+        return new UserResource($request->user());
     }
 }

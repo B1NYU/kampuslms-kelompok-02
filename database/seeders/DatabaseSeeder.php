@@ -44,7 +44,17 @@ class DatabaseSeeder extends Seeder
         $demoMahasiswa->role = 'mahasiswa';
         $demoMahasiswa->save();
 
-        $dosenLain = User::factory()->dosen()->count(2)->create();
+        $demoDosenB = User::create([
+            'name' => 'Dosen B',
+            'email' => 'dosenB@kampuslms.test',
+            'nim_nip' => 'NIP-999',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
+        $demoDosenB->role = 'dosen';
+        $demoDosenB->save();
+
+        $dosenLain = User::factory()->dosen()->count(1)->create();
         $mahasiswaLain = User::factory()->mahasiswa()->count(29)->create();
 
         $semuaDosen = collect([$demoDosen])->merge($dosenLain);
@@ -54,16 +64,33 @@ class DatabaseSeeder extends Seeder
             'Users: 1 admin, ' . $semuaDosen->count() . ' dosen, ' . $semuaMahasiswa->count() . ' mahasiswa.'
         );
 
-        $courses = collect(range(1, 5))->map(function () use ($semuaDosen) {
+        // Mata kuliah 1 diampu Dosen Demo, mata kuliah 2 diampu Dosen B (tetap, agar
+        // skrip uji otorisasi deterministik); sisanya acak.
+        $courses = collect(range(1, 5))->map(function (int $nomor) use ($dosenLain, $demoDosen, $demoDosenB) {
+            $dosen = match ($nomor) {
+                1 => $demoDosen,
+                2 => $demoDosenB,
+                default => $dosenLain->random(), // MK 3-5 bukan milik Dosen A/B
+            };
+
             return Course::factory()->create([
-                'lecturer_id' => $semuaDosen->random()->id,
+                'lecturer_id' => $dosen->id,
                 'status' => 'active',
             ]);
         });
 
-        $courses->each(function (Course $course) use ($semuaMahasiswa) {
+        $courses->each(function (Course $course) use ($semuaMahasiswa, $demoMahasiswa, $courses) {
             $jumlahEnroll = random_int(15, min(22, $semuaMahasiswa->count()));
             $terdaftar = $semuaMahasiswa->random($jumlahEnroll);
+
+            // Mahasiswa Demo selalu terdaftar di MK 1 dan TIDAK terdaftar di MK 2
+            // (untuk menguji 403 pada mahasiswa yang bukan peserta).
+            $terdaftar = $terdaftar->reject(fn (User $u) => $u->id === $demoMahasiswa->id);
+            if ($course->id !== $courses[1]->id) {
+                if ($course->id === $courses[0]->id || random_int(0, 1)) {
+                    $terdaftar->push($demoMahasiswa);
+                }
+            }
 
             $pivot = $terdaftar->mapWithKeys(fn (User $mhs) => [
                 $mhs->id => ['enrolled_at' => now()->subDays(random_int(10, 90))],

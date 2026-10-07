@@ -43,7 +43,7 @@ class AuthAndRoleTest extends TestCase
 
     public function test_tamu_diarahkan_ke_login_dan_request_json_mendapat_401(): void
     {
-        $this->get('/dashboard')->assertRedirect(route('login'));
+        $this->get('/mahasiswa/dashboard')->assertRedirect(route('login'));
         $this->getJson('/admin/pengguna')->assertStatus(401);
     }
 
@@ -55,7 +55,7 @@ class AuthAndRoleTest extends TestCase
         $this->actingAs($mhs)->get('/admin/pengguna')->assertForbidden();
         $this->actingAs($mhs)->get('/dosen/tugas')->assertForbidden();
         $this->actingAs($dosen)->get('/admin/pengguna')->assertForbidden();
-        $this->actingAs($dosen)->get('/dashboard')->assertForbidden();
+        $this->actingAs($dosen)->get('/mahasiswa/dashboard')->assertForbidden();
     }
 
     public function test_mahasiswa_tidak_bisa_mengubah_role_lewat_endpoint_admin(): void

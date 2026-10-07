@@ -66,7 +66,7 @@
                             &larr; Kembali ke Dashboard Admin
                         </a>
                     @else
-                        <a href="{{ route('mata-kuliah.show', $assignment->course_id) }}" class="btn-secondary-action">
+                        <a href="{{ route('mahasiswa.mata-kuliah.show', $assignment->course_id) }}" class="btn-secondary-action">
                             &larr; Kembali ke Mata Kuliah
                         </a>
                     @endif
@@ -170,7 +170,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data" class="card-form">
+                        <form action="{{ route('mahasiswa.assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data" class="card-form">
                             @csrf
                             <div class="form-group">
                                 <label for="file">
