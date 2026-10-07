@@ -44,14 +44,26 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 403 — dari abort(403) maupun AuthorizationException.
-        // Status selain 403 dikembalikan null → diteruskan ke handler berikutnya.
+        // 403 / 429 / 405 — dari abort(), AuthorizationException, throttle, dll.
+        // Selalu JSON bersih tanpa stack trace (walau APP_DEBUG=true). Status lain
+        // dikembalikan null → diteruskan ke handler berikutnya.
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, Request $request) {
-            if ($request->is('api/*') && $e->getStatusCode() === 403) {
-                return response()->json([
-                    'message' => 'Anda tidak memiliki akses ke sumber daya ini.',
-                ], 403);
+            if (! $request->is('api/*')) {
+                return null;
             }
+
+            $message = match ($e->getStatusCode()) {
+                403 => 'Anda tidak memiliki akses ke sumber daya ini.',
+                405 => 'Metode HTTP tidak diizinkan untuk endpoint ini.',
+                429 => $e->getMessage() && ! str_contains($e->getMessage(), 'Too Many')
+                    ? $e->getMessage()
+                    : 'Terlalu banyak permintaan. Coba lagi nanti.',
+                default => null,
+            };
+
+            return $message === null
+                ? null
+                : response()->json(['message' => $message], $e->getStatusCode(), $e->getHeaders());
         });
 
         // 404 — ModelNotFoundException juga dikonversi menjadi NotFoundHttpException

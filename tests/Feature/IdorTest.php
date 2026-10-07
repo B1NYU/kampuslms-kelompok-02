@@ -95,14 +95,14 @@ class IdorTest extends TestCase
 
     public function test_mahasiswa_terdaftar_bisa_membuka_matkul_dan_hanya_melihat_data_sendiri(): void
     {
-        $this->actingAs($this->budi)->get(route('mata-kuliah.show', $this->course))
+        $this->actingAs($this->budi)->get(route('mahasiswa.mata-kuliah.show', $this->course))
             ->assertOk()
             ->assertDontSee('jawaban-siti-RAHASIA.pdf');
     }
 
     public function test_mahasiswa_tidak_terdaftar_ditolak(): void
     {
-        $this->actingAs($this->outsider)->get(route('mata-kuliah.show', $this->course))->assertForbidden();
+        $this->actingAs($this->outsider)->get(route('mahasiswa.mata-kuliah.show', $this->course))->assertForbidden();
     }
 
     // ---------- /assignments/{assignment} ----------
@@ -139,7 +139,7 @@ class IdorTest extends TestCase
         $this->subBudi->delete();
 
         $this->actingAs($this->budi)->post(
-            route('assignments.submissions.store', $this->assignment),
+            route('mahasiswa.assignments.submissions.store', $this->assignment),
             ['file' => UploadedFile::fake()->create('tugas.pdf', 100, 'application/pdf'), 'user_id' => $this->siti->id]
         )->assertRedirect();
 
@@ -153,7 +153,7 @@ class IdorTest extends TestCase
         Storage::fake('local');
 
         $this->actingAs($this->outsider)->post(
-            route('assignments.submissions.store', $this->assignment),
+            route('mahasiswa.assignments.submissions.store', $this->assignment),
             ['file' => UploadedFile::fake()->create('tugas.pdf', 100, 'application/pdf')]
         )->assertForbidden();
 
