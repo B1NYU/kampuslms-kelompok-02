@@ -108,6 +108,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/pendaftaran', function () {
             return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));
         })->name('pendaftaran');
+
+        Route::get('/materi', function () {
+            return view()->file(resource_path('views/admin/admin.materi.blade.php'));
+        })->name('materi');
     });
 
 });

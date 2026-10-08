@@ -51,6 +51,8 @@
 .brand-info {
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .brand-info h2,
@@ -61,6 +63,7 @@
     color: #039FFA;
     letter-spacing: 0.05em;
     line-height: 1;
+    white-space: nowrap;
 }
 
 .portal-badge {
@@ -73,6 +76,7 @@
     margin-top: 2px;
     display: inline-block;
     width: fit-content;
+    white-space: nowrap;
 }
 
 .portal-badge-mhs {
@@ -157,6 +161,8 @@
     border-radius: 30px;
     border: 1px solid rgba(3, 159, 250, 0.25);
     box-shadow: 0 1px 4px rgba(3, 159, 250, 0.06);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .mhs-avatar,
@@ -180,6 +186,8 @@
 .admin-badge-info {
     display: flex;
     flex-direction: column;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .mhs-name,
@@ -189,6 +197,7 @@
     font-weight: 800;
     color: #0F172A;
     line-height: 1.2;
+    white-space: nowrap;
 }
 
 .mhs-role,
@@ -197,6 +206,7 @@
     font-size: 10.5px;
     font-weight: 600;
     color: #F96305;
+    white-space: nowrap;
 }
 
 /* Tombol Logout */
