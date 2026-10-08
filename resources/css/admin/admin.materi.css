@@ -1,0 +1,836 @@
+/* ==========================================================================
+   ADMIN.MATERI.CSS - Distribusi & Manajemen Materi Kuliah (Portal Admin)
+   Theme: Harmonized with Mahasiswa Mode (Primary Blue, Gold, Coral accents)
+   ========================================================================== */
+
+@import './admin.common.css';
+
+/* Stat Grid Header */
+.materi-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.materi-stat-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 16px -4px rgba(3, 159, 250, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.materi-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px -4px rgba(3, 159, 250, 0.14);
+}
+
+.materi-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.icon-blue   { background: rgba(3, 159, 250, 0.12); color: #039FFA; }
+.icon-orange { background: rgba(249, 99, 5, 0.12);  color: #F96305; }
+.icon-gold   { background: rgba(249, 184, 4, 0.14); color: #D97706; }
+.icon-green  { background: rgba(16, 185, 129, 0.12); color: #10B981; }
+
+.materi-stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.materi-stat-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--admin-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.materi-stat-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--admin-text);
+    line-height: 1.2;
+}
+
+/* Toolbar & Filters */
+.materi-filter-toolbar {
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 14px -3px rgba(3, 159, 250, 0.06);
+}
+
+/* Search Box (Di Kiri) */
+.materi-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+    min-width: 220px;
+}
+
+.materi-search-box input {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    font-size: 13px;
+    font-weight: 600;
+    background: #F8FAFC;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.materi-search-box input:focus {
+    background: #FFFFFF;
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.materi-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-muted);
+    pointer-events: none;
+}
+
+/* Kelompok Filter Dropdowns (Di Kanan) */
+.toolbar-right-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.filter-select-wrapper {
+    position: relative;
+    min-width: 230px;
+}
+
+.filter-select-wrapper.filter-type-wrapper {
+    min-width: 165px;
+}
+
+.filter-select-wrapper select {
+    width: 100%;
+    padding: 9px 34px 9px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--admin-text);
+    background: #F8FAFC;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.filter-select-wrapper select:focus {
+    border-color: var(--admin-primary);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.filter-select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--admin-muted);
+}
+
+/* Custom Filter Dropdown (Dengan Scrollbar) */
+.custom-filter-dropdown {
+    position: relative;
+    min-width: 250px;
+}
+
+.filter-dropdown-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--admin-text);
+    background: #F8FAFC;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.filter-dropdown-btn:hover {
+    background: #FFFFFF;
+    border-color: var(--admin-primary);
+}
+
+.custom-filter-dropdown.open .filter-dropdown-btn {
+    border-color: var(--admin-primary);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.filter-dropdown-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.filter-dropdown-icon {
+    color: var(--admin-muted);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.custom-filter-dropdown.open .filter-dropdown-icon {
+    transform: rotate(180deg);
+    color: var(--admin-primary);
+}
+
+.filter-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 270px;
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.18), 0 4px 10px -2px rgba(3, 159, 250, 0.1);
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease;
+}
+
+.custom-filter-dropdown.open .filter-dropdown-menu {
+    display: block;
+}
+
+.filter-options-scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px;
+    margin: 0;
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(3, 159, 250, 0.4) #F1F5F9;
+}
+
+/* Custom Sleek Scrollbar */
+.filter-options-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-options-scroll::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 6px;
+}
+
+.filter-options-scroll::-webkit-scrollbar-thumb {
+    background: rgba(3, 159, 250, 0.4);
+    border-radius: 6px;
+}
+
+.filter-options-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--admin-primary);
+}
+
+.filter-option-item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--admin-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #F8FAFC;
+}
+
+.filter-option-item:last-child {
+    border-bottom: none;
+}
+
+.filter-option-item:hover {
+    background: rgba(3, 159, 250, 0.08);
+}
+
+.filter-option-item.active {
+    background: rgba(3, 159, 250, 0.14);
+    color: var(--admin-primary);
+    border-left: 3px solid var(--admin-primary);
+}
+
+.filter-option-code {
+    background: #EFF6FF;
+    color: var(--admin-primary);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    flex-shrink: 0;
+}
+
+.filter-option-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Materials Cards Grid */
+.materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.material-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.18);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px -4px rgba(3, 159, 250, 0.07);
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.material-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px -4px rgba(3, 159, 250, 0.16);
+    border-color: rgba(3, 159, 250, 0.4);
+}
+
+.material-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.badge-tag-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge-mk-code {
+    background: #EFF6FF;
+    color: #039FFA;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+}
+
+.badge-file-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.badge-type-pdf  { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+.badge-type-pptx { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+.badge-type-docx { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+.badge-type-link { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+
+.material-card-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--admin-text);
+    margin-bottom: 6px;
+    line-height: 1.35;
+}
+
+.material-card-desc {
+    font-size: 12.5px;
+    color: var(--admin-muted);
+    line-height: 1.45;
+    margin-bottom: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Material File Meta Box */
+.material-meta-pill {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 11.5px;
+    color: #475569;
+}
+
+.material-meta-pill .file-name-text {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190px;
+}
+
+.material-meta-pill .file-size-badge {
+    background: #E2E8F0;
+    color: #475569;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* Card Footer */
+.material-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(3, 159, 250, 0.18);
+}
+
+.uploader-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.uploader-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #E0F2FE;
+    color: #039FFA;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.uploader-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.uploader-date {
+    font-size: 10px;
+    color: #94A3B8;
+    display: block;
+}
+
+.material-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-materi-view {
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #EFF6FF;
+    color: var(--admin-primary);
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    font-size: 11.5px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-materi-view:hover {
+    background: var(--admin-primary);
+    color: #FFFFFF;
+}
+
+/* Modal Overlay & Card */
+.materi-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.materi-modal-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.materi-modal-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    overflow: hidden;
+    transform: translateY(20px) scale(0.97);
+    transition: all 0.25s ease;
+}
+
+.materi-modal-overlay.show .materi-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.materi-modal-header {
+    padding: 18px 24px;
+    background: linear-gradient(135deg, rgba(3, 159, 250, 0.08) 0%, rgba(249, 184, 4, 0.05) 100%);
+    border-bottom: 1px solid rgba(3, 159, 250, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.materi-modal-header h3 {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--admin-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--admin-muted);
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 2px 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--admin-danger);
+}
+
+.materi-modal-body {
+    padding: 22px 24px;
+    max-height: calc(85vh - 120px);
+    overflow-y: auto;
+}
+
+.type-switch-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.type-option-radio {
+    flex: 1;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.type-option-radio input {
+    cursor: pointer;
+}
+
+.type-option-radio.selected {
+    border-color: var(--admin-primary);
+    background: #EFF6FF;
+}
+
+/* File Drop Area */
+.file-drop-area {
+    border: 2px dashed rgba(3, 159, 250, 0.35);
+    background: #F8FAFC;
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-drop-area:hover {
+    background: #EFF6FF;
+    border-color: var(--admin-primary);
+}
+
+.file-drop-area input[type="file"] {
+    display: none;
+}
+
+/* Empty State */
+.materi-empty-state {
+    grid-column: 1 / -1;
+    background: #FFFFFF;
+    border: 1.5px dashed rgba(3, 159, 250, 0.25);
+    border-radius: 16px;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.materi-empty-icon {
+    font-size: 44px;
+    margin-bottom: 12px;
+}
+
+.materi-empty-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--admin-text);
+    margin-bottom: 6px;
+}
+
+.materi-empty-desc {
+    font-size: 13px;
+    color: var(--admin-muted);
+    max-width: 440px;
+    margin: 0 auto 18px;
+}
+
+/* ==========================================================================
+   CUSTOM SEARCHABLE COMBOBOX (Mata Kuliah Tujuan)
+   ========================================================================== */
+.custom-combobox-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.combobox-input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.combobox-input-box input {
+    width: 100%;
+    padding: 10px 38px 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(3, 159, 250, 0.28);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--admin-text);
+    background: #FFFFFF;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.combobox-input-box input:focus {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.combobox-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--admin-muted);
+    transition: transform 0.2s ease;
+}
+
+.custom-combobox-wrapper.open .combobox-arrow {
+    transform: translateY(-50%) rotate(180deg);
+    color: var(--admin-primary);
+}
+
+.combobox-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.18), 0 4px 10px -2px rgba(3, 159, 250, 0.1);
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease;
+}
+
+.custom-combobox-wrapper.open .combobox-dropdown-menu {
+    display: block;
+}
+
+.combobox-options-list {
+    max-height: 210px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px;
+    list-style: none;
+    margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(3, 159, 250, 0.4) #F1F5F9;
+}
+
+/* Custom Sleek Scrollbar */
+.combobox-options-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.combobox-options-list::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 6px;
+}
+
+.combobox-options-list::-webkit-scrollbar-thumb {
+    background: rgba(3, 159, 250, 0.4);
+    border-radius: 6px;
+}
+
+.combobox-options-list::-webkit-scrollbar-thumb:hover {
+    background: var(--admin-primary);
+}
+
+.combobox-option-item {
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border-bottom: 1px solid #F8FAFC;
+}
+
+.combobox-option-item:last-child {
+    border-bottom: none;
+}
+
+.combobox-option-item:hover,
+.combobox-option-item.highlighted {
+    background: rgba(3, 159, 250, 0.08);
+}
+
+.combobox-option-item.selected {
+    background: rgba(3, 159, 250, 0.14);
+    border-left: 3px solid var(--admin-primary);
+}
+
+.option-main-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.option-code-pill {
+    background: #EFF6FF;
+    color: var(--admin-primary);
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid rgba(3, 159, 250, 0.22);
+}
+
+.option-name-text {
+    font-size: 13px;
+    color: var(--admin-text);
+    font-weight: 800;
+}
+
+.option-sub-text {
+    font-size: 11px;
+    color: var(--admin-muted);
+    padding-left: 2px;
+}
+
+.combobox-empty-message {
+    padding: 16px;
+    text-align: center;
+    color: #94A3B8;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+/* Responsiveness */
+@media (max-width: 860px) {
+    .materi-filter-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .materi-search-box {
+        max-width: 100%;
+    }
+
+    .toolbar-right-filters {
+        justify-content: stretch;
+    }
+
+    .filter-select-wrapper {
+        flex: 1;
+        min-width: 140px;
+    }
+}
+

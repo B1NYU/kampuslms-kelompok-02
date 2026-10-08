@@ -56,15 +56,30 @@
                         Pendaftaran MK
                     </a>
                 </li>
+                <li class="{{ request()->is('admin/materi') ? 'active' : '' }}">
+                    <a href="{{ route('admin.materi') }}" class="nav-link-admin">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        Materi Kuliah
+                    </a>
+                </li>
             </ul>
         </div>
 
         <!-- Kanan: Identitas Admin & Tombol Logout -->
         <div class="navbar-right-group">
+            @php
+                $adminUser = auth()->user();
+                $adminName = $adminUser?->name ?? 'Super Administrator';
+                $words = explode(' ', trim($adminName));
+                $initials = strtoupper(substr($words[0] ?? 'A', 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : 'D'));
+            @endphp
             <div class="admin-avatar-badge">
-                <div class="admin-avatar">AD</div>
+                <div class="admin-avatar">{{ $initials }}</div>
                 <div class="admin-badge-info">
-                    <span class="admin-name">Super Administrator</span>
+                    <span class="admin-name">{{ $adminName }}</span>
                     <span class="admin-role-tag">Akses Penuh Sistem</span>
                 </div>
             </div>
