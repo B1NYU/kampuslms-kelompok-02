@@ -32,27 +32,13 @@
         <main class="dosen-content">
 
             @php
-                $dosenUser = auth()->user();
-                $activeCourses = collect();
-                if ($dosenUser && $dosenUser->role === 'dosen') {
-                    $activeCourses = $dosenUser->taughtCourses()->where('status', 'active')->with('materials')->get();
-                    if ($activeCourses->isEmpty()) {
-                        $activeCourses = $dosenUser->taughtCourses()->with('materials')->get();
-                    }
-                }
-                if ($activeCourses->isEmpty()) {
-                    $activeCourses = \App\Models\Course::where('status', 'active')->with('materials')->get();
-                }
-                if ($activeCourses->isEmpty()) {
-                    $activeCourses = \App\Models\Course::with('materials')->get();
-                }
-                $firstCourse = $activeCourses->first();
-                $allDbMaterials = $activeCourses->flatMap->materials;
+                // $courses dikirim controller: hanya MK yang diampu dosen yang login.
+                $activeCourses  = $courses;
+                $allDbMaterials = $courses->flatMap->materials->sortByDesc('created_at');
             @endphp
 
             <!-- Topbar Header -->
             <header class="dash-topbar justify-end">
-
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
                     <select id="selectCurrentCourse" class="course-select" {{ $activeCourses->isEmpty() ? 'disabled' : '' }}>
@@ -94,22 +80,59 @@
                         </div>
                     </div>
 
-                    <!-- Grid Materi yang Terpublikasi (Full Width) -->
+                    <!-- Grid Materi yang Terpublikasi -->
                     <div class="materials-published-wrap">
                         <div class="table-header-tools">
-                            <span class="table-summary-info">Koleksi Materi Perkuliahan (<strong id="materialListCount">0</strong> Modul)</span>
+                            <span class="table-summary-info">Koleksi Materi Perkuliahan (<strong id="materialListCount">{{ $allDbMaterials->count() }}</strong> Modul)</span>
                             <span class="card-subtitle-tag">Semester Genap 2026</span>
                         </div>
 
                         <div class="materials-grid" id="materialsGrid">
-                            <div class="empty-state" id="materialEmptyState" style="padding: 48px 16px; text-align: center; width: 100%; grid-column: 1 / -1; background: #F8FAFC; border-radius: 16px; border: 1.5px dashed rgba(3, 159, 250, 0.25);">
-                                <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
-                                <div style="font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Belum Ada Materi Perkuliahan</div>
-                                <p style="font-size: 12.5px; color: #64748B; margin-bottom: 14px;">Klik tombol di atas atau tombol di bawah untuk mempublikasikan materi perkuliahan baru (PDF, PPTX, atau tautan referensi).</p>
-                                <button type="button" class="btn-primary-action" onclick="document.getElementById('btnOpenUploadMaterialModal').click()" style="margin: 0 auto; font-size: 12.5px;">
-                                    + Unggah Materi Pertama
-                                </button>
-                            </div>
+                            @forelse ($allDbMaterials as $material)
+                                <div class="material-card" data-course-id="{{ $material->course_id }}">
+                                    <div class="material-card-top">
+                                        @if ($material->type === 'file')
+                                            <span class="material-type-tag tag-pdf">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                                                {{ strtoupper(pathinfo($material->original_name ?? '', PATHINFO_EXTENSION) ?: 'FILE') }} &bull; Berkas File
+                                            </span>
+                                        @else
+                                            <span class="material-type-tag tag-link">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg>
+                                                LINK &bull; Tautan
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <h4 class="material-card-title">{{ $material->title }}</h4>
+                                    <p class="material-card-desc">{{ $material->description ?? 'Tidak ada catatan.' }}</p>
+                                    <div class="material-card-footer">
+                                        <span class="material-meta-date">Diunggah: {{ $material->created_at ? $material->created_at->diffForHumans() : '-' }}</span>
+                                        <div class="material-card-actions">
+                                            @if ($material->type === 'file')
+                                                <a href="{{ route('dosen.materi.download', $material) }}" class="btn-open-resource">Unduh File</a>
+                                            @else
+                                                <a href="{{ $material->external_url }}" target="_blank" rel="noopener noreferrer" class="btn-open-resource">Buka Link</a>
+                                            @endif
+                                            <form action="{{ route('dosen.materi.destroy', $material) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-icon-danger" title="Hapus materi">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="empty-state" id="materialEmptyState" style="padding: 48px 16px; text-align: center; width: 100%; grid-column: 1 / -1; background: #F8FAFC; border-radius: 16px; border: 1.5px dashed rgba(3, 159, 250, 0.25);">
+                                    <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
+                                    <div style="font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Belum Ada Materi Perkuliahan</div>
+                                    <p style="font-size: 12.5px; color: #64748B; margin-bottom: 14px;">Klik tombol di atas untuk mempublikasikan materi perkuliahan baru (PDF, PPTX, atau tautan referensi).</p>
+                                    <button type="button" class="btn-primary-action" onclick="document.getElementById('btnOpenUploadMaterialModal').click()" style="margin: 0 auto; font-size: 12.5px;">
+                                        + Unggah Materi Pertama
+                                    </button>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -137,14 +160,27 @@
                     <button type="button" class="btn-close-modal" id="btnCloseMaterialModal" aria-label="Tutup modal">&times;</button>
                 </div>
 
-                <form id="formUploadMaterial" style="margin: 0; display: flex; flex-direction: column;">
+                <!-- FORM TERHUBUNG DENGAN LARAVEL -->
+                <form id="formUploadMaterial" action="{{ route('dosen.materi.store') }}" method="POST" enctype="multipart/form-data" style="margin: 0; display: flex; flex-direction: column;">
+                    @csrf
+                    <input type="hidden" name="type" id="materialType" value="{{ old('type', 'file') }}">
+
                     <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
+
+                        @if ($errors->any())
+                            <div style="background:#FEF2F2; border:1px solid #FECACA; color:#B91C1C; border-radius:10px; padding:10px 12px; font-size:12.5px; font-weight:600; margin-bottom:12px;">
+                                @foreach ($errors->all() as $error)
+                                    <div>{{ $error }}</div>
+                                @endforeach
+                            </div>
+                        @endif
+
                         <div class="form-row-2">
                             <div class="form-group">
                                 <label for="materialCourse">Mata Kuliah Aktif <span class="required">*</span></label>
-                                <select id="materialCourse" class="form-select" required {{ $activeCourses->isEmpty() ? 'disabled' : '' }}>
+                                <select id="materialCourse" name="course_id" class="form-select" required {{ $activeCourses->isEmpty() ? 'disabled' : '' }}>
                                     @forelse ($activeCourses as $c)
-                                        <option value="{{ $c->id }}" data-code="{{ $c->code }}">{{ $c->code }} - {{ $c->name }}</option>
+                                        <option value="{{ $c->id }}" data-code="{{ $c->code }}" @selected((int) old('course_id') === $c->id)>{{ $c->code }} - {{ $c->name }}</option>
                                     @empty
                                         <option value="">Belum ada mata kuliah aktif</option>
                                     @endforelse
@@ -152,33 +188,20 @@
                             </div>
                             <div class="form-group">
                                 <label for="materialSession">Pertemuan Ke-</label>
+                                {{-- Tidak ber-name: tabel materials tidak punya kolom pertemuan, jadi nilainya tidak dikirim. --}}
                                 <select id="materialSession" class="form-select">
-                                    <option value="1">Pertemuan 1</option>
-                                    <option value="2">Pertemuan 2</option>
-                                    <option value="3">Pertemuan 3</option>
-                                    <option value="4">Pertemuan 4</option>
-                                    <option value="5">Pertemuan 5</option>
-                                    <option value="6" selected>Pertemuan 6</option>
-                                    <option value="7">Pertemuan 7</option>
-                                    <option value="8">Pertemuan 8</option>
-                                    <option value="9">Pertemuan 9</option>
-                                    <option value="10">Pertemuan 10</option>
-                                    <option value="11">Pertemuan 11</option>
-                                    <option value="12">Pertemuan 12</option>
-                                    <option value="13">Pertemuan 13</option>
-                                    <option value="14">Pertemuan 14</option>
-                                    <option value="15">Pertemuan 15</option>
-                                    <option value="16">Pertemuan 16</option>
+                                    @for ($i = 1; $i <= 16; $i++)
+                                        <option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Pertemuan {{ $i }}</option>
+                                    @endfor
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="materialTitle">Judul Materi <span class="required">*</span></label>
-                            <input type="text" id="materialTitle" class="form-control" placeholder="Contoh: Modul 06 - Autentikasi Multi-Role Laravel" required>
+                            <input type="text" id="materialTitle" name="title" class="form-control" placeholder="Contoh: Modul 06 - Autentikasi Multi-Role Laravel" value="{{ old('title') }}" required>
                         </div>
 
-                        <!-- Pilihan Format Materi (Berkas File & Link) -->
                         <div class="form-group">
                             <label>Pilih Format Materi <span class="required">*</span></label>
                             <div class="type-selector-group">
@@ -199,10 +222,9 @@
                             </div>
                         </div>
 
-                        <!-- Dynamic File Upload or URL Input -->
                         <div id="fileUploadContainer" class="form-group">
                             <label>Unggah Berkas File (PDF / PPTX)</label>
-                            <div class="file-dropzone" id="materialDropzone">
+                            <div class="file-dropzone" id="materialDropzone" style="position: relative;">
                                 <svg class="file-dropzone-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="17 8 12 3 7 8"></polyline>
@@ -210,19 +232,25 @@
                                 </svg>
                                 <span class="file-dropzone-text" id="dropzoneText">Klik untuk memilih file PDF atau PPTX, atau seret berkas ke sini</span>
                                 <span class="file-dropzone-sub">Maksimal ukuran file: 50MB (Format PDF, PPT, PPTX)</span>
-                                <span class="file-selected-info" id="fileSelectedInfo"></span>
-                                <input type="file" id="materialFileInput" accept=".pdf,.pptx,.ppt" style="display: none;">
+
+                                {{-- Input menutupi seluruh dropzone (transparan): klik & seret ditangani browser --}}
+                                <input type="file" id="materialFileInput" name="file" accept=".pdf,.pptx,.ppt" title=" "
+                                       style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: block;">
                             </div>
+
+                            {{-- Kotak status berkas: gaya inline agar tidak bergantung pada CSS lain --}}
+                            <div id="fileStatus" role="status" aria-live="polite"
+                                 style="display: none; margin-top: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; word-break: break-all;"></div>
                         </div>
 
                         <div id="linkInputContainer" class="form-group" style="display: none;">
                             <label for="materialUrl">URL Tautan / Link Materi <span class="required">*</span></label>
-                            <input type="url" id="materialUrl" class="form-control" placeholder="https://laravel.com/docs/11.x/authentication atau link video">
+                            <input type="url" id="materialUrl" name="external_url" class="form-control" placeholder="https://laravel.com/docs/12.x/authentication" value="{{ old('external_url') }}">
                         </div>
 
                         <div class="form-group">
                             <label for="materialDesc">Catatan Pembelajaran / Petunjuk</label>
-                            <textarea id="materialDesc" class="form-textarea" rows="2" placeholder="Tulis ringkasan atau instruksi bagi mahasiswa..."></textarea>
+                            <textarea id="materialDesc" name="description" class="form-textarea" rows="2" placeholder="Tulis ringkasan atau instruksi bagi mahasiswa...">{{ old('description') }}</textarea>
                         </div>
                     </div>
 
@@ -248,71 +276,111 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            function showToast(message, isSuccess = true) {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'dosen-toast';
-                if (!isSuccess) toast.style.borderLeftColor = '#EF4444';
-
-                toast.innerHTML = `
-                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#10B981' : '#EF4444'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    <span>${message}</span>
-                `;
-                container.appendChild(toast);
-
-                setTimeout(() => toast.classList.add('show'), 50);
-
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 350);
-                }, 3500);
-            }
-
             const typePills = document.querySelectorAll('.type-pill');
             const fileUploadContainer = document.getElementById('fileUploadContainer');
             const linkInputContainer = document.getElementById('linkInputContainer');
             const materialDropzone = document.getElementById('materialDropzone');
             const materialFileInput = document.getElementById('materialFileInput');
             const dropzoneText = document.getElementById('dropzoneText');
-            const fileSelectedInfo = document.getElementById('fileSelectedInfo');
-            const formUploadMaterial = document.getElementById('formUploadMaterial');
-            const materialsGrid = document.getElementById('materialsGrid');
-            const materialListCount = document.getElementById('materialListCount');
+            const fileStatus = document.getElementById('fileStatus');
+            const materialTypeInput = document.getElementById('materialType');
 
-            let activeMaterialType = 'file';
+            const defaultDropzoneText = dropzoneText.textContent;
+
+            // Tampilkan status berkas di bawah dropzone (hijau = berhasil, merah = ditolak)
+            function showFileStatus(ok, message) {
+                fileStatus.textContent = message;
+                fileStatus.style.display = 'block';
+                fileStatus.style.background = ok ? '#ECFDF5' : '#FEF2F2';
+                fileStatus.style.border = '1px solid ' + (ok ? '#A7F3D0' : '#FECACA');
+                fileStatus.style.color = ok ? '#047857' : '#B91C1C';
+            }
+
+            function resetFileStatus() {
+                fileStatus.textContent = '';
+                fileStatus.style.display = 'none';
+                dropzoneText.textContent = defaultDropzoneText;
+            }
+
+            function setType(activeType) {
+                typePills.forEach(p => p.classList.toggle('active', p.getAttribute('data-type') === activeType));
+                materialTypeInput.value = activeType;
+
+                if (activeType === 'link') {
+                    fileUploadContainer.style.display = 'none';
+                    linkInputContainer.style.display = 'block';
+                    // Kosongkan berkas agar tidak ikut terkirim
+                    materialFileInput.value = '';
+                    resetFileStatus();
+                } else {
+                    fileUploadContainer.style.display = 'block';
+                    linkInputContainer.style.display = 'none';
+                }
+            }
 
             typePills.forEach(pill => {
-                pill.addEventListener('click', () => {
-                    typePills.forEach(p => p.classList.remove('active'));
-                    pill.classList.add('active');
+                pill.addEventListener('click', () => setType(pill.getAttribute('data-type')));
+            });
 
-                    activeMaterialType = pill.getAttribute('data-type');
-                    if (activeMaterialType === 'link') {
-                        fileUploadContainer.style.display = 'none';
-                        linkInputContainer.style.display = 'block';
-                    } else {
-                        fileUploadContainer.style.display = 'block';
-                        linkInputContainer.style.display = 'none';
-                        materialFileInput.accept = '.pdf,.pptx,.ppt,.docx';
-                        dropzoneText.textContent = 'Klik untuk memilih berkas (PDF / PPTX) atau seret ke sini';
-                    }
+            // Pulihkan pilihan format setelah validasi gagal
+            setType(materialTypeInput.value === 'link' ? 'link' : 'file');
+
+            // ===== Dropzone: klik & seret ditangani langsung oleh <input type="file"> transparan =====
+
+            // Efek visual saat berkas diseret di atas dropzone
+            ['dragenter', 'dragover'].forEach(evt => {
+                materialDropzone.addEventListener(evt, () => {
+                    materialDropzone.style.borderColor = '#039FFA';
+                    materialDropzone.style.background = 'rgba(3, 159, 250, 0.06)';
+                });
+            });
+            ['dragleave', 'drop'].forEach(evt => {
+                materialDropzone.addEventListener(evt, () => {
+                    materialDropzone.style.borderColor = '';
+                    materialDropzone.style.background = '';
                 });
             });
 
-            materialDropzone.addEventListener('click', () => {
-                materialFileInput.click();
+            // Jika berkas terlepas di luar dropzone, jangan biarkan browser membukanya
+            ['dragover', 'drop'].forEach(evt => {
+                window.addEventListener(evt, (e) => {
+                    if (!materialDropzone.contains(e.target)) e.preventDefault();
+                });
             });
 
-            materialFileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    fileSelectedInfo.textContent = `✓ Berkas dipilih: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+            // Dijalankan setiap kali berkas dipilih (lewat klik maupun seret).
+            // Atribut accept tidak berlaku untuk berkas yang diseret, jadi dicek di sini juga
+            // (server tetap memvalidasi ulang di StoreMaterialRequest).
+            materialFileInput.addEventListener('change', () => {
+                const file = materialFileInput.files[0];
+
+                if (!file) {
+                    resetFileStatus();
+                    return;
                 }
+
+                const ext = file.name.split('.').pop().toLowerCase();
+
+                if (!['pdf', 'ppt', 'pptx'].includes(ext)) {
+                    materialFileInput.value = '';
+                    dropzoneText.textContent = defaultDropzoneText;
+                    showFileStatus(false, '✕ Format tidak didukung. Pilih berkas PDF, PPT, atau PPTX.');
+                    return;
+                }
+
+                if (file.size > 50 * 1024 * 1024) {
+                    materialFileInput.value = '';
+                    dropzoneText.textContent = defaultDropzoneText;
+                    showFileStatus(false, '✕ Ukuran berkas maksimal 50 MB.');
+                    return;
+                }
+
+                const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                dropzoneText.textContent = file.name;
+                showFileStatus(true, `✓ Berkas dipilih: ${file.name} (${sizeMb} MB)`);
             });
 
-            // Modal Controls
+            // ===== Modal Controls =====
             const materialModal = document.getElementById('materialModalOverlay');
             const btnOpenUpload = document.getElementById('btnOpenUploadMaterialModal');
             const btnCloseMaterialModal = document.getElementById('btnCloseMaterialModal');
@@ -340,123 +408,42 @@
                 }
             });
 
-            formUploadMaterial.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const session = document.getElementById('materialSession').value;
-                const title = document.getElementById('materialTitle').value.trim();
-                const desc = document.getElementById('materialDesc').value.trim() || 'Materi perkuliahan baru.';
-                const courseSelect = document.getElementById('materialCourse');
-                const courseId = courseSelect ? courseSelect.value : '';
+            // Validasi server gagal -> buka lagi modal agar pesan error terlihat
+            @if ($errors->any())
+                openMaterialModal();
+            @endif
 
-                if (!title) {
-                    alert('Harap masukkan judul materi!');
-                    return;
-                }
-
-                let badgeHtml = '';
-                let actionBtnHtml = '';
-
-                if (activeMaterialType === 'file') {
-                    const fileObj = materialFileInput.files[0];
-                    const ext = fileObj ? fileObj.name.split('.').pop().toUpperCase() : 'PDF/PPTX';
-                    badgeHtml = `<span class="material-type-tag tag-pdf"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg> ${ext} &bull; Berkas File</span>`;
-                    actionBtnHtml = `<a href="#" class="btn-open-resource" onclick="alert('Membuka file materi ${title}...'); return false;">Unduh File</a>`;
-                } else {
-                    const url = document.getElementById('materialUrl').value.trim() || '#';
-                    badgeHtml = `<span class="material-type-tag tag-link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> LINK &bull; Tautan</span>`;
-                    actionBtnHtml = `<a href="${url}" target="_blank" class="btn-open-resource">Buka Link</a>`;
-                }
-
-                const card = document.createElement('div');
-                card.className = 'material-card';
-                if (courseId) card.setAttribute('data-course-id', courseId);
-                card.innerHTML = `
-                    <div class="material-card-top">
-                        ${badgeHtml}
-                        <span class="card-subtitle-tag" style="padding:2px 7px; font-size:10px;">Pertemuan ${session}</span>
-                    </div>
-                    <h4 class="material-card-title">${title}</h4>
-                    <p class="material-card-desc">${desc}</p>
-                    <div class="material-card-footer">
-                        <span class="material-meta-date">Diunggah: Baru saja</span>
-                        <div class="material-card-actions">
-                            ${actionBtnHtml}
-                            <button class="btn-icon-danger btn-delete-material" title="Hapus materi">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                const emptyState = document.getElementById('materialEmptyState');
-                if (emptyState) emptyState.remove();
-
-                materialsGrid.prepend(card);
-                formUploadMaterial.reset();
-                fileSelectedInfo.textContent = '';
-                closeMaterialModal();
-                updateMaterialCount();
-                attachDeleteMaterialEvents();
-                showToast(`Materi "${title}" berhasil dipublikasikan untuk Pertemuan ${session}!`);
-            });
-
+            // ===== Course Filter =====
             const selectCurrentCourse = document.getElementById('selectCurrentCourse');
+            const materialCourse = document.getElementById('materialCourse');
+            const materialsGrid = document.getElementById('materialsGrid');
+            const materialListCount = document.getElementById('materialListCount');
+
+            function applyCourseFilter() {
+                if (!selectCurrentCourse || !materialsGrid) return;
+
+                const selectedVal = selectCurrentCourse.value;
+                let visibleCount = 0;
+
+                materialsGrid.querySelectorAll('.material-card').forEach(card => {
+                    const show = !selectedVal || card.getAttribute('data-course-id') === selectedVal;
+                    card.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+
+                if (materialListCount) materialListCount.textContent = visibleCount;
+
+                // Dropdown di modal ikut mata kuliah yang sedang dilihat
+                // (kecuali baru kembali dari validasi gagal, supaya pilihan lama tidak tertimpa)
+                @if (! $errors->any())
+                    if (materialCourse && selectedVal) materialCourse.value = selectedVal;
+                @endif
+            }
+
             if (selectCurrentCourse) {
-                selectCurrentCourse.addEventListener('change', () => {
-                    const selectedVal = selectCurrentCourse.value;
-                    const cards = materialsGrid.querySelectorAll('.material-card');
-                    let visibleCount = 0;
-                    cards.forEach(c => {
-                        const courseId = c.getAttribute('data-course-id');
-                        if (!selectedVal || !courseId || courseId === selectedVal) {
-                            c.style.display = '';
-                            visibleCount++;
-                        } else {
-                            c.style.display = 'none';
-                        }
-                    });
-                    if (materialListCount) materialListCount.textContent = visibleCount;
-                });
+                selectCurrentCourse.addEventListener('change', applyCourseFilter);
+                applyCourseFilter();
             }
-
-            const emptyStateHtml = `
-                <div class="empty-state" id="materialEmptyState" style="padding: 48px 16px; text-align: center; width: 100%; grid-column: 1 / -1; background: #F8FAFC; border-radius: 16px; border: 1.5px dashed rgba(3, 159, 250, 0.25);">
-                    <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
-                    <div style="font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Belum Ada Materi Perkuliahan</div>
-                    <p style="font-size: 12.5px; color: #64748B; margin-bottom: 14px;">Klik tombol di atas atau tombol di bawah untuk mempublikasikan materi perkuliahan baru (PDF, PPTX, atau tautan referensi).</p>
-                    <button type="button" class="btn-primary-action" onclick="document.getElementById('btnOpenUploadMaterialModal').click()" style="margin: 0 auto; font-size: 12.5px;">
-                        + Unggah Materi Pertama
-                    </button>
-                </div>
-            `;
-
-            function updateMaterialCount() {
-                const total = materialsGrid.querySelectorAll('.material-card').length;
-                if (materialListCount) materialListCount.textContent = total;
-
-                const emptyState = document.getElementById('materialEmptyState');
-                if (total === 0 && !emptyState) {
-                    materialsGrid.innerHTML = emptyStateHtml;
-                } else if (total > 0 && emptyState) {
-                    emptyState.remove();
-                }
-            }
-
-            function attachDeleteMaterialEvents() {
-                const deleteBtns = document.querySelectorAll('.btn-delete-material');
-                deleteBtns.forEach(btn => {
-                    btn.onclick = function() {
-                        const card = btn.closest('.material-card');
-                        const title = card.querySelector('.material-card-title').textContent;
-                        if (confirm(`Hapus materi "${title}"?`)) {
-                            card.remove();
-                            updateMaterialCount();
-                            showToast(`Materi "${title}" telah dihapus.`, false);
-                        }
-                    };
-                });
-            }
-            attachDeleteMaterialEvents();
 
         });
     </script>
