@@ -31,15 +31,38 @@
         <!-- Konten Utama Unggah Materi -->
         <main class="dosen-content">
 
+            @php
+                $dosenUser = auth()->user();
+                $activeCourses = collect();
+                if ($dosenUser && $dosenUser->role === 'dosen') {
+                    $activeCourses = $dosenUser->taughtCourses()->where('status', 'active')->with('materials')->get();
+                    if ($activeCourses->isEmpty()) {
+                        $activeCourses = $dosenUser->taughtCourses()->with('materials')->get();
+                    }
+                }
+                if ($activeCourses->isEmpty()) {
+                    $activeCourses = \App\Models\Course::where('status', 'active')->with('materials')->get();
+                }
+                if ($activeCourses->isEmpty()) {
+                    $activeCourses = \App\Models\Course::with('materials')->get();
+                }
+                $firstCourse = $activeCourses->first();
+                $allDbMaterials = $activeCourses->flatMap->materials;
+            @endphp
+
             <!-- Topbar Header -->
             <header class="dash-topbar justify-end">
 
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
-                    <select id="selectCurrentCourse" class="course-select">
-                        <option value="SI101" selected>SI101 &bull; Pemrograman Web (3 SKS)</option>
-                        <option value="SI102">SI102 &bull; Basis Data Lanjut (3 SKS)</option>
-                        <option value="SI103">SI103 &bull; Analisis &amp; Desain SI (4 SKS)</option>
+                    <select id="selectCurrentCourse" class="course-select" {{ $activeCourses->isEmpty() ? 'disabled' : '' }}>
+                        @forelse ($activeCourses as $idx => $c)
+                            <option value="{{ $c->id }}" {{ $idx === 0 ? 'selected' : '' }}>
+                                {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS)
+                            </option>
+                        @empty
+                            <option value="">Belum ada mata kuliah aktif</option>
+                        @endforelse
                     </select>
                 </div>
             </header>
@@ -118,11 +141,13 @@
                     <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="form-row-2">
                             <div class="form-group">
-                                <label for="materialCourse">Mata Kuliah</label>
-                                <select id="materialCourse" class="form-select">
-                                    <option value="SI101">SI101 - Pemrograman Web</option>
-                                    <option value="SI102">SI102 - Basis Data</option>
-                                    <option value="SI103">SI103 - Analisis Sistem</option>
+                                <label for="materialCourse">Mata Kuliah Aktif <span class="required">*</span></label>
+                                <select id="materialCourse" class="form-select" required {{ $activeCourses->isEmpty() ? 'disabled' : '' }}>
+                                    @forelse ($activeCourses as $c)
+                                        <option value="{{ $c->id }}" data-code="{{ $c->code }}">{{ $c->code }} - {{ $c->name }}</option>
+                                    @empty
+                                        <option value="">Belum ada mata kuliah aktif</option>
+                                    @endforelse
                                 </select>
                             </div>
                             <div class="form-group">
@@ -135,6 +160,15 @@
                                     <option value="5">Pertemuan 5</option>
                                     <option value="6" selected>Pertemuan 6</option>
                                     <option value="7">Pertemuan 7</option>
+                                    <option value="8">Pertemuan 8</option>
+                                    <option value="9">Pertemuan 9</option>
+                                    <option value="10">Pertemuan 10</option>
+                                    <option value="11">Pertemuan 11</option>
+                                    <option value="12">Pertemuan 12</option>
+                                    <option value="13">Pertemuan 13</option>
+                                    <option value="14">Pertemuan 14</option>
+                                    <option value="15">Pertemuan 15</option>
+                                    <option value="16">Pertemuan 16</option>
                                 </select>
                             </div>
                         </div>
@@ -144,24 +178,16 @@
                             <input type="text" id="materialTitle" class="form-control" placeholder="Contoh: Modul 06 - Autentikasi Multi-Role Laravel" required>
                         </div>
 
-                        <!-- Pilihan Tipe Materi (PDF, PPTX, Link) -->
+                        <!-- Pilihan Format Materi (Berkas File & Link) -->
                         <div class="form-group">
                             <label>Pilih Format Materi <span class="required">*</span></label>
                             <div class="type-selector-group">
-                                <div class="type-pill active" data-type="pdf">
+                                <div class="type-pill active" data-type="file">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                         <polyline points="14 2 14 8 20 8"></polyline>
                                     </svg>
-                                    Dokumen PDF
-                                </div>
-                                <div class="type-pill" data-type="pptx">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                                        <line x1="12" y1="17" x2="12" y2="21"></line>
-                                    </svg>
-                                    Slide PPTX
+                                    Berkas File (PDF / PPTX)
                                 </div>
                                 <div class="type-pill" data-type="link">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -175,17 +201,17 @@
 
                         <!-- Dynamic File Upload or URL Input -->
                         <div id="fileUploadContainer" class="form-group">
-                            <label>Unggah Berkas (PDF / PPTX)</label>
+                            <label>Unggah Berkas File (PDF / PPTX)</label>
                             <div class="file-dropzone" id="materialDropzone">
                                 <svg class="file-dropzone-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="17 8 12 3 7 8"></polyline>
                                     <line x1="12" y1="3" x2="12" y2="15"></line>
                                 </svg>
-                                <span class="file-dropzone-text" id="dropzoneText">Klik untuk memilih file PDF atau seret berkas ke sini</span>
-                                <span class="file-dropzone-sub">Maksimal ukuran file: 50MB</span>
+                                <span class="file-dropzone-text" id="dropzoneText">Klik untuk memilih file PDF atau PPTX, atau seret berkas ke sini</span>
+                                <span class="file-dropzone-sub">Maksimal ukuran file: 50MB (Format PDF, PPT, PPTX)</span>
                                 <span class="file-selected-info" id="fileSelectedInfo"></span>
-                                <input type="file" id="materialFileInput" accept=".pdf" style="display: none;">
+                                <input type="file" id="materialFileInput" accept=".pdf,.pptx,.ppt" style="display: none;">
                             </div>
                         </div>
 
@@ -255,7 +281,7 @@
             const materialsGrid = document.getElementById('materialsGrid');
             const materialListCount = document.getElementById('materialListCount');
 
-            let activeMaterialType = 'pdf';
+            let activeMaterialType = 'file';
 
             typePills.forEach(pill => {
                 pill.addEventListener('click', () => {
@@ -269,13 +295,8 @@
                     } else {
                         fileUploadContainer.style.display = 'block';
                         linkInputContainer.style.display = 'none';
-                        if (activeMaterialType === 'pdf') {
-                            materialFileInput.accept = '.pdf';
-                            dropzoneText.textContent = 'Klik untuk memilih file PDF atau seret berkas ke sini';
-                        } else {
-                            materialFileInput.accept = '.pptx,.ppt';
-                            dropzoneText.textContent = 'Klik untuk memilih file PPTX / Presentasi atau seret berkas ke sini';
-                        }
+                        materialFileInput.accept = '.pdf,.pptx,.ppt,.docx';
+                        dropzoneText.textContent = 'Klik untuk memilih berkas (PDF / PPTX) atau seret ke sini';
                     }
                 });
             });
@@ -324,6 +345,8 @@
                 const session = document.getElementById('materialSession').value;
                 const title = document.getElementById('materialTitle').value.trim();
                 const desc = document.getElementById('materialDesc').value.trim() || 'Materi perkuliahan baru.';
+                const courseSelect = document.getElementById('materialCourse');
+                const courseId = courseSelect ? courseSelect.value : '';
 
                 if (!title) {
                     alert('Harap masukkan judul materi!');
@@ -333,12 +356,11 @@
                 let badgeHtml = '';
                 let actionBtnHtml = '';
 
-                if (activeMaterialType === 'pdf') {
-                    badgeHtml = `<span class="material-type-tag tag-pdf"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg> PDF &bull; Terlampir</span>`;
-                    actionBtnHtml = `<a href="#" class="btn-open-resource" onclick="alert('Membuka materi ${title}...'); return false;">Unduh PDF</a>`;
-                } else if (activeMaterialType === 'pptx') {
-                    badgeHtml = `<span class="material-type-tag tag-pptx"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"></rect></svg> PPTX &bull; Slide</span>`;
-                    actionBtnHtml = `<a href="#" class="btn-open-resource" onclick="alert('Mengunduh presentasi...'); return false;">Unduh Slide</a>`;
+                if (activeMaterialType === 'file') {
+                    const fileObj = materialFileInput.files[0];
+                    const ext = fileObj ? fileObj.name.split('.').pop().toUpperCase() : 'PDF/PPTX';
+                    badgeHtml = `<span class="material-type-tag tag-pdf"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg> ${ext} &bull; Berkas File</span>`;
+                    actionBtnHtml = `<a href="#" class="btn-open-resource" onclick="alert('Membuka file materi ${title}...'); return false;">Unduh File</a>`;
                 } else {
                     const url = document.getElementById('materialUrl').value.trim() || '#';
                     badgeHtml = `<span class="material-type-tag tag-link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> LINK &bull; Tautan</span>`;
@@ -347,6 +369,7 @@
 
                 const card = document.createElement('div');
                 card.className = 'material-card';
+                if (courseId) card.setAttribute('data-course-id', courseId);
                 card.innerHTML = `
                     <div class="material-card-top">
                         ${badgeHtml}
@@ -374,8 +397,27 @@
                 closeMaterialModal();
                 updateMaterialCount();
                 attachDeleteMaterialEvents();
-                showToast(`Materi "${title}" berhasil diunggah untuk Pertemuan ${session}!`);
+                showToast(`Materi "${title}" berhasil dipublikasikan untuk Pertemuan ${session}!`);
             });
+
+            const selectCurrentCourse = document.getElementById('selectCurrentCourse');
+            if (selectCurrentCourse) {
+                selectCurrentCourse.addEventListener('change', () => {
+                    const selectedVal = selectCurrentCourse.value;
+                    const cards = materialsGrid.querySelectorAll('.material-card');
+                    let visibleCount = 0;
+                    cards.forEach(c => {
+                        const courseId = c.getAttribute('data-course-id');
+                        if (!selectedVal || !courseId || courseId === selectedVal) {
+                            c.style.display = '';
+                            visibleCount++;
+                        } else {
+                            c.style.display = 'none';
+                        }
+                    });
+                    if (materialListCount) materialListCount.textContent = visibleCount;
+                });
+            }
 
             const emptyStateHtml = `
                 <div class="empty-state" id="materialEmptyState" style="padding: 48px 16px; text-align: center; width: 100%; grid-column: 1 / -1; background: #F8FAFC; border-radius: 16px; border: 1.5px dashed rgba(3, 159, 250, 0.25);">

@@ -1,15 +1,81 @@
 @php
-    $courses = \App\Models\Course::with([
-        'assignments.submissions.grade',
-        'assignments.submissions.student',
-        'lecturer'
-    ])->get();
+    // Penanganan penyimpanan nilai langsung ke database
+    if (request()->has('action') && request('action') === 'save_grade') {
+        $subId = request('submission_id');
+        $score = floatval(request('score'));
+        $feedback = request('feedback');
 
-    $allSubmissions = \App\Models\Submission::with([
-        'assignment.course',
-        'student',
-        'grade'
-    ])->latest('submitted_at')->get();
+        $sub = \App\Models\Submission::find($subId);
+        if ($sub) {
+            $graderId = auth()->id() ?? ($sub->assignment?->course?->lecturer_id ?? 1);
+            $grade = \App\Models\Grade::updateOrCreate(
+                ['submission_id' => $sub->id],
+                [
+                    'graded_by' => $graderId,
+                    'score'     => $score,
+                    'feedback'  => $feedback,
+                    'graded_at' => now(),
+                ]
+            );
+
+            if (request()->ajax() || request()->wantsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+                response()->json([
+                    'success' => true,
+                    'grade'   => $grade,
+                    'message' => 'Nilai dan feedback berhasil disimpan ke database.'
+                ])->send();
+                exit;
+            }
+        }
+    }
+
+    $dosenUser = auth()->user();
+    if ($dosenUser && $dosenUser->role === 'dosen') {
+        $courses = $dosenUser->taughtCourses()->where('status', 'active')->with([
+            'assignments.submissions.grade',
+            'assignments.submissions.student',
+            'lecturer'
+        ])->get();
+        if ($courses->isEmpty()) {
+            $courses = $dosenUser->taughtCourses()->with([
+                'assignments.submissions.grade',
+                'assignments.submissions.student',
+                'lecturer'
+            ])->get();
+        }
+    } else {
+        $courses = \App\Models\Course::where('status', 'active')->with([
+            'assignments.submissions.grade',
+            'assignments.submissions.student',
+            'lecturer'
+        ])->get();
+    }
+
+    if ($courses->isEmpty()) {
+        $courses = \App\Models\Course::with([
+            'assignments.submissions.grade',
+            'assignments.submissions.student',
+            'lecturer'
+        ])->get();
+    }
+
+    $courseIds = $courses->pluck('id');
+    $assignmentIds = \App\Models\Assignment::whereIn('course_id', $courseIds)->pluck('id');
+
+    $allSubmissions = \App\Models\Submission::whereIn('assignment_id', $assignmentIds)
+        ->with([
+            'assignment.course',
+            'student',
+            'grade'
+        ])->latest('submitted_at')->get();
+
+    if ($allSubmissions->isEmpty()) {
+        $allSubmissions = \App\Models\Submission::with([
+            'assignment.course',
+            'student',
+            'grade'
+        ])->latest('submitted_at')->get();
+    }
 
     $totalSubmissions = $allSubmissions->count();
     $totalGraded = $allSubmissions->whereNotNull('grade')->count();
@@ -55,12 +121,12 @@
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
                     <select id="selectCurrentCourse" class="course-select">
-                        <option value="all">Semua Mata Kuliah ({{ $totalSubmissions }} Pengumpulan)</option>
+                        <option value="all">Semua Mata Kuliah Aktif ({{ $totalSubmissions }} Pengumpulan)</option>
                         @foreach ($courses as $c)
                             @php
                                 $cSubmissionsCount = $c->assignments->flatMap->submissions->count();
                             @endphp
-                            <option value="{{ $c->id }}" {{ $loop->first ? 'selected' : '' }}>
+                            <option value="{{ $c->id }}">
                                 {{ $c->code }} &bull; {{ $c->name }} ({{ $cSubmissionsCount }} Pengumpulan)
                             </option>
                         @endforeach
@@ -81,33 +147,69 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Penilaian &amp; Umpan Balik (Feedback) Pengumpulan Mahasiswa</h2>
-                                <p>Evaluasi kiriman mahasiswa, berikan skor angka (0-100), dan cantumkan catatan konstruktif terhubung ke database.</p>
+                                <p>Evaluasi tugas mahasiswa, berikan skor angka (0-100), dan cantumkan catatan konstruktif yang tersimpan langsung ke database.</p>
                             </div>
                         </div>
                         <span class="section-header-badge">Evaluasi &amp; Grading</span>
                     </div>
 
-                    <!-- Seeder 4.4 Criteria Verification Banner -->
-                    <div style="background: linear-gradient(135deg, #FFF7EB 0%, #FFF0DE 100%); border: 1px solid #F6D8A8; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 22px;">📋</span>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 800; color: #7A4B00;">Kriteria Seeder 4.4 Terverifikasi (Database Aktif)</div>
-                                <div style="font-size: 12px; color: #9E6B15;">
-                                    3 tugas per MK (lewat deadline, aktif, draft) &bull; &ge; 100 submission real dari mahasiswa, ~60% di antaranya telah dinilai.
+                    <!-- Tampilan Statistik KPI Tugas: Total Semua Tugas, Sudah Dinilai, Belum Dinilai -->
+                    <div class="grading-kpi-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px;">
+                        <!-- KPI 1: Total Semua Tugas -->
+                        <div class="kpi-card" style="background: #FFFFFF; border: 1.5px solid rgba(3, 159, 250, 0.22); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 14px rgba(3, 159, 250, 0.05);">
+                            <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(3, 159, 250, 0.12); color: #039FFA; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <div style="flex: 1;">
+                                <span style="font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.06em; display: block;">Total Semua Tugas</span>
+                                <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
+                                    <span id="kpiTotalAll" style="font-size: 26px; font-weight: 900; color: #0F172A; line-height: 1.1;">{{ $totalSubmissions }}</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: #64748B;">Pengumpulan</span>
                                 </div>
+                                <span style="font-size: 11px; color: #94A3B8; font-weight: 600;">Semua berkas tugas mahasiswa</span>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <span style="background: #10B981; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
-                                ✓ {{ $totalSubmissions }} Total Submission (&ge; 100)
-                            </span>
-                            <span style="background: #039FFA; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
-                                ✓ {{ $totalGraded }} Dinilai ({{ $persenGraded }}% &sim;60%)
-                            </span>
-                            <span style="background: #F9B804; color: #0F172A; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">
-                                ⏳ {{ $totalPending }} Menunggu Review
-                            </span>
+
+                        <!-- KPI 2: Tugas Sudah Dinilai -->
+                        <div class="kpi-card" style="background: #FFFFFF; border: 1.5px solid rgba(16, 185, 129, 0.28); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.05);">
+                            <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #10B981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                            <div style="flex: 1;">
+                                <span style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.06em; display: block;">Tugas Sudah Dinilai</span>
+                                <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
+                                    <span id="kpiTotalGraded" style="font-size: 26px; font-weight: 900; color: #10B981; line-height: 1.1;">{{ $totalGraded }}</span>
+                                    <span id="kpiGradedPercent" style="font-size: 11px; font-weight: 800; color: #059669; background: #ECFDF5; padding: 2px 8px; border-radius: 12px;">{{ $persenGraded }}%</span>
+                                </div>
+                                <span style="font-size: 11px; color: #64748B; font-weight: 600;">Telah dievaluasi &amp; diberi nilai</span>
+                            </div>
+                        </div>
+
+                        <!-- KPI 3: Tugas Belum Dinilai -->
+                        <div class="kpi-card" style="background: #FFFFFF; border: 1.5px solid rgba(249, 184, 4, 0.35); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 14px rgba(249, 184, 4, 0.05);">
+                            <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(249, 184, 4, 0.14); color: #D97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <div style="flex: 1;">
+                                <span style="font-size: 11px; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 0.06em; display: block;">Tugas Belum Dinilai</span>
+                                <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
+                                    <span id="kpiTotalPending" style="font-size: 26px; font-weight: 900; color: #D97706; line-height: 1.1;">{{ $totalPending }}</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: #B45309;">Menunggu</span>
+                                </div>
+                                <span style="font-size: 11px; color: #64748B; font-weight: 600;">Perlu pemeriksaan dosen</span>
+                            </div>
                         </div>
                     </div>
 
@@ -401,8 +503,8 @@
                 if (e.target === modalOverlay) closeModal();
             });
 
-            btnSaveGrading.addEventListener('click', () => {
-                const score = parseInt(inputScore.value);
+            btnSaveGrading.addEventListener('click', async () => {
+                const score = parseFloat(inputScore.value);
                 const feedback = inputFeedback.value.trim();
 
                 if (isNaN(score) || score < 0 || score > 100) {
@@ -411,40 +513,71 @@
                 }
 
                 if (!feedback) {
-                    alert('Harap masukkan feedback/ulasan konstruktif bagi mahasiswa!');
+                    alert('Harap masukkan feedback / ulasan konstruktif bagi mahasiswa!');
                     return;
                 }
 
-                const targetRow = document.querySelector(`#submissionTableBody tr[data-id="${activeSubmissionId}"]`);
-                if (targetRow) {
-                    targetRow.setAttribute('data-status', 'graded');
+                const originalBtnHtml = btnSaveGrading.innerHTML;
+                btnSaveGrading.disabled = true;
+                btnSaveGrading.innerHTML = 'Menyimpan ke Database...';
 
-                    const scoreElem = targetRow.querySelector('.item-score');
-                    if (scoreElem) {
-                        scoreElem.className = 'score-badge score-badge-graded item-score';
-                        scoreElem.textContent = `${score} / 100`;
-                    }
+                try {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('action', 'save_grade');
+                    url.searchParams.set('submission_id', activeSubmissionId);
+                    url.searchParams.set('score', score);
+                    url.searchParams.set('feedback', feedback);
 
-                    const feedbackElem = targetRow.querySelector('.item-feedback');
-                    if (feedbackElem) {
-                        feedbackElem.style.color = '#0F172A';
-                        feedbackElem.style.fontStyle = 'normal';
-                        feedbackElem.title = feedback;
-                        feedbackElem.textContent = `"${feedback.length > 60 ? feedback.substring(0, 60) + '...' : feedback}"`;
-                    }
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
 
-                    const actionBtn = targetRow.querySelector('.btn-grade-action');
-                    if (actionBtn) {
-                        actionBtn.style.background = 'linear-gradient(135deg, #039FFA 0%, #0284C7 100%)';
-                        actionBtn.textContent = 'Edit Nilai';
-                        actionBtn.setAttribute('data-score', score);
-                        actionBtn.setAttribute('data-feedback', feedback);
+                    const data = await res.json();
+
+                    if (data && data.success) {
+                        const targetRow = document.querySelector(`#submissionTableBody tr[data-id="${activeSubmissionId}"]`);
+                        if (targetRow) {
+                            targetRow.setAttribute('data-status', 'graded');
+
+                            const scoreElem = targetRow.querySelector('.item-score');
+                            if (scoreElem) {
+                                scoreElem.className = 'score-badge score-badge-graded item-score';
+                                scoreElem.textContent = `${Math.round(score)} / 100`;
+                            }
+
+                            const feedbackElem = targetRow.querySelector('.item-feedback');
+                            if (feedbackElem) {
+                                feedbackElem.style.color = '#0F172A';
+                                feedbackElem.style.fontStyle = 'normal';
+                                feedbackElem.title = feedback;
+                                feedbackElem.textContent = `"${feedback.length > 60 ? feedback.substring(0, 60) + '...' : feedback}"`;
+                            }
+
+                            const actionBtn = targetRow.querySelector('.btn-grade-action');
+                            if (actionBtn) {
+                                actionBtn.style.background = 'linear-gradient(135deg, #039FFA 0%, #0284C7 100%)';
+                                actionBtn.textContent = 'Edit Nilai';
+                                actionBtn.setAttribute('data-score', Math.round(score));
+                                actionBtn.setAttribute('data-feedback', feedback);
+                            }
+                        }
+
+                        applyFilters();
+                        closeModal();
+                        showToast(`Nilai (${Math.round(score)}) & Feedback berhasil disimpan ke database!`);
+                    } else {
+                        alert('Gagal menyimpan nilai ke database. Silakan coba lagi.');
                     }
+                } catch (err) {
+                    console.error('Grading save error:', err);
+                    alert('Terjadi kesalahan saat menyimpan nilai ke database.');
+                } finally {
+                    btnSaveGrading.disabled = false;
+                    btnSaveGrading.innerHTML = originalBtnHtml;
                 }
-
-                applyFilters();
-                closeModal();
-                showToast(`Nilai (${score}) & Feedback berhasil disimpan untuk ${modalStudentName.textContent}!`);
             });
 
             const selectCurrentCourse = document.getElementById('selectCurrentCourse');
@@ -452,6 +585,36 @@
             const filterSearchInput = document.getElementById('filterSearchInput');
             const gradedSummary = document.getElementById('gradedSummary');
             const ungradedSummary = document.getElementById('ungradedSummary');
+
+            function updateKpiStats(selectedCourse) {
+                const rows = document.querySelectorAll('#submissionTableBody tr[data-status]');
+                let totalAll = 0;
+                let totalGraded = 0;
+                let totalPending = 0;
+
+                rows.forEach(r => {
+                    const rowCourseId = r.getAttribute('data-course-id');
+                    const rowStatus = r.getAttribute('data-status');
+                    if (selectedCourse === 'all' || rowCourseId === selectedCourse) {
+                        totalAll++;
+                        if (rowStatus === 'graded') totalGraded++;
+                        else totalPending++;
+                    }
+                });
+
+                const kpiTotalAll = document.getElementById('kpiTotalAll');
+                const kpiTotalGraded = document.getElementById('kpiTotalGraded');
+                const kpiTotalPending = document.getElementById('kpiTotalPending');
+                const kpiGradedPercent = document.getElementById('kpiGradedPercent');
+
+                if (kpiTotalAll) kpiTotalAll.textContent = totalAll;
+                if (kpiTotalGraded) kpiTotalGraded.textContent = totalGraded;
+                if (kpiTotalPending) kpiTotalPending.textContent = totalPending;
+                if (kpiGradedPercent) {
+                    const pct = totalAll > 0 ? Math.round((totalGraded / totalAll) * 100) : 0;
+                    kpiGradedPercent.textContent = `${pct}%`;
+                }
+            }
 
             function applyFilters() {
                 const selectedCourse = selectCurrentCourse ? selectCurrentCourse.value : 'all';
@@ -486,6 +649,8 @@
 
                 if (gradedSummary) gradedSummary.textContent = `${visibleGraded} Dinilai`;
                 if (ungradedSummary) ungradedSummary.textContent = `${visiblePending} Menunggu Review`;
+
+                updateKpiStats(selectedCourse);
             }
 
             if (selectCurrentCourse) {

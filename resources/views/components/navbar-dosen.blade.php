@@ -67,13 +67,29 @@
         </ul>
     </div>
 
+    @php
+        $authUser = auth()->user();
+        $authName = $authUser?->name ?? 'Dosen Pengampu';
+        $nameParts = array_values(array_filter(explode(' ', trim($authName))));
+        $initials = '';
+        if (count($nameParts) >= 2) {
+            $initials = strtoupper(mb_substr($nameParts[0], 0, 1) . mb_substr($nameParts[1], 0, 1));
+        } elseif (count($nameParts) === 1) {
+            $initials = strtoupper(mb_substr($nameParts[0], 0, 2));
+        } else {
+            $initials = 'DS';
+        }
+        $nip = $authUser?->nim_nip ?? null;
+        $roleTag = $nip ? 'NIP: ' . $nip : ($authUser ? ucfirst($authUser->role ?? 'Dosen Pengampu') : 'Dosen Pengampu');
+    @endphp
+
     <!-- Kanan: Identitas Dosen & Tombol Logout -->
     <div class="navbar-right-group">
         <div class="dosen-avatar-badge">
-            <div class="dosen-avatar">BS</div>
+            <div class="dosen-avatar">{{ $initials }}</div>
             <div class="dosen-badge-info">
-                <span class="dosen-name">Dr. Budi Santoso, M.Kom</span>
-                <span class="dosen-role-tag">Dosen Pengampu Utama</span>
+                <span class="dosen-name">{{ $authName }}</span>
+                <span class="dosen-role-tag">{{ $roleTag }}</span>
             </div>
         </div>
 

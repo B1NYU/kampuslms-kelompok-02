@@ -36,7 +36,13 @@
                 $dosenCourses = $dosenUser
                     ? $dosenUser->taughtCourses()->with('students')->get()
                     : collect();
+                if ($dosenCourses->isEmpty()) {
+                    $dosenCourses = \App\Models\Course::where('status', 'active')->with('students')->get();
+                }
                 $firstCourse = $dosenCourses->first();
+                $registeredStudents = \App\Models\User::where('role', 'mahasiswa')
+                    ->select('id', 'name', 'nim_nip')
+                    ->get();
             @endphp
 
             <!-- Topbar Header / Judul di Luar Container Utama -->
@@ -95,7 +101,6 @@
                                     <thead>
                                         <tr>
                                             <th>Mahasiswa</th>
-                                            <th>Program Studi</th>
                                             <th>Kelas</th>
                                             <th>Status</th>
                                             <th style="text-align: right;">Aksi</th>
@@ -108,7 +113,7 @@
                                         @endphp
                                         @if ($dosenCourses->isEmpty())
                                             <tr>
-                                                <td colspan="5" style="text-align:center;padding:36px 20px;color:#64748B;">
+                                                <td colspan="4" style="text-align:center;padding:36px 20px;color:#64748B;">
                                                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                                             <circle cx="12" cy="12" r="10"></circle>
@@ -122,7 +127,7 @@
                                             </tr>
                                         @else
                                             <tr id="emptyCourseRow" style="{{ $hasStudentsInFirstCourse ? 'display:none;' : '' }}">
-                                                <td colspan="5" style="text-align:center;padding:32px 20px;color:#94A3B8;">
+                                                <td colspan="4" style="text-align:center;padding:32px 20px;color:#94A3B8;">
                                                     Belum ada mahasiswa yang terdaftar di kelas mata kuliah ini.
                                                 </td>
                                             </tr>
@@ -150,7 +155,6 @@
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td>Sistem Informasi</td>
                                                         <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
                                                         <td><span class="badge-status badge-status-active">Aktif</span></td>
                                                         <td style="text-align: right;">
@@ -209,8 +213,9 @@
 
                         <div class="form-row-2">
                             <div class="form-group">
-                                <label for="mhsNim">Nomor Induk (NIM) <span class="required">*</span></label>
-                                <input type="text" id="mhsNim" class="form-control" placeholder="Contoh: 10241022" required>
+                                <label for="mhsNim">Nomor Induk Mahasiswa (NIM) <span class="required">*</span></label>
+                                <input type="text" id="mhsNim" class="form-control" placeholder="Ketik NIM mahasiswa, cth: 10241001" required autocomplete="off">
+                                <small id="nimLookupStatus" style="display:block; font-size:11px; margin-top:4px; color:#64748B; font-weight:600;">Masukkan NIM untuk melengkapi nama secara otomatis</small>
                             </div>
                             <div class="form-group">
                                 <label for="mhsKelas">Kelas <span class="required">*</span></label>
@@ -223,17 +228,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="mhsNama">Nama Lengkap Mahasiswa <span class="required">*</span></label>
-                            <input type="text" id="mhsNama" class="form-control" placeholder="Nama mahasiswa..." required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="mhsProdi">Program Studi</label>
-                            <select id="mhsProdi" class="form-select">
-                                <option value="Sistem Informasi">Sistem Informasi</option>
-                                <option value="Teknologi Informasi">Teknologi Informasi</option>
-                                <option value="Informatika">Informatika</option>
-                            </select>
+                            <label for="mhsNama">Nama Lengkap Mahasiswa <span class="required">*</span> <span style="font-size:11px; font-weight:normal; color:#64748B;">(Otomatis terisi dari identitas NIM)</span></label>
+                            <input type="text" id="mhsNama" class="form-control" placeholder="Nama otomatis terisi sesuai NIM..." readonly required style="background-color: #F8FAFC; border-color: #CBD5E1; color: #1E293B; cursor: not-allowed; font-weight: 700;">
                         </div>
                     </div>
 
@@ -318,17 +314,63 @@
                 }
             });
 
+            const registeredStudentsDb = @json($registeredStudents);
+            const mhsNimInput = document.getElementById('mhsNim');
+            const mhsNamaInput = document.getElementById('mhsNama');
+            const nimLookupStatus = document.getElementById('nimLookupStatus');
+
+            function handleNimLookup() {
+                const query = mhsNimInput ? mhsNimInput.value.trim().toLowerCase() : '';
+                if (!query) {
+                    if (mhsNamaInput) mhsNamaInput.value = '';
+                    if (nimLookupStatus) {
+                        nimLookupStatus.textContent = 'Masukkan NIM untuk melengkapi nama secara otomatis';
+                        nimLookupStatus.style.color = '#64748B';
+                    }
+                    return;
+                }
+
+                // Match exact or contains
+                const match = registeredStudentsDb.find(s => s.nim_nip && s.nim_nip.toLowerCase() === query);
+                if (match) {
+                    mhsNamaInput.value = match.name;
+                    if (nimLookupStatus) {
+                        nimLookupStatus.textContent = `✓ Mahasiswa teridentifikasi: ${match.name}`;
+                        nimLookupStatus.style.color = '#10B981';
+                    }
+                } else {
+                    const partialMatch = registeredStudentsDb.find(s => s.nim_nip && s.nim_nip.toLowerCase().includes(query));
+                    if (partialMatch && query.length >= 6) {
+                        mhsNamaInput.value = partialMatch.name;
+                        if (nimLookupStatus) {
+                            nimLookupStatus.textContent = `✓ Mahasiswa teridentifikasi: ${partialMatch.name} (${partialMatch.nim_nip})`;
+                            nimLookupStatus.style.color = '#10B981';
+                        }
+                    } else {
+                        mhsNamaInput.value = '';
+                        if (nimLookupStatus) {
+                            nimLookupStatus.textContent = 'NIM tidak terdaftar di sistem. Periksa kembali NIM.';
+                            nimLookupStatus.style.color = '#EF4444';
+                        }
+                    }
+                }
+            }
+
+            if (mhsNimInput) {
+                mhsNimInput.addEventListener('input', handleNimLookup);
+                mhsNimInput.addEventListener('change', handleNimLookup);
+            }
+
             formAddStudent.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const nim = document.getElementById('mhsNim').value.trim();
                 const nama = document.getElementById('mhsNama').value.trim();
                 const kelas = document.getElementById('mhsKelas').value;
-                const prodi = document.getElementById('mhsProdi').value;
                 const matkulSelect = document.getElementById('mhsMatkul').value;
                 const currentMkVal = selectCurrentCourse ? selectCurrentCourse.value : '';
 
                 if (!nim || !nama) {
-                    alert('Harap lengkapi data NIM dan Nama Mahasiswa!');
+                    alert('Harap masukkan NIM yang valid dan terdaftar di database agar nama terisi otomatis!');
                     return;
                 }
 
@@ -356,7 +398,6 @@
                             </div>
                         </div>
                     </td>
-                    <td>${prodi}</td>
                     <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">${kelas}</span></td>
                     <td><span class="badge-status badge-status-active">Aktif</span></td>
                     <td style="text-align: right;">
@@ -371,6 +412,10 @@
 
                 studentTableBody.prepend(newRow);
                 formAddStudent.reset();
+                if (nimLookupStatus) {
+                    nimLookupStatus.textContent = 'Masukkan NIM untuk melengkapi nama secara otomatis';
+                    nimLookupStatus.style.color = '#64748B';
+                }
                 closeStudentModal();
                 applyCourseFilter();
                 attachDeleteStudentEvents();
