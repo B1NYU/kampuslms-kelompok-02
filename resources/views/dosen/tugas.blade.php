@@ -121,7 +121,14 @@
 
                                 <div class="assignment-card {{ $assignment->id === $a->id ? 'is-editing' : '' }}">
                                     <div class="assignment-card-header">
-                                        <h4 class="assignment-card-title">{{ $a->title }}</h4>
+                                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                            @php
+                                                preg_match('/(Pertemuan|Minggu)\s*(\d+)/i', $a->title, $matches);
+                                                $weekNum = $matches[2] ?? $loop->iteration;
+                                            @endphp
+                                            <span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px; background: rgba(3, 159, 250, 0.1); color: #039FFA; border-color: rgba(3, 159, 250, 0.25);">Pertemuan {{ $weekNum }}</span>
+                                            <h4 class="assignment-card-title" style="margin: 0;">{{ $a->title }}</h4>
+                                        </div>
                                         <span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">Maks. {{ $a->max_score }}</span>
                                     </div>
                                     <p style="font-size: 11.5px; color: #64748B;">{{ \Illuminate\Support\Str::limit($a->instructions, 140) }}</p>
@@ -210,9 +217,21 @@
                     @endif
 
                     <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
-                        <div class="form-group">
-                            <label>Mata Kuliah Target</label>
-                            <input type="text" class="form-control" value="{{ $course->code }} - {{ $course->name }}" disabled style="background: #F1F5F9; color: #64748B;">
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Mata Kuliah Target</label>
+                                <input type="text" class="form-control" value="{{ $course->code }} - {{ $course->name }}" disabled style="background: #F1F5F9; color: #64748B;">
+                            </div>
+                            <div class="form-group">
+                                <label for="taskSession">Pertemuan / Minggu Ke- <span class="required">*</span></label>
+                                <select id="taskSession" name="session" class="form-select" required>
+                                    @for ($w = 1; $w <= 16; $w++)
+                                        <option value="{{ $w }}" @selected(old('session') == $w || Str::contains($assignment->title ?? '', ['Pertemuan ' . $w, 'Minggu ' . $w, 'Tugas 0' . $w, 'Tugas ' . $w]))>
+                                            Pertemuan {{ $w }} (Minggu ke-{{ $w }})
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">

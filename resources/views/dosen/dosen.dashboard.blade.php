@@ -32,6 +32,28 @@
         <!-- 2. Konten Utama Dashboard Dosen -->
         <main class="dosen-content" id="overview">
 
+            @php
+                $dosenUser = auth()->user();
+                $dashCourses = collect();
+                if ($dosenUser && $dosenUser->role === 'dosen') {
+                    $dashCourses = $dosenUser->taughtCourses()->where('status', 'active')->with(['students', 'materials', 'assignments.submissions.grade'])->get();
+                    if ($dashCourses->isEmpty()) {
+                        $dashCourses = $dosenUser->taughtCourses()->with(['students', 'materials', 'assignments.submissions.grade'])->get();
+                    }
+                }
+                if ($dashCourses->isEmpty()) {
+                    $dashCourses = \App\Models\Course::where('status', 'active')->with(['students', 'materials', 'assignments.submissions.grade'])->get();
+                }
+                if ($dashCourses->isEmpty()) {
+                    $dashCourses = \App\Models\Course::with(['students', 'materials', 'assignments.submissions.grade'])->get();
+                }
+                $totalStudents = $dashCourses->flatMap->students->unique('id')->count();
+                $totalMaterials = $dashCourses->flatMap->materials->count();
+                $totalAssignments = $dashCourses->flatMap->assignments->count();
+                $allSubs = $dashCourses->flatMap->assignments->flatMap->submissions;
+                $pendingGrading = $allSubs->whereNull('grade')->count();
+            @endphp
+
             <!-- Topbar Header -->
             <header class="dash-topbar">
                 <div class="topbar-left">
@@ -44,9 +66,13 @@
                 <div class="course-filter-bar">
                     <span class="course-filter-label">Mata Kuliah Aktif:</span>
                     <select id="selectCurrentCourse" class="course-select">
-                        <option value="SI101" selected>SI101 &bull; Pemrograman Web (3 SKS)</option>
-                        <option value="SI102">SI102 &bull; Basis Data Lanjut (3 SKS)</option>
-                        <option value="SI103">SI103 &bull; Analisis &amp; Desain SI (4 SKS)</option>
+                        @forelse ($dashCourses as $c)
+                            <option value="{{ $c->id }}">
+                                {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS)
+                            </option>
+                        @empty
+                            <option value="">Belum ada mata kuliah aktif</option>
+                        @endforelse
                     </select>
                 </div>
             </header>
@@ -64,7 +90,7 @@
                     </div>
                     <div class="stat-details">
                         <span class="stat-label">Mahasiswa Bimbingan</span>
-                        <span class="stat-value" id="statTotalStudents">38</span>
+                        <span class="stat-value" id="statTotalStudents">{{ $totalStudents }}</span>
                         <span class="stat-desc">Terdaftar di kelas ini &rarr;</span>
                     </div>
                 </a>
@@ -78,7 +104,7 @@
                     </div>
                     <div class="stat-details">
                         <span class="stat-label">Materi Perkuliahan</span>
-                        <span class="stat-value" id="statTotalMaterials">6</span>
+                        <span class="stat-value" id="statTotalMaterials">{{ $totalMaterials }}</span>
                         <span class="stat-desc">PDF, PPTX &amp; Tautan &rarr;</span>
                     </div>
                 </a>
@@ -94,7 +120,7 @@
                     </div>
                     <div class="stat-details">
                         <span class="stat-label">Tugas Aktif</span>
-                        <span class="stat-value" id="statActiveAssignments">3</span>
+                        <span class="stat-value" id="statActiveAssignments">{{ $totalAssignments }}</span>
                         <span class="stat-desc">Dengan batas waktu &rarr;</span>
                     </div>
                 </a>
@@ -108,7 +134,7 @@
                     </div>
                     <div class="stat-details">
                         <span class="stat-label">Perlu Dinilai</span>
-                        <span class="stat-value" id="statPendingGrading">4</span>
+                        <span class="stat-value" id="statPendingGrading">{{ $pendingGrading }}</span>
                         <span class="stat-desc">Pengumpulan mahasiswa &rarr;</span>
                     </div>
                 </a>

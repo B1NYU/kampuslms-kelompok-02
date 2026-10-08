@@ -6,6 +6,15 @@
           action="{{ $assignment->exists ? route('dosen.assignments.update', $assignment) : route('dosen.courses.assignments.store', $course) }}">
         @csrf
         @if($assignment->exists) @method('PUT') @endif
+        <label>Pertemuan / Minggu Ke-
+            <select name="session">
+                @for ($w = 1; $w <= 16; $w++)
+                    <option value="{{ $w }}" @selected(old('session') == $w || Str::contains($assignment->title ?? '', ['Pertemuan ' . $w, 'Minggu ' . $w]))>
+                        Pertemuan {{ $w }} (Minggu ke-{{ $w }})
+                    </option>
+                @endfor
+            </select>
+        </label>
         <label>Judul<input name="title" value="{{ old('title', $assignment->title) }}" required></label>
         <label>Instruksi<textarea name="instructions" rows="5" required>{{ old('instructions', $assignment->instructions) }}</textarea></label>
         <label>Batas waktu<input type="datetime-local" name="due_at" value="{{ old('due_at', $assignment->due_at?->format('Y-m-d\TH:i')) }}" required></label>
