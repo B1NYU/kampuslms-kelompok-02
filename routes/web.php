@@ -70,8 +70,10 @@ Route::middleware('auth')->group(function () {
         // Materi: nama 'dosen.materi' dipertahankan agar link di navbar tidak putus.
         Route::get('/materi', [DosenMaterialController::class, 'index'])->name('materi');
         Route::post('/materi', [DosenMaterialController::class, 'store'])->name('materi.store');
+        Route::put('/materi/{material}', [DosenMaterialController::class, 'update'])->name('materi.update');
         Route::delete('/materi/{material}', [DosenMaterialController::class, 'destroy'])->name('materi.destroy');
-        Route::get('/materi/{material}/download', [DosenMaterialController::class, 'download'])->name('materi.download');
+        // Download memakai MaterialController umum (App\Http\Controllers\MaterialController).
+        Route::get('/materi/{material}/download', [MaterialController::class, 'download'])->name('materi.download');
 
         // Pintu masuk menu "Buat Tugas": diarahkan ke mata kuliah pertama yang diampu.
         Route::get('/tugas', [DosenAssignmentController::class, 'landing'])->name('tugas');
@@ -113,9 +115,11 @@ Route::middleware('auth')->group(function () {
             return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));
         })->name('pendaftaran');
 
-        Route::get('/materi', function () {
-            return view()->file(resource_path('views/admin/admin.materi.blade.php'));
-        })->name('materi');
+        Route::get('/materi', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'index'])->name('materi');
+        Route::post('/materi', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'store'])->name('materi.store');
+        Route::put('/materi/{material}', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'update'])->name('materi.update');
+        Route::delete('/materi/{material}', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'destroy'])->name('materi.destroy');
+        Route::get('/materi/{material}/download', [\App\Http\Controllers\MaterialController::class, 'download'])->name('materi.download');
     });
 
 });

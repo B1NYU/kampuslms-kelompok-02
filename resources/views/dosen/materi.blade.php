@@ -113,6 +113,16 @@
                                             @else
                                                 <a href="{{ $material->external_url }}" target="_blank" rel="noopener noreferrer" class="btn-open-resource">Buka Link</a>
                                             @endif
+                                            <button type="button" class="btn-icon-edit btn-edit-material" title="Edit materi"
+                                                    data-id="{{ $material->id }}"
+                                                    data-type="{{ $material->type }}"
+                                                    data-title="{{ $material->title }}"
+                                                    data-description="{{ $material->description }}"
+                                                    data-url="{{ $material->external_url }}"
+                                                    data-filename="{{ $material->original_name }}"
+                                                    style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; border:1px solid rgba(3,159,250,0.25); background:rgba(3,159,250,0.08); color:#039FFA; cursor:pointer;">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                            </button>
                                             <form action="{{ route('dosen.materi.destroy', $material) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
@@ -267,6 +277,64 @@
             </div>
         </div>
 
+        <!-- MODAL FORM EDIT MATERI -->
+        <div class="dosen-modal-overlay" id="editMaterialModalOverlay">
+            <div class="dosen-modal-card" style="max-width: 620px; width: 95%;">
+                <div class="dosen-modal-header">
+                    <div>
+                        <h3>Edit Materi Perkuliahan</h3>
+                        <span style="font-size: 11px; color: #64748B; font-weight: 600;">Ubah judul, catatan, atau ganti berkas / tautan</span>
+                    </div>
+                    <button type="button" class="btn-close-modal" id="btnCloseEditModal" aria-label="Tutup modal">&times;</button>
+                </div>
+
+                <form id="formEditMaterial" action="#" method="POST" enctype="multipart/form-data" style="margin: 0; display: flex; flex-direction: column;"
+                      data-action-template="{{ route('dosen.materi.update', ['material' => '__ID__']) }}">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="edit_id" id="editMaterialId" value="{{ old('edit_id') }}">
+
+                    <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
+
+                        @if ($errors->editMaterial->any())
+                            <div style="background:#FEF2F2; border:1px solid #FECACA; color:#B91C1C; border-radius:10px; padding:10px 12px; font-size:12.5px; font-weight:600; margin-bottom:12px;">
+                                @foreach ($errors->editMaterial->all() as $error)
+                                    <div>{{ $error }}</div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <div class="form-group">
+                            <label for="editMaterialTitle">Judul Materi <span class="required">*</span></label>
+                            <input type="text" id="editMaterialTitle" name="title" class="form-control" required>
+                        </div>
+
+                        <div id="editFileContainer" class="form-group">
+                            <label for="editMaterialFile">Ganti Berkas (opsional)</label>
+                            <div id="editCurrentFile" style="font-size:12.5px; color:#64748B; font-weight:600; margin-bottom:6px; word-break:break-all;"></div>
+                            <input type="file" id="editMaterialFile" name="file" accept=".pdf,.pptx,.ppt" class="form-control">
+                            <span style="font-size:11.5px; color:#64748B;">Kosongkan jika tidak ingin mengganti berkas. Maks 50MB (PDF, PPT, PPTX).</span>
+                        </div>
+
+                        <div id="editLinkContainer" class="form-group" style="display: none;">
+                            <label for="editMaterialUrl">URL Tautan / Link Materi <span class="required">*</span></label>
+                            <input type="url" id="editMaterialUrl" name="external_url" class="form-control" placeholder="https://...">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editMaterialDesc">Catatan Pembelajaran / Petunjuk</label>
+                            <textarea id="editMaterialDesc" name="description" class="form-textarea" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="dosen-modal-footer">
+                        <button type="button" class="btn-secondary-action" id="btnCancelEditModal">Batal</button>
+                        <button type="submit" class="btn-primary-action">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <x-footer />
     </div>
 
@@ -411,6 +479,65 @@
             // Validasi server gagal -> buka lagi modal agar pesan error terlihat
             @if ($errors->any())
                 openMaterialModal();
+            @endif
+
+            // ===== Edit Materi =====
+            const editModal = document.getElementById('editMaterialModalOverlay');
+            const formEdit = document.getElementById('formEditMaterial');
+            const editId = document.getElementById('editMaterialId');
+            const editTitle = document.getElementById('editMaterialTitle');
+            const editDesc = document.getElementById('editMaterialDesc');
+            const editUrl = document.getElementById('editMaterialUrl');
+            const editFile = document.getElementById('editMaterialFile');
+            const editFileContainer = document.getElementById('editFileContainer');
+            const editLinkContainer = document.getElementById('editLinkContainer');
+            const editCurrentFile = document.getElementById('editCurrentFile');
+
+            function openEditModal(card) {
+                const isLink = card.dataset.type === 'link';
+
+                formEdit.action = formEdit.dataset.actionTemplate.replace('__ID__', card.dataset.id);
+                editId.value = card.dataset.id;
+                editTitle.value = card.dataset.title || '';
+                editDesc.value = card.dataset.description || '';
+                editUrl.value = card.dataset.url || '';
+                editFile.value = '';
+
+                editFileContainer.style.display = isLink ? 'none' : 'block';
+                editLinkContainer.style.display = isLink ? 'block' : 'none';
+                // Field yang disembunyikan dinonaktifkan agar tidak ikut tervalidasi/terkirim
+                editFile.disabled = isLink;
+                editUrl.disabled = !isLink;
+                editUrl.required = isLink;
+                editCurrentFile.textContent = isLink ? '' : 'Berkas saat ini: ' + (card.dataset.filename || '-');
+
+                editModal.classList.add('active');
+            }
+
+            function closeEditModal() {
+                editModal.classList.remove('active');
+            }
+
+            document.querySelectorAll('.btn-edit-material').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn));
+            });
+            document.getElementById('btnCloseEditModal').addEventListener('click', closeEditModal);
+            document.getElementById('btnCancelEditModal').addEventListener('click', closeEditModal);
+            editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && editModal.classList.contains('active')) closeEditModal();
+            });
+
+            // Validasi edit gagal -> buka lagi modal edit dengan isian terakhir
+            @if ($errors->editMaterial->any() && old('edit_id'))
+                (function () {
+                    const btn = document.querySelector('.btn-edit-material[data-id="{{ old('edit_id') }}"]');
+                    if (!btn) return;
+                    openEditModal(btn);
+                    editTitle.value = @json(old('title', ''));
+                    editDesc.value = @json(old('description', ''));
+                    if (!editUrl.disabled) editUrl.value = @json(old('external_url', ''));
+                })();
             @endif
 
             // ===== Course Filter =====

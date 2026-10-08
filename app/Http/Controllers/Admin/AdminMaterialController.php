@@ -1,34 +1,31 @@
 <?php
 
-namespace App\Http\Controllers\Dosen;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreMaterialRequest;
 use App\Models\Course;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreMaterialRequest;
 
-class MaterialController extends Controller
+class AdminMaterialController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // Hanya mata kuliah yang diampu dosen yang sedang login.
-        $courses = $request->user()
-            ->taughtCourses()
-            ->with('materials')   // eager load agar tidak N+1
-            ->orderBy('code')
-            ->get();
+        $coursesList = Course::with('lecturer')->orderBy('code')->get();
+        $materials = Material::with(['course', 'uploader'])->latest()->get();
 
-        return view('dosen.materi', compact('courses'));
+        return view()->file(resource_path('views/admin/admin.materi.blade.php'), [
+            'coursesList' => $coursesList,
+            'materials' => $materials
+        ]);
     }
 
     public function store(StoreMaterialRequest $request)
     {
         $data   = $request->validated();
         $course = Course::findOrFail($data['course_id']);
-
-        // TODO (Policy): pastikan MK ini diampu dosen yang sedang login.
 
         $payload = [
             'uploaded_by' => $request->user()->id,
@@ -43,7 +40,6 @@ class MaterialController extends Controller
             $payload['original_name'] = $file->getClientOriginalName();
             $payload['file_size']     = $file->getSize();
             $payload['mime_type']     = $file->getMimeType();
-            // Disk 'local' = privat (tidak bisa diakses lewat URL publik).
             $payload['file_path']     = $file->store("materials/{$course->id}", 'local');
         } else {
             $payload['external_url'] = $data['external_url'];
@@ -52,18 +48,12 @@ class MaterialController extends Controller
         $course->materials()->create($payload);
 
         return redirect()
-            ->route('dosen.materi')
+            ->route('admin.materi')
             ->with('success', "Materi \"{$data['title']}\" berhasil diunggah.");
     }
 
     public function update(Request $request, Material $material)
     {
-        // Hanya dosen pengampu mata kuliah materi ini yang boleh mengubahnya.
-        abort_unless(
-            $request->user()->taughtCourses()->whereKey($material->course_id)->exists(),
-            403
-        );
-
         $rules = [
             'title'       => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -107,14 +97,12 @@ class MaterialController extends Controller
         $material->update($payload);
 
         return redirect()
-            ->route('dosen.materi')
+            ->route('admin.materi')
             ->with('success', "Materi \"{$material->title}\" berhasil diperbarui.");
     }
 
     public function destroy(Material $material)
     {
-        // TODO (Policy): hanya dosen pengampu MK ini yang boleh menghapus.
-
         if ($material->type === 'file' && $material->file_path) {
             Storage::disk('local')->delete($material->file_path);
         }
@@ -122,7 +110,7 @@ class MaterialController extends Controller
         $material->delete();
 
         return redirect()
-            ->route('dosen.materi')
+            ->route('admin.materi')
             ->with('success', 'Materi berhasil dihapus.');
     }
 }
