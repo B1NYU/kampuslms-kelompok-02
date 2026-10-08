@@ -120,6 +120,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/materi/{material}', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'update'])->name('materi.update');
         Route::delete('/materi/{material}', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'destroy'])->name('materi.destroy');
         Route::get('/materi/{material}/download', [\App\Http\Controllers\MaterialController::class, 'download'])->name('materi.download');
+
+        Route::get('/tugas', function () {
+            return view()->file(resource_path('views/admin/admin.tugas.blade.php'));
+        })->name('tugas');
     });
 
 });
