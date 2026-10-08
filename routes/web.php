@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dosen\AssignmentController as DosenAssignmentController;
+use App\Http\Controllers\Dosen\MaterialController as DosenMaterialController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Mahasiswa\MahasiswaCourseController;
@@ -65,9 +67,11 @@ Route::middleware('auth')->group(function () {
             return view()->file(resource_path('views/dosen/mahasiswa.blade.php'));
         })->name('mahasiswa');
 
-        Route::get('/materi', function () {
-            return view()->file(resource_path('views/dosen/materi.blade.php'));
-        })->name('materi');
+        // Materi: nama 'dosen.materi' dipertahankan agar link di navbar tidak putus.
+        Route::get('/materi', [DosenMaterialController::class, 'index'])->name('materi');
+        Route::post('/materi', [DosenMaterialController::class, 'store'])->name('materi.store');
+        Route::delete('/materi/{material}', [DosenMaterialController::class, 'destroy'])->name('materi.destroy');
+        Route::get('/materi/{material}/download', [DosenMaterialController::class, 'download'])->name('materi.download');
 
         // Pintu masuk menu "Buat Tugas": diarahkan ke mata kuliah pertama yang diampu.
         Route::get('/tugas', [DosenAssignmentController::class, 'landing'])->name('tugas');
