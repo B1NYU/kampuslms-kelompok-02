@@ -11,7 +11,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     <!-- CSS via Vite -->
-    @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.matkul.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.matkul.css', 'resources/js/app.js'])
+    @endif
 </head>
 <body>
     <!-- Background Decorative Elements (Matching Dashboard & Login) -->
@@ -80,12 +82,36 @@
                             $courseAssignments = $course->assignments->sortBy('due_at')->values();
                             $pertemuanList = [];
 
+                            // Format ukuran berkas tanpa ekstensi intl (Number::fileSize butuh intl).
+                            $fmtUkuran = function ($byte) {
+                                $byte = (int) $byte;
+                                if ($byte >= 1048576) return number_format($byte / 1048576, 1, ',', '.') . ' MB';
+                                if ($byte >= 1024)    return number_format($byte / 1024, 0, ',', '.') . ' KB';
+                                return $byte . ' B';
+                            };
+
+                            // Bentuk data materi untuk ditampilkan (semua unduhan lewat route berpolicy).
+                            $fmtMateri = fn ($m) => [
+                                'id'        => $m->id,
+                                'judul'     => $m->title,
+                                'nama'      => $m->isLink() ? 'Tautan eksternal' : ($m->original_name ?: 'Berkas'),
+                                'meta'      => $m->isLink()
+                                    ? 'Tautan'
+                                    : (strtoupper(pathinfo((string) $m->original_name, PATHINFO_EXTENSION) ?: 'file')
+                                        . ($m->file_size ? ' · ' . $fmtUkuran($m->file_size) : '')),
+                                'deskripsi' => $m->description,
+                                'kind'      => $m->type,
+                                'url'       => route('mahasiswa.materi.download', $m),
+                            ];
+                            // Materi yang tidak terikat pertemuan tertentu (session = NULL).
+                            $materiUmum = $course->materials->whereNull('session')->map($fmtMateri)->values();
+
                             for ($minggu = 1; $minggu <= 16; $minggu++) {
                                 $isExam = ($minggu == 8 || $minggu == 16);
                                 $judul = $minggu == 8 ? 'Minggu 8 (UTS)' : ($minggu == 16 ? 'Minggu 16 (UAS)' : 'Minggu ' . $minggu);
 
                                 // 1. Hubungkan berkas materi jika ada di database untuk sesi ini
-                                $matFiles = $course->materials ? $course->materials->where('session', $minggu)->pluck('original_name')->toArray() : [];
+                                $matFiles = $course->materials->where('session', $minggu)->map($fmtMateri)->values()->all();
 
                                 // 2. Hubungkan tugas jika ada di database
                                 $assignIdx = $minggu - 1;
@@ -111,6 +137,7 @@
                                         'judul' => $dbAssign->title,
                                         'deadline' => 'Batas: ' . ($dbAssign->due_at ? $dbAssign->due_at->translatedFormat('d M Y, H:i') . ' WITA' : 'Jadwal fleksibel'),
                                         'btn' => $btnAction,
+                                        'url' => route('assignments.show', $dbAssign),
                                     ];
                                 }
 
@@ -164,16 +191,16 @@
                             @foreach ($pertemuanList as $minggu => $item)
                                 @php
                                     $isExam = ($minggu == 8 || $minggu == 16);
-                                    $materiList = (array) $item['materi'];
-                                    $materiJson = htmlspecialchars(json_encode($materiList), ENT_QUOTES, 'UTF-8');
-                                    $tasksJson = htmlspecialchars(json_encode($item['tasks']), ENT_QUOTES, 'UTF-8');
                                 @endphp
                                 <div class="timeline-item">
                                     <div class="timeline-node {{ $item['status'] }} {{ $isExam ? 'exam' : '' }}">
                                         <div class="timeline-node-inner"></div>
                                     </div>
                                     <div class="session-card" id="cardWeek{{ $minggu }}"
-                                         onclick="switchRightToDetail({{ $minggu }}, '{{ addslashes($item['judul']) }}', '{!! $materiJson !!}', '{!! $tasksJson !!}')">
+                                         data-judul="{{ $item['judul'] }}"
+                                         data-materi="{{ json_encode($item['materi']) }}"
+                                         data-tasks="{{ json_encode($item['tasks']) }}"
+                                         onclick="switchRightToDetail({{ $minggu }}, this)">
                                         <div class="session-left">
                                             <div class="session-icon-circle {{ $item['status'] }} {{ $isExam ? 'exam-icon' : '' }}">
                                                 {{ $minggu }}
@@ -233,6 +260,10 @@
                                         </span>
                                     </div>
                                     <div class="meta-row">
+                                        <span>Materi Tersedia</span>
+                                        <span class="meta-chip chip-cyan">{{ $courseDb->materials->count() }} Materi</span>
+                                    </div>
+                                    <div class="meta-row">
                                         <span>Status Kelas</span>
                                         <span class="meta-chip chip-green">{{ ucfirst($mataKuliah['status'] ?? 'Aktif') }}</span>
                                     </div>
@@ -243,6 +274,29 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- 1b. MATERI UMUM (tidak terikat pertemuan) -->
+                        @if ($materiUmum->isNotEmpty())
+                            <div class="card-course-info" style="margin-top: 18px;">
+                                <h3>Materi Umum</h3>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    @foreach ($materiUmum as $m)
+                                        <div class="resource-card">
+                                            <div class="resource-left">
+                                                <div class="resource-icon">{{ $m['kind'] === 'link' ? '🔗' : '📄' }}</div>
+                                                <div>
+                                                    <div class="resource-name">{{ $m['judul'] }}</div>
+                                                    <div class="resource-meta">{{ $m['meta'] }}</div>
+                                                </div>
+                                            </div>
+                                            <a class="btn-mini-download" href="{{ $m['url'] }}" @if($m['kind'] === 'link') target="_blank" rel="noopener noreferrer" @endif style="text-decoration:none;">
+                                                {{ $m['kind'] === 'link' ? 'Buka' : 'Unduh' }}
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <!-- 2. TAMPILAN PENGGANTI (DETAIL SESI MINGGUAN) -->
                         <div id="detailRightPanel" class="content-fade" style="display: none;">
@@ -368,7 +422,7 @@
                                         <td>
                                             <div class="task-name-cell">
                                                 <div class="task-info">
-                                                    <span class="task-title-text">{{ $item['judul'] }}</span>
+                                                    <a href="{{ $item['url'] }}" class="task-title-text" style="text-decoration:none;color:inherit;">{{ $item['judul'] }}</a>
                                                 </div>
                                             </div>
                                         </td>
@@ -487,58 +541,64 @@
             });
         }
 
-        // Switcher Pertemuan Mingguan (Left -> Right)
-        function switchRightToDetail(minggu, judul, materiJsonStr, tasksJsonStr) {
+        // Pembantu: buat elemen dengan teks aman (tanpa innerHTML => tidak ada XSS dari judul/nama berkas).
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined && text !== null) node.textContent = text;
+            return node;
+        }
+
+        function emptyNote(message, bg, border, color) {
+            const box = el('div', null, message);
+            box.style.cssText = `padding:14px 16px;background:${bg};border:1px dashed ${border};border-radius:12px;color:${color};font-size:12.5px;text-align:center;font-weight:600;`;
+            return box;
+        }
+
+        // Switcher Pertemuan Mingguan (Left -> Right). Data dibaca dari atribut data-* kartu.
+        function switchRightToDetail(minggu, card) {
             document.getElementById('defaultRightPanel').style.display = 'none';
-            const detailPanel = document.getElementById('detailRightPanel');
-            detailPanel.style.display = 'block';
+            document.getElementById('detailRightPanel').style.display = 'block';
 
             document.getElementById('detailBadgeSession').innerText = 'Minggu ' + minggu;
-            document.getElementById('detailHeading').innerText = judul;
+            document.getElementById('detailHeading').innerText = card.dataset.judul;
 
-            // Render Materi
-            const materiList = JSON.parse(materiJsonStr);
+            const materiList = JSON.parse(card.dataset.materi || '[]');
+            const tasks = JSON.parse(card.dataset.tasks || '[]');
+
+            // --- Materi: tombol Unduh/Buka mengarah ke route berpolicy ---
             const materiContainer = document.getElementById('materiListContainer');
-            materiContainer.innerHTML = '';
+            materiContainer.replaceChildren();
 
             if (materiList.length === 0) {
-                materiContainer.innerHTML = `
-                    <div style="padding: 14px 16px; background: #F0F9FF; border: 1px dashed rgba(3, 159, 250, 0.3); border-radius: 12px; color: #0284C7; font-size: 12.5px; text-align: center; font-weight: 600;">
-                        Belum ada berkas materi diunggah di database untuk pertemuan ini.
-                    </div>
-                `;
+                materiContainer.appendChild(emptyNote('Belum ada materi untuk pertemuan ini.', '#F0F9FF', 'rgba(3,159,250,0.3)', '#0284C7'));
             } else {
-                materiList.forEach(materi => {
-                    const resourceCard = document.createElement('div');
-                    resourceCard.className = 'resource-card';
-                    resourceCard.innerHTML = `
-                        <div class="resource-left">
-                            <div class="resource-icon">&#128196;</div>
-                            <div>
-                                <div class="resource-name">${materi}</div>
-                                <div class="resource-meta">Materi Dosen &middot; Format Dokumen</div>
-                            </div>
-                        </div>
-                        <button class="btn-mini-download" onclick="alert('Mengunduh ${materi}...')">
-                            Unduh
-                        </button>
-                    `;
-                    materiContainer.appendChild(resourceCard);
+                materiList.forEach(m => {
+                    const item = el('div', 'resource-card');
+                    const left = el('div', 'resource-left');
+                    left.appendChild(el('div', 'resource-icon', m.kind === 'link' ? '\u{1F517}' : '\u{1F4C4}'));
+                    const info = el('div');
+                    info.appendChild(el('div', 'resource-name', m.judul));
+                    info.appendChild(el('div', 'resource-meta', m.nama + ' \u00B7 ' + m.meta));
+                    left.appendChild(info);
+
+                    const btn = el('a', 'btn-mini-download', m.kind === 'link' ? 'Buka' : 'Unduh');
+                    btn.href = m.url;
+                    btn.style.textDecoration = 'none';
+                    if (m.kind === 'link') { btn.target = '_blank'; btn.rel = 'noopener noreferrer'; }
+
+                    item.append(left, btn);
+                    materiContainer.appendChild(item);
                 });
             }
 
-            // Render Tasks
-            const tasks = JSON.parse(tasksJsonStr);
+            // --- Tugas: tombol membuka halaman detail & pengumpulan ---
             const tasksContainer = document.getElementById('tasksListContainer');
-            tasksContainer.innerHTML = '';
+            tasksContainer.replaceChildren();
             document.getElementById('tasksHeaderTitle').innerText = 'Aktivitas & Tugas (' + tasks.length + ' Penugasan)';
 
             if (tasks.length === 0) {
-                tasksContainer.innerHTML = `
-                    <div style="padding: 14px 16px; background: #FFFBEB; border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: 12px; color: #92400E; font-size: 12.5px; text-align: center; font-weight: 600;">
-                        Tidak ada penugasan terjadwal untuk pertemuan ini.
-                    </div>
-                `;
+                tasksContainer.appendChild(emptyNote('Tidak ada penugasan terjadwal untuk pertemuan ini.', '#FFFBEB', 'rgba(245,158,11,0.35)', '#92400E'));
             } else {
                 tasks.forEach((task, index) => {
                     const typeLower = task.tipe.toLowerCase();
@@ -548,33 +608,26 @@
                     else if (typeLower.includes('milestone')) badgeClass = 'milestone';
                     else if (typeLower.includes('ujian') || typeLower.includes('uts') || typeLower.includes('uas')) badgeClass = 'exam';
 
-                    const isLihatNilai = task.btn.includes('Lihat Nilai');
-                    const clickAction = isLihatNilai ? "switchCourseTab('nilai')" : "alert('Penugasan: " + task.judul.replace(/'/g, "\\'") + "')";
+                    const box = el('div', 'task-card-box');
+                    const head = el('div', 'task-card-header');
+                    head.appendChild(el('span', 'task-badge-tag ' + badgeClass, task.tipe));
+                    const num = el('span', null, 'Penugasan #' + (index + 1));
+                    num.style.cssText = 'font-size:11px;font-weight:800;color:#F96305;';
+                    head.appendChild(num);
 
-                    const taskCard = document.createElement('div');
-                    taskCard.className = 'task-card-box';
-                    taskCard.innerHTML = `
-                        <div class="task-card-header">
-                            <span class="task-badge-tag ${badgeClass}">${task.tipe}</span>
-                            <span style="font-size: 11px; font-weight: 800; color: #F96305;">Penugasan #${index + 1}</span>
-                        </div>
-                        <div class="task-card-title">${task.judul}</div>
-                        <div class="task-deadline">${task.deadline}</div>
-                        <button class="btn-task-action" onclick="${clickAction}">
-                            ${task.btn}
-                        </button>
-                    `;
-                    tasksContainer.appendChild(taskCard);
+                    const action = el('a', 'btn-task-action');
+                    action.innerHTML = task.btn; // teks tombol disusun server (berisi &rarr;), bukan input pengguna
+                    action.href = task.url;
+                    action.style.cssText = 'text-decoration:none;display:block;text-align:center;';
+
+                    box.append(head, el('div', 'task-card-title', task.judul), el('div', 'task-deadline', task.deadline), action);
+                    tasksContainer.appendChild(box);
                 });
             }
 
-            document.querySelectorAll('.session-card').forEach(card => {
-                card.classList.remove('selected-active');
-            });
+            document.querySelectorAll('.session-card').forEach(c => c.classList.remove('selected-active'));
             const activeCard = document.getElementById('cardWeek' + minggu);
-            if (activeCard) {
-                activeCard.classList.add('selected-active');
-            }
+            if (activeCard) activeCard.classList.add('selected-active');
         }
 
         function restoreDefaultInfo() {

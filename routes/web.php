@@ -46,6 +46,10 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
             ->name('assignments.submissions.store');
+
+        // Unduh materi mata kuliah yang diikuti (hak akses dicek di MaterialController).
+        Route::get('/materi/{material}/unduh', [MaterialController::class, 'download'])
+            ->name('materi.download');
     });
 
     // ===== Mahasiswa, dosen & admin: detail tugas (kepemilikan dicek di controller) =====
@@ -56,6 +60,8 @@ Route::middleware('auth')->group(function () {
     // ===== Semua peran login: pemilik / dosen pengampu / admin (dicek di controller) =====
     Route::get('/submissions/{submission}', [SubmissionController::class, 'show'])
         ->name('submissions.show');
+    Route::get('/submissions/{submission}/unduh', [SubmissionController::class, 'download'])
+        ->name('submissions.download');
 
     // ===== Dosen =====
     Route::middleware('role:dosen')->prefix('dosen')->name('dosen.')->group(function () {
@@ -130,6 +136,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/tugas', [AdminAssignmentController::class, 'store'])->name('tugas.store');
         Route::put('/tugas/{assignment}', [AdminAssignmentController::class, 'update'])->name('tugas.update');
         Route::delete('/tugas/{assignment}', [AdminAssignmentController::class, 'destroy'])->name('tugas.destroy');
+
+        Route::get('/nilai', [AdminGradeController::class, 'index'])->name('nilai');
     });
 
 });

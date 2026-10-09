@@ -198,10 +198,10 @@
                             </div>
                             <div class="form-group">
                                 <label for="materialSession">Pertemuan Ke-</label>
-                                {{-- Tidak ber-name: tabel materials tidak punya kolom pertemuan, jadi nilainya tidak dikirim. --}}
-                                <select id="materialSession" class="form-select">
+                                <select id="materialSession" name="session" class="form-select">
+                                    <option value="">Materi umum (tanpa pertemuan)</option>
                                     @for ($i = 1; $i <= 16; $i++)
-                                        <option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Pertemuan {{ $i }}</option>
+                                        <option value="{{ $i }}" @selected((int) old('session') === $i)>Pertemuan {{ $i }}</option>
                                     @endfor
                                 </select>
                             </div>

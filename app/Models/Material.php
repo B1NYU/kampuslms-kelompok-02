@@ -11,6 +11,7 @@ class Material extends Model
 
     protected $fillable = [
         'course_id',
+        'session',
         'uploaded_by',
         'title',
         'description',
@@ -26,7 +27,19 @@ class Material extends Model
     {
         return [
             'file_size' => 'integer',
+            'session' => 'integer',
         ];
+    }
+
+    /** Admin, dosen pengampu, atau mahasiswa terdaftar di mata kuliahnya. */
+    public function isViewableBy(User $user): bool
+    {
+        return $this->course->isViewableBy($user);
+    }
+
+    public function isLink(): bool
+    {
+        return $this->type === 'link';
     }
 
     public function course()

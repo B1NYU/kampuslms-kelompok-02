@@ -49,7 +49,7 @@
                 $totalCourseCount = $dbCourses->count();
                 $totalSks = $dbCourses->sum('sks');
 
-                // Tugas aktif & pending dari mata kuliah yang diikuti
+                // Tugas published dari mata kuliah yang diikuti, urut tenggat.
                 $dbAssignments = $dbCourses->isNotEmpty()
                     ? \App\Models\Assignment::whereIn('course_id', $dbCourses->pluck('id'))
                         ->where('status', 'published')
@@ -57,8 +57,23 @@
                         ->orderBy('due_at')
                         ->get()
                     : collect();
-                $tugasPending = $dbAssignments->where('due_at', '>=', now())->count();
-                $tugasSelesai = $mhsUser ? \App\Models\Submission::where('user_id', $mhsUser->id)->count() : 0;
+
+                // Tugas yang sudah dikumpulkan mahasiswa ini (hanya dari tugas di atas).
+                $idTerkumpul = $mhsUser && $dbAssignments->isNotEmpty()
+                    ? \App\Models\Submission::where('user_id', $mhsUser->id)
+                        ->whereIn('assignment_id', $dbAssignments->pluck('id'))
+                        ->pluck('assignment_id')
+                    : collect();
+
+                $belumDikumpulkan = $dbAssignments->reject(fn ($a) => $idTerkumpul->contains($a->id));
+                $tugasPending = $belumDikumpulkan->where('due_at', '>=', now())->count();
+                $tugasSelesai = $idTerkumpul->count();
+                $persenTugasSelesai = $dbAssignments->count() > 0
+                    ? (int) round($tugasSelesai / $dbAssignments->count() * 100)
+                    : 0;
+
+                // Daftar "Tugas Terkini": yang belum dikumpulkan dan belum lewat tenggat tampil duluan.
+                $tugasTerkini = $belumDikumpulkan->sortBy(fn ($a) => [$a->due_at->isPast() ? 1 : 0, $a->due_at->timestamp])->values();
             @endphp
 
             <!-- Row 1: 3 Stat Cards terhubung ke Database -->
@@ -72,7 +87,7 @@
                     <span class="stat-value stat-color-3">{{ $totalSks }} SKS</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">Tugas Terjadwal</span>
+                    <span class="stat-label">Tugas Belum Dikumpulkan</span>
                     <span class="stat-value stat-color-4">{{ $tugasPending }}</span>
                 </div>
             </section>
@@ -162,9 +177,9 @@
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                          fill="none" stroke="#F96305" stroke-width="3.2" stroke-dasharray="70, 100" stroke-linecap="round" />
+                                          fill="none" stroke="#F96305" stroke-width="3.2" stroke-dasharray="{{ $persenTugasSelesai }}, 100" stroke-linecap="round" />
                                 </svg>
-                                <span class="gauge-text">70%</span>
+                                <span class="gauge-text">{{ $persenTugasSelesai }}%</span>
                             </div>
                             <span class="gauge-label">Tugas Selesai</span>
                         </div>
@@ -192,22 +207,22 @@
                         <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="link-see-all">Semua MK</a>
                     </div>
                     <div class="message-list">
-                        @forelse ($dbAssignments->take(3) as $assign)
+                        @forelse ($tugasTerkini->take(3) as $assign)
                             @php
-                                $isDuePast = $assign->due_at ? $assign->due_at->isPast() : false;
+                                $isDuePast = $assign->due_at->isPast();
                             @endphp
-                            <div class="message-item">
+                            <a href="{{ route('assignments.show', $assign) }}" class="message-item" style="text-decoration:none;color:inherit;">
                                 <span class="msg-sender">{{ $assign->course?->code ?? 'MK' }}</span>
                                 <span class="msg-badge" style="background:#FFFDF8; color:{{ $isDuePast ? '#F96305' : '#039FFA' }}; border:1px solid {{ $isDuePast ? 'rgba(249, 99, 5, 0.35)' : 'rgba(3, 159, 250, 0.35)' }};">
-                                    {{ $isDuePast ? 'Lewat Deadline' : 'Aktif' }}
+                                    {{ $isDuePast ? 'Lewat Deadline' : 'Belum Dikumpulkan' }}
                                 </span>
-                                <span class="msg-body"><strong>{{ $assign->title }}</strong> &bull; Batas: {{ $assign->due_at ? $assign->due_at->translatedFormat('d M Y, H:i') : '-' }}</span>
-                            </div>
+                                <span class="msg-body"><strong>{{ $assign->title }}</strong> &bull; Batas: {{ $assign->due_at->translatedFormat('d M Y, H:i') }}</span>
+                            </a>
                         @empty
                             <div class="message-item">
                                 <span class="msg-sender">Sistem</span>
                                 <span class="msg-badge">Info</span>
-                                <span class="msg-body">Belum ada tugas baru yang dipublikasikan.</span>
+                                <span class="msg-body">Tidak ada tugas yang menunggu. Semua tugas sudah dikumpulkan.</span>
                             </div>
                         @endforelse
                     </div>

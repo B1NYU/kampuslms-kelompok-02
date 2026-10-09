@@ -32,6 +32,7 @@ class MaterialController extends Controller
 
         $payload = [
             'uploaded_by' => $request->user()->id,
+            'session'     => $data['session'] ?? null,
             'title'       => $data['title'],
             'description' => $data['description'] ?? null,
             'type'        => $data['type'],
