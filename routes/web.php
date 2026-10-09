@@ -124,6 +124,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/tugas', function () {
             return view()->file(resource_path('views/admin/admin.tugas.blade.php'));
         })->name('tugas');
+
+        Route::get('/nilai', function () {
+            return view()->file(resource_path('views/admin/admin.nilai.blade.php'));
+        })->name('nilai');
     });
 
 });

@@ -50,47 +50,76 @@
                 <div class="topbar-left">
                     <div class="page-title">
                         <h1>Pendaftaran Mahasiswa ke Mata Kuliah</h1>
-                        <span class="table-summary-info">Menampilkan <strong id="studentTableCount">{{ $firstCourse?->students?->count() ?? 0 }}</strong> Mahasiswa Terdaftar</span>
                     </div>
                 </div>
             </header>
 
             <!-- Section: Form & Tabel Mahasiswa -->
             <section class="feature-section" id="kelola-mahasiswa">
-                <div class="section-card">
 
-                    <!-- Toolbar Kontrol: Pencarian di Kiri, Filter MK di sebelah kiri Tombol Daftarkan Mahasiswa -->
-                    <div class="table-toolbar-row">
-                        <!-- Kolom Mencari Mahasiswa (Kiri) -->
-                        <div class="search-input-box">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <!-- 1. Toolbar Kontrol di LUAR Card Utama (Search di Kiri, Filter MK & Tombol Daftarkan di Kanan) -->
+                <div class="table-toolbar-row">
+                    <!-- Kolom Mencari Mahasiswa (Kiri) -->
+                    <div class="search-input-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="searchStudentInput" placeholder="Cari nama mahasiswa atau NIM...">
+                    </div>
+
+                    <!-- Sisi Kanan: Filter MK & Tombol Daftarkan Mahasiswa -->
+                    <div class="toolbar-right-group">
+                        <div class="course-filter-bar">
+                            <select id="selectCurrentCourse" class="course-select" {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
+                                @forelse ($dosenCourses as $idx => $c)
+                                    <option value="{{ $c->code }}" {{ $idx === 0 ? 'selected' : '' }}>
+                                        {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)
+                                    </option>
+                                @empty
+                                    <option value="">Belum ada mata kuliah yang diampu</option>
+                                @endforelse
+                            </select>
+                            <svg class="course-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
-                            <input type="text" id="searchStudentInput" placeholder="Cari mahasiswa / NIM...">
                         </div>
 
-                        <!-- Sisi Kanan: Filter MK Aktif di sebelah kiri Button Daftarkan Mahasiswa -->
-                        <div class="toolbar-right-group">
-                            <div class="course-filter-bar">
-                                <select id="selectCurrentCourse" class="course-select" {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
-                                    @forelse ($dosenCourses as $idx => $c)
-                                        <option value="{{ $c->code }}" {{ $idx === 0 ? 'selected' : '' }}>
-                                            {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)
-                                        </option>
-                                    @empty
-                                        <option value="">Belum ada mata kuliah yang diampu</option>
-                                    @endforelse
-                                </select>
-                            </div>
+                        <button type="button" class="btn-primary-action" id="btnOpenAddStudentModal">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            <span>Daftarkan Mahasiswa</span>
+                        </button>
+                    </div>
+                </div>
 
-                            <button type="button" class="btn-primary-action" id="btnOpenAddStudentModal">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                                <span>+ Daftarkan Mahasiswa</span>
-                            </button>
+                <!-- 2. Card Utama Berisi Header Card ('All Deals' style & Sort by) dan Tabel Mahasiswa -->
+                <div class="section-card">
+
+                    <!-- Header Card: Info Mahasiswa Terdaftar (Kiri) & Sort By (Kanan) -->
+                    <div class="table-card-header">
+                        <div class="table-card-header-left">
+                            <span class="table-summary-info">Menampilkan <strong id="studentTableCount">{{ $firstCourse?->students?->count() ?? 0 }}</strong> Mahasiswa Terdaftar</span>
+                        </div>
+
+                        <div class="table-card-header-right">
+                            <div class="sort-control-wrap">
+                                <span class="sort-label">Sort by:</span>
+                                <div class="sort-select-box">
+                                    <select id="sortStudentSelect" class="sort-select">
+                                        <option value="default">Default</option>
+                                        <option value="name-asc">Nama (A &rarr; Z)</option>
+                                        <option value="name-desc">Nama (Z &rarr; A)</option>
+                                        <option value="nim-asc">NIM (Terkecil)</option>
+                                        <option value="nim-desc">NIM (Terbesar)</option>
+                                    </select>
+                                    <svg class="sort-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -101,6 +130,8 @@
                                     <thead>
                                         <tr>
                                             <th>Mahasiswa</th>
+                                            <th>NIM</th>
+                                            <th>Program Studi</th>
                                             <th>Kelas</th>
                                             <th>Status</th>
                                             <th style="text-align: right;">Aksi</th>
@@ -113,7 +144,7 @@
                                         @endphp
                                         @if ($dosenCourses->isEmpty())
                                             <tr>
-                                                <td colspan="4" style="text-align:center;padding:36px 20px;color:#64748B;">
+                                                <td colspan="6" style="text-align:center;padding:36px 20px;color:#64748B;">
                                                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                                             <circle cx="12" cy="12" r="10"></circle>
@@ -127,13 +158,15 @@
                                             </tr>
                                         @else
                                             <tr id="emptyCourseRow" style="{{ $hasStudentsInFirstCourse ? 'display:none;' : '' }}">
-                                                <td colspan="4" style="text-align:center;padding:32px 20px;color:#94A3B8;">
+                                                <td colspan="6" style="text-align:center;padding:32px 20px;color:#94A3B8;">
                                                     Belum ada mahasiswa yang terdaftar di kelas mata kuliah ini.
                                                 </td>
                                             </tr>
+                                            @php $orderIdx = 0; @endphp
                                             @foreach ($dosenCourses as $course)
                                                 @foreach ($course->students as $mhs)
                                                     @php
+                                                        $orderIdx++;
                                                         $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
                                                         $initials = strtoupper(mb_substr($initials, 0, 2));
                                                         $colors = [
@@ -145,16 +178,21 @@
                                                         ];
                                                         [$bg, $c] = $colors[$mhs->id % count($colors)];
                                                     @endphp
-                                                    <tr data-mk="{{ $course->code }}" style="{{ $course->code === $selectedCourseCode ? '' : 'display:none;' }}">
+                                                    <tr data-mk="{{ $course->code }}"
+                                                        data-name="{{ strtolower($mhs->name) }}"
+                                                        data-nim="{{ $mhs->nim_nip }}"
+                                                        data-order="{{ $orderIdx }}"
+                                                        style="{{ $course->code === $selectedCourseCode ? '' : 'display:none;' }}">
                                                         <td>
                                                             <div class="student-cell">
                                                                 <div class="student-avatar" style="background:{{ $bg }}; color:{{ $c }};">{{ $initials }}</div>
-                                                                <div class="student-meta">
-                                                                    <span class="student-name">{{ $mhs->name }}</span>
-                                                                    <span class="student-nim">{{ $mhs->nim_nip }}</span>
-                                                                </div>
+                                                                <span class="student-name">{{ $mhs->name }}</span>
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <span class="student-nim">{{ $mhs->nim_nip }}</span>
+                                                        </td>
+                                                        <td>Sistem Informasi</td>
                                                         <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
                                                         <td><span class="badge-status badge-status-active">Aktif</span></td>
                                                         <td style="text-align: right;">
@@ -388,16 +426,20 @@
                 if (currentMkVal) {
                     newRow.setAttribute('data-mk', currentMkVal);
                 }
+                newRow.setAttribute('data-name', nama.toLowerCase());
+                newRow.setAttribute('data-nim', nim);
+                newRow.setAttribute('data-order', '0');
                 newRow.innerHTML = `
                     <td>
                         <div class="student-cell">
                             <div class="student-avatar" style="background:${pickedColor.bg}; color:${pickedColor.text};">${initials}</div>
-                            <div class="student-meta">
-                                <span class="student-name">${nama}</span>
-                                <span class="student-nim">${nim}</span>
-                            </div>
+                            <span class="student-name">${nama}</span>
                         </div>
                     </td>
+                    <td>
+                        <span class="student-nim">${nim}</span>
+                    </td>
+                    <td>${prodi}</td>
                     <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">${kelas}</span></td>
                     <td><span class="badge-status badge-status-active">Aktif</span></td>
                     <td style="text-align: right;">
@@ -417,12 +459,54 @@
                     nimLookupStatus.style.color = '#64748B';
                 }
                 closeStudentModal();
+                sortStudentRows();
                 applyCourseFilter();
                 attachDeleteStudentEvents();
                 showToast(`Mahasiswa ${nama} (${nim}) berhasil didaftarkan ke kelas!`);
             });
 
             const selectCurrentCourse = document.getElementById('selectCurrentCourse');
+            const sortStudentSelect = document.getElementById('sortStudentSelect');
+
+            function sortStudentRows() {
+                const sortBy = sortStudentSelect ? sortStudentSelect.value : 'default';
+                const rows = Array.from(studentTableBody.querySelectorAll('tr[data-mk]'));
+
+                rows.sort((a, b) => {
+                    if (sortBy === 'name-asc') {
+                        const nameA = (a.dataset.name || a.querySelector('.student-name')?.textContent || '').toLowerCase().trim();
+                        const nameB = (b.dataset.name || b.querySelector('.student-name')?.textContent || '').toLowerCase().trim();
+                        return nameA.localeCompare(nameB, 'id', { sensitivity: 'base' });
+                    } else if (sortBy === 'name-desc') {
+                        const nameA = (a.dataset.name || a.querySelector('.student-name')?.textContent || '').toLowerCase().trim();
+                        const nameB = (b.dataset.name || b.querySelector('.student-name')?.textContent || '').toLowerCase().trim();
+                        return nameB.localeCompare(nameA, 'id', { sensitivity: 'base' });
+                    } else if (sortBy === 'nim-asc') {
+                        const nimA = (a.dataset.nim || a.querySelector('.student-nim')?.textContent || '').trim();
+                        const nimB = (b.dataset.nim || b.querySelector('.student-nim')?.textContent || '').trim();
+                        return nimA.localeCompare(nimB, undefined, { numeric: true });
+                    } else if (sortBy === 'nim-desc') {
+                        const nimA = (a.dataset.nim || a.querySelector('.student-nim')?.textContent || '').trim();
+                        const nimB = (b.dataset.nim || b.querySelector('.student-nim')?.textContent || '').trim();
+                        return nimB.localeCompare(nimA, undefined, { numeric: true });
+                    } else {
+                        const orderA = parseInt(a.dataset.order || '0', 10);
+                        const orderB = parseInt(b.dataset.order || '0', 10);
+                        return orderA - orderB;
+                    }
+                });
+
+                rows.forEach(row => {
+                    studentTableBody.appendChild(row);
+                });
+            }
+
+            if (sortStudentSelect) {
+                sortStudentSelect.addEventListener('change', () => {
+                    sortStudentRows();
+                    applyCourseFilter();
+                });
+            }
 
             function applyCourseFilter() {
                 const currentMk = selectCurrentCourse ? selectCurrentCourse.value : '';
@@ -474,6 +558,7 @@
                 });
             }
             attachDeleteStudentEvents();
+            sortStudentRows();
             applyCourseFilter();
 
         });
