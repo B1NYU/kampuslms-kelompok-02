@@ -11,9 +11,10 @@
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.tugas.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/admin/admin.tugas.css', 'resources/css/dosen/dosen.tugas.css', 'resources/js/app.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/admin/admin.tugas.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.tugas.css') }}">
     @endif
 </head>
 <body>
@@ -47,91 +48,6 @@
                 </div>
             </header>
 
-            @php
-                // Ambil daftar mata kuliah yang aktif di database
-                $coursesList = \App\Models\Course::with('lecturer')->orderBy('code')->get();
-
-                // Mockup initial assignments data terhubung dengan courses di sistem
-                $c1 = $coursesList->first();
-                $c2 = $coursesList->skip(1)->first() ?? $c1;
-                $c3 = $coursesList->skip(2)->first() ?? $c1;
-
-                $initialAssignments = [
-                    [
-                        'id' => 1,
-                        'course_id' => $c1?->id ?? 1,
-                        'course_code' => $c1?->code ?? 'SI101',
-                        'course_name' => $c1?->name ?? 'Pemrograman Web',
-                        'lecturer_name' => $c1?->lecturer?->name ?? 'Dosen Pengampu',
-                        'title' => 'Tugas 01: Implementasi CRUD Blade & Sanitasi Input',
-                        'instructions' => 'Buatlah antarmuka CRUD pengguna menggunakan framework Laravel 12 dan Blade templating engine. Pastikan seluruh input divalidasi dengan FormRequest dan terlindung dari kerentanan IDOR.',
-                        'due_at' => now()->addDays(3)->setTime(23, 59)->format('Y-m-d H:i:s'),
-                        'due_display' => now()->addDays(3)->translatedFormat('d M Y, 23:59'),
-                        'countdown' => '3 Hari Lagi',
-                        'countdown_type' => 'tag-upcoming',
-                        'max_score' => 100,
-                        'allow_late' => 1,
-                        'status' => 'published',
-                        'submissions_count' => 18,
-                        'created_by' => 'Super Administrator',
-                    ],
-                    [
-                        'id' => 2,
-                        'course_id' => $c2?->id ?? 2,
-                        'course_code' => $c2?->code ?? 'SI102',
-                        'course_name' => $c2?->name ?? 'Basis Data Lanjut',
-                        'lecturer_name' => $c2?->lecturer?->name ?? 'Dosen Pengampu',
-                        'title' => 'Praktikum 03: Optimasi Query Index & Explain Plan',
-                        'instructions' => 'Analisis performa query JOIN pada tabel berukuran besar menggunakan EXPLAIN. Buatlah composite index yang efisien dan dokumentasikan perbandingan execution time.',
-                        'due_at' => now()->addDay()->setTime(17, 00)->format('Y-m-d H:i:s'),
-                        'due_display' => now()->addDay()->translatedFormat('d M Y, 17:00'),
-                        'countdown' => 'Besok, 17:00',
-                        'countdown_type' => 'tag-urgent',
-                        'max_score' => 100,
-                        'allow_late' => 0,
-                        'status' => 'published',
-                        'submissions_count' => 24,
-                        'created_by' => 'Dosen Pengampu',
-                    ],
-                    [
-                        'id' => 3,
-                        'course_id' => $c3?->id ?? 3,
-                        'course_code' => $c3?->code ?? 'SI103',
-                        'course_name' => $c3?->name ?? 'Analisis & Desain SI',
-                        'lecturer_name' => $c3?->lecturer?->name ?? 'Dosen Pengampu',
-                        'title' => 'Tugas Kelompok: Penyusunan Dokumen SRS & Use Case Matrix',
-                        'instructions' => 'Setiap kelompok menyusun dokumen Software Requirements Specification (SRS) berstandar IEEE untuk topik aplikasi yang telah disepakati bersama dosen pengampu.',
-                        'due_at' => now()->addDays(7)->setTime(23, 59)->format('Y-m-d H:i:s'),
-                        'due_display' => now()->addDays(7)->translatedFormat('d M Y, 23:59'),
-                        'countdown' => '7 Hari Lagi',
-                        'countdown_type' => 'tag-upcoming',
-                        'max_score' => 100,
-                        'allow_late' => 1,
-                        'status' => 'published',
-                        'submissions_count' => 6,
-                        'created_by' => 'Super Administrator',
-                    ],
-                    [
-                        'id' => 4,
-                        'course_id' => $c1?->id ?? 1,
-                        'course_code' => $c1?->code ?? 'SI101',
-                        'course_name' => $c1?->name ?? 'Pemrograman Web',
-                        'lecturer_name' => $c1?->lecturer?->name ?? 'Dosen Pengampu',
-                        'title' => 'Draf Tugas 02: RESTful API Sanctum & Dokumentasi Postman',
-                        'instructions' => 'Implementasi API token-based authentication menggunakan Laravel Sanctum dengan proteksi throttle request dan dokumentasi OpenAPI/Postman collection.',
-                        'due_at' => now()->addDays(14)->setTime(23, 59)->format('Y-m-d H:i:s'),
-                        'due_display' => now()->addDays(14)->translatedFormat('d M Y, 23:59'),
-                        'countdown' => 'Draf Penugasan',
-                        'countdown_type' => 'tag-passed',
-                        'max_score' => 100,
-                        'allow_late' => 1,
-                        'status' => 'draft',
-                        'submissions_count' => 0,
-                        'created_by' => 'Super Administrator',
-                    ],
-                ];
-            @endphp
-
             <!-- Baris Statistik Metrik Cepat -->
             <section class="tugas-stats-bar">
                 <div class="tugas-stat-card">
@@ -145,7 +61,7 @@
                     </div>
                     <div class="tugas-stat-info">
                         <span class="tugas-stat-label">Total Penugasan</span>
-                        <span class="tugas-stat-value" id="statTotalTugas">{{ count($initialAssignments) }}</span>
+                        <span class="tugas-stat-value" id="statTotalTugas">{{ $totalAssignments }}</span>
                     </div>
                 </div>
 
@@ -157,7 +73,7 @@
                     </div>
                     <div class="tugas-stat-info">
                         <span class="tugas-stat-label">Dipublikasikan</span>
-                        <span class="tugas-stat-value" id="statPublishedTugas">3</span>
+                        <span class="tugas-stat-value" id="statPublishedTugas">{{ $totalPublished }}</span>
                     </div>
                 </div>
 
@@ -171,7 +87,7 @@
                     </div>
                     <div class="tugas-stat-info">
                         <span class="tugas-stat-label">Draf Tugas</span>
-                        <span class="tugas-stat-value" id="statDraftTugas">1</span>
+                        <span class="tugas-stat-value" id="statDraftTugas">{{ $totalDraft }}</span>
                     </div>
                 </div>
 
@@ -183,7 +99,7 @@
                     </div>
                     <div class="tugas-stat-info">
                         <span class="tugas-stat-label">Pengumpulan Masuk</span>
-                        <span class="tugas-stat-value" id="statTotalSubmissions">48 Berkas</span>
+                        <span class="tugas-stat-value" id="statTotalSubmissions">{{ $totalSubmissions }} Berkas</span>
                     </div>
                 </div>
             </section>
@@ -239,79 +155,153 @@
 
             <!-- Grid Kartu Tugas -->
             <section class="assignments-grid" id="tugasCardsGrid">
-                @foreach ($initialAssignments as $t)
+                @forelse ($assignments as $t)
                     @php
-                        $isPublished = $t['status'] === 'published';
-                        $statusBadgeClass = $isPublished ? 'badge-status-published' : 'badge-status-draft';
-                        $statusBadgeText = $isPublished ? 'Dipublikasikan' : 'Draf';
+                        $isPublished = $t->status === 'published';
+                        $isPast = $t->due_at->isPast();
+                        $isSoon = !$isPast && $t->due_at->isBefore(now()->addHours(48));
+
+                        if (!$isPublished) {
+                            $badgeClass = 'badge-status-draft';
+                            $badgeText = 'Draft';
+                            $badgeIcon = '○';
+                        } elseif ($isPast) {
+                            $badgeClass = 'badge-status-published';
+                            $badgeText = 'Deadline Berakhir';
+                            $badgeIcon = '●';
+                        } elseif ($isSoon) {
+                            $badgeClass = 'badge-status-warning';
+                            $badgeText = 'Mendekati Deadline';
+                            $badgeIcon = '●';
+                        } else {
+                            $badgeClass = 'badge-status-published';
+                            $badgeText = 'Tugas Aktif';
+                            $badgeIcon = '●';
+                        }
+
+                        // Penyesuaian informasi mode dosen: Pertemuan & Progress Pengumpulan
+                        preg_match('/(Pertemuan|Minggu)\s*(\d+)/i', $t->title, $matches);
+                        $weekNum = $matches[2] ?? null;
+
+                        $studentCount = $t->course ? $t->course->students()->count() : 0;
+                        $pct = $studentCount > 0 ? min(100, round($t->submissions_count / $studentCount * 100)) : 0;
+
+                        $creatorName = $t->creator?->name ?? 'Administrator';
+                        $creatorInitials = strtoupper(substr($creatorName, 0, 2));
                     @endphp
+
                     <div class="assignment-card"
-                         data-id="{{ $t['id'] }}"
-                         data-course-id="{{ $t['course_id'] }}"
-                         data-status="{{ $t['status'] }}"
-                         data-title="{{ $t['title'] }}"
-                         data-instructions="{{ $t['instructions'] }}"
-                         data-due="{{ $t['due_at'] }}"
-                         data-score="{{ $t['max_score'] }}"
-                         data-allow-late="{{ $t['allow_late'] }}"
-                         data-submissions="{{ $t['submissions_count'] }}">
+                         data-id="{{ $t->id }}"
+                         data-course-id="{{ $t->course_id }}"
+                         data-course-code="{{ $t->course?->code ?? '' }}"
+                         data-course-name="{{ $t->course?->name ?? '' }}"
+                         data-course-lecturer="{{ $t->course?->lecturer?->name ?? 'Belum Ditugaskan' }}"
+                         data-course-sks="{{ $t->course?->sks ?? 3 }}"
+                         data-status="{{ $t->status }}"
+                         data-title="{{ $t->title }}"
+                         data-session="{{ $weekNum ?? '' }}"
+                         data-instructions="{{ $t->instructions }}"
+                         data-due-date="{{ $t->due_at->format('Y-m-d') }}"
+                         data-due-time="{{ $t->due_at->format('H:i') }}"
+                         data-score="{{ $t->max_score }}"
+                         data-allow-late="{{ $t->allow_late ? 1 : 0 }}"
+                         data-submissions="{{ $t->submissions_count }}">
 
                         <div>
                             <div class="assignment-card-top">
                                 <div class="badge-tag-wrap">
-                                    <span class="badge-mk-code">{{ $t['course_code'] }}</span>
-                                    <span class="badge-status {{ $statusBadgeClass }}">
-                                        <span>{{ $isPublished ? '●' : '○' }}</span>
-                                        <span>{{ $statusBadgeText }}</span>
+                                    <span class="badge-mk-code">{{ $t->course?->code ?? 'MK' }}</span>
+                                    @if ($weekNum)
+                                        <span class="badge-mk-code" style="background: rgba(3, 159, 250, 0.1); color: #039FFA; border-color: rgba(3, 159, 250, 0.25);">Pertemuan {{ $weekNum }}</span>
+                                    @endif
+                                    <span class="badge-status {{ $badgeClass }}">
+                                        <span>{{ $badgeIcon }}</span>
+                                        <span>{{ $badgeText }}</span>
                                     </span>
                                 </div>
                                 <div class="btn-actions">
                                     <button type="button" class="btn-icon btn-icon-edit btn-edit-tugas" title="Edit Tugas">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     </button>
-                                    <button type="button" class="btn-icon btn-icon-danger btn-delete-tugas" title="Hapus Tugas">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                                    </button>
+                                    <form action="{{ route('admin.tugas.destroy', $t) }}" method="POST"
+                                          onsubmit="return confirm('Hapus tugas &quot;{{ addslashes($t->title) }}&quot;? Tindakan ini tidak dapat dibatalkan.')"
+                                          style="margin: 0; display: inline-flex;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-icon btn-icon-danger btn-delete-tugas" title="Hapus Tugas">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
-                            <h3 class="assignment-card-title">{{ $t['title'] }}</h3>
-                            <div class="assignment-course-name">
-                                <span>📚 {{ $t['course_name'] }}</span>
+                            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 2px;">
+                                <h3 class="assignment-card-title">{{ $t->title }}</h3>
+                                <span class="badge-mk-code" style="background: #F8FAFC; color: #475569; font-size: 10px; flex-shrink: 0;">Maks. {{ $t->max_score }}</span>
                             </div>
 
-                            <p class="assignment-card-desc">{{ $t['instructions'] }}</p>
+                            <div class="assignment-course-name">
+                                <span>📚 {{ $t->course?->name ?? 'Mata Kuliah' }}</span>
+                                <small style="color: #94A3B8;">&bull; {{ $t->course?->lecturer?->name ?? 'Dosen' }}</small>
+                            </div>
 
-                            <!-- Keterangan Deadline -->
-                            <div class="assignment-deadline-row">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span>Deadline:</span>
-                                <span class="meta-deadline-text">{{ $t['due_display'] }}</span>
+                            <p class="assignment-card-desc">{{ Str::limit($t->instructions, 140) }}</p>
+
+                            <!-- Kotak Deadline Menyesuaikan Mode Dosen -->
+                            <div class="assignment-deadline-box">
+                                <svg class="deadline-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <div class="deadline-info">
+                                    <span class="deadline-label">Batas Waktu Pengumpulan{{ $t->allow_late ? ' (boleh terlambat)' : '' }}</span>
+                                    <span class="deadline-value">{{ $t->due_at->translatedFormat('d M Y') }} &middot; {{ $t->due_at->format('H:i') }} WITA</span>
+                                </div>
+                            </div>
+
+                            <!-- Progress Pengumpulan Menyesuaikan Mode Dosen -->
+                            <div class="submission-progress-wrap">
+                                <div class="submission-progress-labels">
+                                    <span>Progress Pengumpulan</span>
+                                    <span><strong>{{ $t->submissions_count }}</strong> dari {{ $studentCount }} Mahasiswa ({{ $pct }}%)</span>
+                                </div>
+                                <div class="submission-progress-track">
+                                    <div class="submission-progress-fill" style="width: {{ $pct }}%;{{ $pct === 100 ? ' background: #1B8A5A;' : '' }}"></div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Card Footer -->
                         <div class="assignment-card-footer">
                             <div class="creator-info">
-                                <div class="creator-avatar">
-                                    {{ strtoupper(substr($t['created_by'], 0, 2)) }}
+                                <div class="creator-avatar" title="{{ $creatorName }}">
+                                    {{ $creatorInitials }}
                                 </div>
                                 <div>
-                                    <span class="creator-name" title="{{ $t['created_by'] }}">{{ $t['created_by'] }}</span>
+                                    <span class="creator-name" title="{{ $creatorName }}">{{ $creatorName }}</span>
                                 </div>
                             </div>
 
-                            <button type="button" class="btn-view-submissions" onclick="openSubmissionsModal('{{ $t['title'] }}', '{{ $t['course_code'] }}', {{ $t['submissions_count'] }})">
+                            <a href="{{ route('assignments.show', $t) }}" class="btn-view-submissions">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                <span>Pengumpulan ({{ $t['submissions_count'] }})</span>
-                            </button>
+                                <span>Lihat Pengumpulan ({{ $t->submissions_count }}) &rarr;</span>
+                            </a>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="tugas-empty-state" id="tugasEmptyState">
+                        <div class="tugas-empty-icon">📝</div>
+                        <div class="tugas-empty-title">Belum Ada Tugas Perkuliahan</div>
+                        <p class="tugas-empty-desc">Belum ada penugasan yang dibuat pada sistem. Klik tombol di bawah untuk membuat tugas pertama.</p>
+                        <button type="button" class="btn-primary-action" onclick="document.getElementById('btnOpenAddModal').click()" style="margin: 0 auto;">
+                            + Buat Tugas Pertama
+                        </button>
+                    </div>
+                @endforelse
 
-                <!-- Empty State (Hidden by default) -->
-                <div class="tugas-empty-state" id="tugasEmptyState" style="display: none;">
-                    <div class="tugas-empty-icon">📝</div>
+                <!-- Filter Empty State (Hidden by default, shown by filter search) -->
+                <div class="tugas-empty-state" id="tugasFilterEmptyState" style="display: none;">
+                    <div class="tugas-empty-icon">🔍</div>
                     <div class="tugas-empty-title">Tidak Ada Tugas yang Cocok</div>
                     <p class="tugas-empty-desc">Tidak ditemukan penugasan kuliah untuk filter mata kuliah, status, atau kata kunci pencarian yang Anda pilih.</p>
                     <button type="button" class="btn-primary-action" onclick="resetFilters()" style="margin: 0 auto;">
@@ -325,141 +315,134 @@
         <x-footer />
     </div>
 
-    <!-- MODAL POPUP: BUAT / EDIT TUGAS -->
-    <div class="tugas-modal-overlay" id="tugasModal">
-        <div class="tugas-modal-card">
-            <div class="tugas-modal-header">
-                <h3 id="modalTitle">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
-                    <span>Buat / Tambah Tugas Baru</span>
-                </h3>
-                <button type="button" class="btn-close-modal" id="btnCloseModal">&times;</button>
+    <!-- MODAL POPUP: BUAT / EDIT TUGAS (SESUAI DESAIN ROLE DOSEN) -->
+    <div class="dosen-modal-overlay {{ $errors->any() ? 'active show' : '' }}" id="tugasModal">
+        <div class="dosen-modal-card" style="max-width: 620px; width: 95%;">
+            <div class="dosen-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(3, 159, 250, 0.12); color: #039FFA; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" style="margin: 0; font-size: 15px; font-weight: 800; color: #0F172A;">Buat Penugasan Baru</h3>
+                        <span id="modalSubtitle" style="font-size: 11px; color: #64748B; font-weight: 600;">Kelola penugasan perkuliahan mahasiswa</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close-modal" id="btnCloseModal" aria-label="Tutup modal">&times;</button>
             </div>
 
-            <form id="formTugas" class="tugas-modal-body">
+            <form id="formTugas" method="POST" action="{{ route('admin.tugas.store') }}" style="margin: 0; display: flex; flex-direction: column;">
+                @csrf
+                <input type="hidden" id="formMethodField" name="_method" value="">
                 <input type="hidden" id="editTugasId" value="">
 
-                <!-- Pilih Mata Kuliah (Searchable Dropdown dengan Scrollbar) -->
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="font-size: 11.5px; font-weight: 800; color: #334155; margin-bottom: 5px; display: block;">Mata Kuliah Tujuan <span class="required" style="color: #EF4444;">*</span></label>
-                    
-                    <!-- Hidden input to store course ID -->
-                    <input type="hidden" id="modalCourseSelect" name="course_id" value="" required>
-
-                    <!-- Custom Searchable Combobox -->
-                    <div class="custom-combobox-wrapper" id="courseComboboxWrapper">
-                        <div class="combobox-input-box" id="comboboxTrigger">
-                            <input type="text" id="comboboxSearchInput" class="form-control" 
-                                   placeholder="Ketik untuk mencari atau klik untuk memilih MK..." 
-                                   autocomplete="off">
-                            <span class="combobox-arrow">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </span>
-                        </div>
-
-                        <div class="combobox-dropdown-menu" id="comboboxDropdownMenu">
-                            <ul class="combobox-options-list" id="comboboxOptionsList">
-                                @foreach ($coursesList as $c)
-                                    <li class="combobox-option-item" 
-                                        data-id="{{ $c->id }}" 
-                                        data-code="{{ $c->code }}" 
-                                        data-name="{{ $c->name }}"
-                                        data-lecturer="{{ $c->lecturer?->name ?? 'Belum Ditugaskan' }}"
-                                        data-sks="{{ $c->sks ?? 3 }}">
-                                        <div class="option-main-text">
-                                            <span class="option-code-pill">{{ $c->code }}</span>
-                                            <strong class="option-name-text">{{ $c->name }}</strong>
-                                        </div>
-                                        <span class="option-sub-text">Pengampu: {{ $c->lecturer?->name ?? 'Belum Ditugaskan' }} &bull; {{ $c->sks }} SKS</span>
-                                    </li>
+                <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    @if ($errors->any())
+                        <div style="background: #FEF2F2; border: 1px solid #EF4444; color: #991B1B; padding: 10px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 700; margin-bottom: 12px;">
+                            Terdapat kesalahan pada input form:
+                            <ul style="margin: 4px 0 0 16px; padding: 0;">
+                                @foreach ($errors->all() as $err)
+                                    <li>{{ $err }}</li>
                                 @endforeach
                             </ul>
-                            <div class="combobox-empty-message" id="comboboxEmptyMessage" style="display: none;">
-                                Mata kuliah tidak ditemukan.
-                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Baris 1: Mata Kuliah Target & Pertemuan -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="modalCourseSelect">Mata Kuliah Target <span class="required">*</span></label>
+                            <select id="modalCourseSelect" name="course_id" class="form-select" required>
+                                <option value="">-- Pilih Mata Kuliah --</option>
+                                @foreach ($coursesList as $c)
+                                    <option value="{{ $c->id }}" @selected(old('course_id') == $c->id)>
+                                        {{ $c->code }} - {{ $c->name }} ({{ $c->lecturer?->name ?? 'Belum Ditugaskan' }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('course_id') <span class="field-error">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="taskSession">Pertemuan / Minggu Ke-</label>
+                            <select id="taskSession" name="session" class="form-select">
+                                <option value="">(Opsional)</option>
+                                @for ($w = 1; $w <= 16; $w++)
+                                    <option value="{{ $w }}" @selected(old('session') == $w)>Pertemuan {{ $w }} (Minggu ke-{{ $w }})</option>
+                                @endfor
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Live Preview Info Dosen Pengampu & SKS -->
-                    <div id="courseLecturerInfoBox" style="display: none; margin-top: 8px; padding: 7px 10px; background: #F8FAFC; border: 1px solid rgba(3, 159, 250, 0.22); border-radius: 9px; align-items: center; justify-content: space-between; gap: 10px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="width: 26px; height: 26px; border-radius: 7px; background: rgba(3, 159, 250, 0.12); color: #039FFA; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
-                                👨‍🏫
-                            </div>
-                            <div>
-                                <span style="font-size: 9.5px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.3px; display: block;">Dosen Pengampu:</span>
-                                <strong id="courseLecturerName" style="font-size: 11.5px; color: #0F172A; font-weight: 800;">-</strong>
-                            </div>
+                    <!-- Judul Tugas -->
+                    <div class="form-group">
+                        <label for="modalTugasTitle">Judul Tugas <span class="required">*</span></label>
+                        <input type="text" id="modalTugasTitle" name="title" class="form-control"
+                               placeholder="Contoh: Tugas 02 - Pembuatan REST API Sanctum"
+                               value="{{ old('title') }}" required>
+                        @error('title') <span class="field-error">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Petunjuk / Instruksi -->
+                    <div class="form-group">
+                        <label for="modalTugasInstructions">Instruksi / Petunjuk Pengerjaan <span class="required">*</span></label>
+                        <textarea id="modalTugasInstructions" name="instructions" class="form-textarea" rows="4"
+                                  placeholder="Jelaskan kebutuhan tugas, format berkas yang dikumpulkan, dan kriteria penilaian..."
+                                  required>{{ old('instructions') }}</textarea>
+                        @error('instructions') <span class="field-error">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Batas Tanggal & Batas Jam -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="modalTugasDueDate">Batas Tanggal (Deadline) <span class="required">*</span></label>
+                            <input type="date" id="modalTugasDueDate" name="due_date" class="form-control" required
+                                   value="{{ old('due_date', now()->addWeek()->format('Y-m-d')) }}">
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span id="courseSksBadge" style="background: rgba(249, 184, 4, 0.14); color: #D97706; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 800; border: 1px solid rgba(249, 184, 4, 0.3);">
-                                3 SKS
-                            </span>
+                        <div class="form-group">
+                            <label for="modalTugasDueTime">Batas Jam <span class="required">*</span></label>
+                            <input type="time" id="modalTugasDueTime" name="due_time" class="form-control" required
+                                   value="{{ old('due_time', '23:59') }}">
                         </div>
                     </div>
-                </div>
+                    @error('due_at') <span class="field-error" style="margin-top:-8px; margin-bottom:10px;">{{ $message }}</span> @enderror
 
-                <!-- Judul Tugas -->
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="font-size: 11.5px; font-weight: 800; color: #334155; margin-bottom: 5px; display: block;">Judul Penugasan <span class="required" style="color: #EF4444;">*</span></label>
-                    <input type="text" id="modalTugasTitle" class="form-control" placeholder="Contoh: Tugas 02 - Pembuatan REST API Sanctum" required style="width: 100%; padding: 7.5px 10px; border-radius: 8px; border: 1px solid rgba(3, 159, 250, 0.25); font-size: 11.5px;">
-                </div>
-
-                <!-- Instruksi / Petunjuk Pengerjaan -->
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="font-size: 11.5px; font-weight: 800; color: #334155; margin-bottom: 5px; display: block;">Instruksi &amp; Panduan Pengerjaan <span class="required" style="color: #EF4444;">*</span></label>
-                    <textarea id="modalTugasInstructions" rows="3" class="form-control" placeholder="Jelaskan kebutuhan tugas, format file pengumpulan, dan kriteria penilaian..." required style="width: 100%; padding: 7.5px 10px; border-radius: 8px; border: 1px solid rgba(3, 159, 250, 0.25); font-size: 11.5px; resize: vertical;"></textarea>
-                </div>
-
-                <!-- Grid Dua Kolom: Tenggat Waktu & Skor Maksimal -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                    <div>
-                        <label style="font-size: 11.5px; font-weight: 800; color: #334155; margin-bottom: 5px; display: block;">Tenggat Waktu (Deadline) <span class="required" style="color: #EF4444;">*</span></label>
-                        <input type="datetime-local" id="modalTugasDueAt" class="form-control" required style="width: 100%; padding: 7.5px 10px; border-radius: 8px; border: 1px solid rgba(3, 159, 250, 0.25); font-size: 11.5px;">
-                    </div>
-                    <div>
-                        <label style="font-size: 11.5px; font-weight: 800; color: #334155; margin-bottom: 5px; display: block;">Skor Maksimal <span class="required" style="color: #EF4444;">*</span></label>
-                        <input type="number" id="modalTugasMaxScore" class="form-control" min="10" max="100" value="100" required style="width: 100%; padding: 7.5px 10px; border-radius: 8px; border: 1px solid rgba(3, 159, 250, 0.25); font-size: 11.5px;">
-                    </div>
-                </div>
-
-                <!-- Opsi Keterlambatan Pengumpulan -->
-                <div class="form-group" style="margin-bottom: 12px; padding: 7px 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
-                        <input type="checkbox" id="modalTugasAllowLate" checked style="width: 14px; height: 14px; accent-color: #039FFA; cursor: pointer;">
-                        <div>
-                            <strong style="font-size: 11.5px; color: #0F172A; display: block;">Izinkan Pengumpulan Terlambat</strong>
-                            <small style="color: #64748B; font-size: 10px;">Mahasiswa tetap dapat mengunggah berkas setelah deadline (akan ditandai sebagai status terlambat).</small>
+                    <!-- Nilai Maksimal & Status Publikasi -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="modalTugasMaxScore">Nilai Maksimal <span class="required">*</span></label>
+                            <input type="number" id="modalTugasMaxScore" name="max_score" class="form-control" min="1" max="100" required
+                                   value="{{ old('max_score', 100) }}">
+                            @error('max_score') <span class="field-error">{{ $message }}</span> @enderror
                         </div>
-                    </label>
-                </div>
+                        <div class="form-group">
+                            <label for="modalTugasStatus">Status Publikasi <span class="required">*</span></label>
+                            <select id="modalTugasStatus" name="status" class="form-select" required>
+                                <option value="published" @selected(old('status', 'published') === 'published')>Terbit (terlihat mahasiswa)</option>
+                                <option value="draft" @selected(old('status') === 'draft')>Draft (belum terlihat mahasiswa)</option>
+                            </select>
+                            @error('status') <span class="field-error">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
 
-                <!-- Status Publikasi Tugas -->
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label style="font-size: 11.5px; font-weight: 800; color: #334155; margin-bottom: 5px; display: block;">Status Publikasi <span class="required" style="color: #EF4444;">*</span></label>
-                    <div class="status-switch-container">
-                        <label class="status-option-radio selected" id="optRadioPublished">
-                            <input type="radio" name="tugasStatus" value="published" checked>
-                            <div>
-                                <strong style="font-size: 11.5px; display: block; color: #059669;">🚀 Dipublikasikan</strong>
-                                <small style="color: #64748B; font-size: 10px;">Tugas aktif dan langsung dapat dilihat mahasiswa.</small>
-                            </div>
+                    <!-- Izinkan Terlambat -->
+                    <div class="form-group" style="margin-top: 4px;">
+                        <label class="check-row" style="cursor: pointer;">
+                            <input type="checkbox" id="modalTugasAllowLate" name="allow_late" value="1"
+                                   @checked(old('allow_late', true))>
+                            Izinkan pengumpulan terlambat (setelah deadline)
                         </label>
-                        <label class="status-option-radio" id="optRadioDraft">
-                            <input type="radio" name="tugasStatus" value="draft">
-                            <div>
-                                <strong style="font-size: 11.5px; display: block; color: #64748B;">📋 Simpan Draf</strong>
-                                <small style="color: #64748B; font-size: 10px;">Tugas belum terlihat oleh mahasiswa.</small>
-                            </div>
-                        </label>
                     </div>
                 </div>
 
-                <!-- Tombol Submit & Cancel -->
-                <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                    <button type="button" class="btn-icon" id="btnCancelModal" style="padding: 6px 14px; font-size: 11.5px; width: auto; height: auto;">Batal</button>
-                    <button type="submit" class="btn-primary-action" style="font-size: 11.5px; padding: 7px 15px;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div class="dosen-modal-footer">
+                    <button type="button" class="btn-secondary-action" id="btnCancelModal">Batal</button>
+                    <button type="submit" class="btn-primary-action" id="btnSubmitAssignment">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
                         <span id="btnSubmitText">Simpan Tugas</span>
                     </button>
                 </div>
@@ -467,46 +450,10 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP: PRATINJAU PENGUMPULAN MAHASISWA -->
-    <div class="tugas-modal-overlay" id="submissionsModal">
-        <div class="tugas-modal-card modal-card-lg">
-            <div class="tugas-modal-header">
-                <h3>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <span id="subModalTitle">Daftar Pengumpulan Mahasiswa</span>
-                </h3>
-                <button type="button" class="btn-close-modal" id="btnCloseSubmissionsModal">&times;</button>
-            </div>
+    <!-- Toast Notification Container -->
+    <div class="dosen-toast-container" id="toastContainer"></div>
 
-            <div class="tugas-modal-body">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <div>
-                        <strong style="font-size: 13px; color: #0F172A; display: block;" id="subModalCourseText">Mata Kuliah: SI101</strong>
-                        <span style="font-size: 11px; color: #64748B;" id="subModalCountText">Total 18 Mahasiswa telah mengumpulkan tugas ini</span>
-                    </div>
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table class="submissions-table">
-                        <thead>
-                            <tr>
-                                <th>Mahasiswa</th>
-                                <th>Berkas Dikumpulkan</th>
-                                <th>Waktu Kumpul</th>
-                                <th>Status</th>
-                                <th style="text-align: right;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="submissionsTableBody">
-                            <!-- Injected by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script Interaktif Frontend -->
+    <!-- Script Interaktif Frontend & Backend Binding -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentCourseFilter = 'all';
@@ -518,176 +465,28 @@
             const btnCloseModal = document.getElementById('btnCloseModal');
             const btnCancelModal = document.getElementById('btnCancelModal');
             const formTugas = document.getElementById('formTugas');
+            const formMethodField = document.getElementById('formMethodField');
             const modalTitle = document.getElementById('modalTitle');
             const editTugasId = document.getElementById('editTugasId');
             const btnSubmitText = document.getElementById('btnSubmitText');
 
-            const optRadioPublished = document.getElementById('optRadioPublished');
-            const optRadioDraft = document.getElementById('optRadioDraft');
-
-            // Custom Searchable Combobox & Live Preview Dosen
             const modalCourseSelect = document.getElementById('modalCourseSelect');
-            const courseComboboxWrapper = document.getElementById('courseComboboxWrapper');
-            const comboboxSearchInput = document.getElementById('comboboxSearchInput');
-            const comboboxDropdownMenu = document.getElementById('comboboxDropdownMenu');
-            const comboboxEmptyMessage = document.getElementById('comboboxEmptyMessage');
-            const courseLecturerInfoBox = document.getElementById('courseLecturerInfoBox');
-            const courseLecturerName = document.getElementById('courseLecturerName');
-            const courseSksBadge = document.getElementById('courseSksBadge');
+            const modalTugasStatus = document.getElementById('modalTugasStatus');
+            const taskSession = document.getElementById('taskSession');
+            const modalTugasTitle = document.getElementById('modalTugasTitle');
 
-            let highlightedIndex = -1;
-
-            function getVisibleOptions() {
-                return Array.from(document.querySelectorAll('#comboboxOptionsList .combobox-option-item')).filter(el => el.style.display !== 'none');
-            }
-
-            function updateHighlightedOption(visibleItems) {
-                document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(el => el.classList.remove('highlighted'));
-                if (highlightedIndex >= 0 && highlightedIndex < visibleItems.length) {
-                    const target = visibleItems[highlightedIndex];
-                    target.classList.add('highlighted');
-                    target.scrollIntoView({ block: 'nearest' });
-                }
-            }
-
-            function selectCourseItem(item) {
-                highlightedIndex = -1;
-                document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(el => el.classList.remove('highlighted'));
-
-                if (!item) {
-                    modalCourseSelect.value = '';
-                    modalCourseSelect.dataset.code = '';
-                    modalCourseSelect.dataset.name = '';
-                    comboboxSearchInput.value = '';
-                    courseLecturerInfoBox.style.display = 'none';
-                    document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(el => el.classList.remove('selected'));
-                    return;
-                }
-
-                const id = item.dataset.id;
-                const code = item.dataset.code;
-                const name = item.dataset.name;
-                const lecturer = item.dataset.lecturer || 'Belum Ditugaskan';
-                const sks = item.dataset.sks || '3';
-
-                modalCourseSelect.value = id;
-                modalCourseSelect.dataset.code = code;
-                modalCourseSelect.dataset.name = name;
-                comboboxSearchInput.value = `${code} • ${name}`;
-
-                document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(el => el.classList.remove('selected'));
-                item.classList.add('selected');
-
-                courseLecturerName.textContent = lecturer;
-                courseSksBadge.textContent = `${sks} SKS`;
-                courseLecturerInfoBox.style.display = 'flex';
-
-                courseComboboxWrapper.classList.remove('open');
-            }
-
-            document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    selectCourseItem(this);
-                });
-            });
-
-            comboboxSearchInput.addEventListener('input', function() {
-                const q = this.value.toLowerCase().trim();
-                courseComboboxWrapper.classList.add('open');
-                highlightedIndex = -1;
-
-                let matched = 0;
-                document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(item => {
-                    const code = (item.dataset.code || '').toLowerCase();
-                    const name = (item.dataset.name || '').toLowerCase();
-                    const lecturer = (item.dataset.lecturer || '').toLowerCase();
-
-                    if (!q || code.includes(q) || name.includes(q) || lecturer.includes(q)) {
-                        item.style.display = 'flex';
-                        matched++;
-                    } else {
-                        item.style.display = 'none';
+            // Sesi Pertemuan generator
+            if (taskSession) {
+                taskSession.addEventListener('change', function() {
+                    const sessionVal = this.value;
+                    if (sessionVal && (!modalTugasTitle.value || modalTugasTitle.value.startsWith('Tugas Pertemuan'))) {
+                        modalTugasTitle.value = `Tugas Pertemuan ${sessionVal}: `;
+                        modalTugasTitle.focus();
                     }
                 });
+            }
 
-                comboboxEmptyMessage.style.display = matched === 0 ? 'block' : 'none';
-
-                if (!q) {
-                    modalCourseSelect.value = '';
-                    modalCourseSelect.dataset.code = '';
-                    courseLecturerInfoBox.style.display = 'none';
-                }
-            });
-
-            comboboxSearchInput.addEventListener('focus', function() {
-                courseComboboxWrapper.classList.add('open');
-                document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(item => item.style.display = 'flex');
-                comboboxEmptyMessage.style.display = 'none';
-            });
-
-            comboboxSearchInput.addEventListener('click', function() {
-                if (!courseComboboxWrapper.classList.contains('open')) {
-                    courseComboboxWrapper.classList.add('open');
-                    document.querySelectorAll('#comboboxOptionsList .combobox-option-item').forEach(item => item.style.display = 'flex');
-                    comboboxEmptyMessage.style.display = 'none';
-                }
-            });
-
-            comboboxSearchInput.addEventListener('keydown', function(e) {
-                const isOpen = courseComboboxWrapper.classList.contains('open');
-                const visibleItems = getVisibleOptions();
-
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (!isOpen) {
-                        courseComboboxWrapper.classList.add('open');
-                        highlightedIndex = 0;
-                    } else if (visibleItems.length > 0) {
-                        highlightedIndex = (highlightedIndex + 1) % visibleItems.length;
-                    }
-                    updateHighlightedOption(visibleItems);
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (!isOpen) {
-                        courseComboboxWrapper.classList.add('open');
-                        highlightedIndex = visibleItems.length - 1;
-                    } else if (visibleItems.length > 0) {
-                        highlightedIndex = (highlightedIndex - 1 + visibleItems.length) % visibleItems.length;
-                    }
-                    updateHighlightedOption(visibleItems);
-                } else if (e.key === 'Enter') {
-                    if (isOpen && highlightedIndex >= 0 && highlightedIndex < visibleItems.length) {
-                        e.preventDefault();
-                        selectCourseItem(visibleItems[highlightedIndex]);
-                    }
-                } else if (e.key === 'Escape') {
-                    if (isOpen) {
-                        e.preventDefault();
-                        courseComboboxWrapper.classList.remove('open');
-                    }
-                }
-            });
-
-            document.getElementById('comboboxTrigger').addEventListener('click', function(e) {
-                if (e.target !== comboboxSearchInput) {
-                    const isOpen = courseComboboxWrapper.classList.contains('open');
-                    if (isOpen) {
-                        courseComboboxWrapper.classList.remove('open');
-                    } else {
-                        courseComboboxWrapper.classList.add('open');
-                        comboboxSearchInput.focus();
-                    }
-                }
-            });
-
-            document.addEventListener('click', function(e) {
-                if (courseComboboxWrapper && !courseComboboxWrapper.contains(e.target)) {
-                    courseComboboxWrapper.classList.remove('open');
-                }
-            });
-
-            // 1. FILTERING & SEARCH
+            // FILTERING & SEARCH
             function applyFilters() {
                 const cards = document.querySelectorAll('.assignment-card');
                 let visibleCount = 0;
@@ -709,9 +508,9 @@
                     }
                 });
 
-                const emptyState = document.getElementById('tugasEmptyState');
+                const emptyState = document.getElementById('tugasFilterEmptyState');
                 if (emptyState) {
-                    emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+                    emptyState.style.display = (cards.length > 0 && visibleCount === 0) ? 'block' : 'none';
                 }
             }
 
@@ -778,324 +577,142 @@
                 applyFilters();
             };
 
-            // 2. MODAL TOGGLES
+            // MODAL CONTROLS (CREATE & EDIT)
             function openModal(isEdit = false, card = null) {
-                formTugas.reset();
-                editTugasId.value = '';
-
-                // Default due date: 7 hari dari sekarang jam 23:59
-                const d = new Date();
-                d.setDate(d.getDate() + 7);
-                d.setHours(23, 59, 0, 0);
-                const localISODate = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                document.getElementById('modalTugasDueAt').value = localISODate;
-
                 if (isEdit && card) {
-                    modalTitle.querySelector('span').textContent = 'Edit Tugas Perkuliahan';
-                    btnSubmitText.textContent = 'Perbarui Tugas';
+                    if (modalTitle) modalTitle.textContent = 'Edit Tugas Perkuliahan';
+                    if (btnSubmitText) btnSubmitText.textContent = 'Perbarui Tugas';
                     editTugasId.value = card.dataset.id;
-                    document.getElementById('modalTugasTitle').value = card.dataset.title;
-                    document.getElementById('modalTugasInstructions').value = card.dataset.instructions;
+                    formTugas.action = `/admin/tugas/${card.dataset.id}`;
+                    formMethodField.value = 'PUT';
+
+                    if (modalCourseSelect) {
+                        modalCourseSelect.value = card.dataset.courseId || '';
+                    }
+
+                    modalTugasTitle.value = card.dataset.title || '';
+                    document.getElementById('modalTugasInstructions').value = card.dataset.instructions || '';
                     document.getElementById('modalTugasMaxScore').value = card.dataset.score || 100;
                     document.getElementById('modalTugasAllowLate').checked = card.dataset.allowLate == '1';
 
-                    if (card.dataset.due) {
-                        const parsedDate = new Date(card.dataset.due);
-                        if (!isNaN(parsedDate.getTime())) {
-                            const formatted = new Date(parsedDate.getTime() - parsedDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                            document.getElementById('modalTugasDueAt').value = formatted;
-                        }
+                    if (card.dataset.dueDate) {
+                        document.getElementById('modalTugasDueDate').value = card.dataset.dueDate;
+                    }
+                    if (card.dataset.dueTime) {
+                        document.getElementById('modalTugasDueTime').value = card.dataset.dueTime;
                     }
 
-                    const status = card.dataset.status;
-                    if (status === 'draft') {
-                        optRadioDraft.querySelector('input').checked = true;
-                        optRadioDraft.classList.add('selected');
-                        optRadioPublished.classList.remove('selected');
-                    } else {
-                        optRadioPublished.querySelector('input').checked = true;
-                        optRadioPublished.classList.add('selected');
-                        optRadioDraft.classList.remove('selected');
+                    if (taskSession) {
+                        taskSession.value = card.dataset.session || '';
                     }
 
-                    const matchingItem = document.querySelector(`#comboboxOptionsList .combobox-option-item[data-id="${card.dataset.courseId}"]`);
-                    if (matchingItem) {
-                        selectCourseItem(matchingItem);
+                    if (modalTugasStatus) {
+                        modalTugasStatus.value = card.dataset.status || 'published';
                     }
                 } else {
-                    modalTitle.querySelector('span').textContent = 'Buat / Tambah Tugas Baru';
-                    btnSubmitText.textContent = 'Simpan Tugas';
-                    optRadioPublished.querySelector('input').checked = true;
-                    optRadioPublished.classList.add('selected');
-                    optRadioDraft.classList.remove('selected');
-                    selectCourseItem(null);
+                    if (modalTitle) modalTitle.textContent = 'Buat Penugasan Baru';
+                    if (btnSubmitText) btnSubmitText.textContent = 'Simpan Tugas';
+                    formTugas.action = @json(route('admin.tugas.store'));
+                    formMethodField.value = '';
+                    editTugasId.value = '';
+
+                    formTugas.reset();
+
+                    // Set default due date: 7 hari dari sekarang jam 23:59
+                    const d = new Date();
+                    d.setDate(d.getDate() + 7);
+                    const yyyy = d.getFullYear();
+                    const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    document.getElementById('modalTugasDueDate').value = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById('modalTugasDueTime').value = '23:59';
+                    document.getElementById('modalTugasMaxScore').value = 100;
+                    document.getElementById('modalTugasAllowLate').checked = true;
+
+                    if (modalTugasStatus) {
+                        modalTugasStatus.value = 'published';
+                    }
+                    if (modalCourseSelect) {
+                        modalCourseSelect.value = '';
+                    }
+                    if (taskSession) {
+                        taskSession.value = '';
+                    }
                 }
 
+                modalOverlay.classList.add('active');
                 modalOverlay.classList.add('show');
             }
 
             function closeModal() {
+                modalOverlay.classList.remove('active');
                 modalOverlay.classList.remove('show');
-                if (courseComboboxWrapper) {
-                    courseComboboxWrapper.classList.remove('open');
-                }
             }
 
-            btnOpenAddModal.addEventListener('click', () => openModal(false));
-            btnCloseModal.addEventListener('click', closeModal);
-            btnCancelModal.addEventListener('click', closeModal);
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) closeModal();
-            });
-
-            // Radio options styling switch
-            optRadioPublished.addEventListener('click', () => {
-                optRadioPublished.classList.add('selected');
-                optRadioDraft.classList.remove('selected');
-            });
-            optRadioDraft.addEventListener('click', () => {
-                optRadioDraft.classList.add('selected');
-                optRadioPublished.classList.remove('selected');
-            });
-
-            // 3. SUBMIT FORM (CLIENT-SIDE SIMULATION)
-            formTugas.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const courseId = modalCourseSelect.value;
-                if (!courseId) {
-                    alert('Silakan pilih mata kuliah tujuan terlebih dahulu.');
-                    comboboxSearchInput.focus();
-                    courseComboboxWrapper.classList.add('open');
-                    return;
+            if (btnOpenAddModal) {
+                btnOpenAddModal.addEventListener('click', () => openModal(false));
+            }
+            if (btnCloseModal) {
+                btnCloseModal.addEventListener('click', closeModal);
+            }
+            if (btnCancelModal) {
+                btnCancelModal.addEventListener('click', closeModal);
+            }
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === modalOverlay) closeModal();
+                });
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay && (modalOverlay.classList.contains('active') || modalOverlay.classList.contains('show'))) {
+                    closeModal();
                 }
-
-                const courseCode = modalCourseSelect.dataset.code || 'SI101';
-                const courseName = modalCourseSelect.dataset.name || 'Mata Kuliah';
-                const title = document.getElementById('modalTugasTitle').value;
-                const instructions = document.getElementById('modalTugasInstructions').value;
-                const dueAt = document.getElementById('modalTugasDueAt').value;
-                const maxScore = document.getElementById('modalTugasMaxScore').value;
-                const allowLate = document.getElementById('modalTugasAllowLate').checked ? 1 : 0;
-                const isPublished = optRadioPublished.querySelector('input').checked;
-                const status = isPublished ? 'published' : 'draft';
-
-                const dueDateObj = new Date(dueAt);
-                const dueDisplay = dueDateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-                const isEditing = Boolean(editTugasId.value);
-                const grid = document.getElementById('tugasCardsGrid');
-
-                if (isEditing) {
-                    const card = document.querySelector(`.assignment-card[data-id="${editTugasId.value}"]`);
-                    if (card) {
-                        card.dataset.courseId = courseId;
-                        card.dataset.status = status;
-                        card.dataset.title = title;
-                        card.dataset.instructions = instructions;
-                        card.dataset.due = dueAt;
-                        card.dataset.score = maxScore;
-                        card.dataset.allowLate = allowLate;
-
-                        card.querySelector('.badge-mk-code').textContent = courseCode;
-                        const statusBadge = card.querySelector('.badge-status');
-                        statusBadge.className = `badge-status ${isPublished ? 'badge-status-published' : 'badge-status-draft'}`;
-                        statusBadge.innerHTML = `<span>${isPublished ? '●' : '○'}</span><span>${isPublished ? 'Dipublikasikan' : 'Draf'}</span>`;
-
-                        card.querySelector('.assignment-card-title').textContent = title;
-                        card.querySelector('.assignment-course-name span').textContent = `📚 ${courseName}`;
-                        card.querySelector('.assignment-card-desc').textContent = instructions;
-
-                        const deadlineText = card.querySelector('.meta-deadline-text');
-                        if (deadlineText) deadlineText.textContent = dueDisplay;
-                    }
-                    alert('Penugasan berhasil diperbarui!');
-                } else {
-                    const newId = Date.now();
-                    const newCardHtml = `
-                        <div class="assignment-card"
-                             data-id="${newId}"
-                             data-course-id="${courseId}"
-                             data-status="${status}"
-                             data-title="${title}"
-                             data-instructions="${instructions}"
-                             data-due="${dueAt}"
-                             data-score="${maxScore}"
-                             data-allow-late="${allowLate}"
-                             data-submissions="0">
-                            <div>
-                                <div class="assignment-card-top">
-                                    <div class="badge-tag-wrap">
-                                        <span class="badge-mk-code">${courseCode}</span>
-                                        <span class="badge-status ${isPublished ? 'badge-status-published' : 'badge-status-draft'}">
-                                            <span>${isPublished ? '●' : '○'}</span>
-                                            <span>${isPublished ? 'Dipublikasikan' : 'Draf'}</span>
-                                        </span>
-                                    </div>
-                                    <div class="btn-actions">
-                                        <button type="button" class="btn-icon btn-icon-edit btn-edit-tugas" title="Edit Tugas">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                        </button>
-                                        <button type="button" class="btn-icon btn-icon-danger btn-delete-tugas" title="Hapus Tugas">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <h3 class="assignment-card-title">${title}</h3>
-                                <div class="assignment-course-name">
-                                    <span>📚 ${courseName}</span>
-                                </div>
-
-                                <p class="assignment-card-desc">${instructions}</p>
-
-                                <div class="assignment-deadline-row">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                    <span>Deadline:</span>
-                                    <span class="meta-deadline-text">${dueDisplay}</span>
-                                </div>
-                            </div>
-
-                            <div class="assignment-card-footer">
-                                <div class="creator-info">
-                                    <div class="creator-avatar">SA</div>
-                                    <div>
-                                        <span class="creator-name">Super Administrator</span>
-                                    </div>
-                                </div>
-
-                                <button type="button" class="btn-view-submissions" onclick="openSubmissionsModal('${title}', '${courseCode}', 0)">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                    <span>Pengumpulan (0)</span>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    grid.insertAdjacentHTML('afterbegin', newCardHtml);
-                    bindCardEvents(grid.firstElementChild);
-                    alert('Penugasan baru berhasil ditambahkan!');
-                }
-
-                updateStats();
-                applyFilters();
-                closeModal();
             });
 
-            // 4. BIND ACTION BUTTONS (EDIT & DELETE)
-            function bindCardEvents(card) {
+            // Bind Edit Buttons on Cards
+            document.querySelectorAll('.assignment-card').forEach(card => {
                 const btnEdit = card.querySelector('.btn-edit-tugas');
                 if (btnEdit) {
-                    btnEdit.addEventListener('click', () => openModal(true, card));
-                }
-
-                const btnDelete = card.querySelector('.btn-delete-tugas');
-                if (btnDelete) {
-                    btnDelete.addEventListener('click', () => {
-                        if (confirm(`Yakin ingin menghapus penugasan "${card.dataset.title}"?`)) {
-                            card.remove();
-                            updateStats();
-                            applyFilters();
-                        }
+                    btnEdit.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openModal(true, card);
                     });
                 }
-            }
-
-            document.querySelectorAll('.assignment-card').forEach(card => bindCardEvents(card));
-
-            function updateStats() {
-                const cards = document.querySelectorAll('.assignment-card');
-                let total = cards.length;
-                let published = 0;
-                let draft = 0;
-                let submissions = 0;
-
-                cards.forEach(c => {
-                    if (c.dataset.status === 'published') published++;
-                    else draft++;
-                    submissions += parseInt(c.dataset.submissions || '0', 10);
-                });
-
-                document.getElementById('statTotalTugas').textContent = total;
-                document.getElementById('statPublishedTugas').textContent = published;
-                document.getElementById('statDraftTugas').textContent = draft;
-                document.getElementById('statTotalSubmissions').textContent = `${submissions} Berkas`;
-            }
-
-            // 5. MODAL PRATINJAU PENGUMPULAN MAHASISWA
-            const subModal = document.getElementById('submissionsModal');
-            const subModalTitle = document.getElementById('subModalTitle');
-            const subModalCourseText = document.getElementById('subModalCourseText');
-            const subModalCountText = document.getElementById('subModalCountText');
-            const submissionsTableBody = document.getElementById('submissionsTableBody');
-            const btnCloseSubModal = document.getElementById('btnCloseSubmissionsModal');
-
-            window.openSubmissionsModal = function(title, code, count) {
-                subModalTitle.textContent = `Daftar Pengumpulan: ${title}`;
-                subModalCourseText.textContent = `Mata Kuliah: ${code}`;
-                subModalCountText.textContent = `Total ${count} Mahasiswa telah mengumpulkan berkas tugas ini`;
-
-                // Dummy data mahasiswa yang mengumpulkan
-                if (count === 0) {
-                    submissionsTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px; color: #94A3B8;">
-                                Belum ada berkas tugas yang dikumpulkan oleh mahasiswa.
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    const mockStudents = [
-                        { name: 'Ahmad Fauzi', nim: '230101001', file: 'Tugas_AhmadFauzi.pdf', time: 'Hari ini, 14:20', isLate: false },
-                        { name: 'Siti Nurhaliza', nim: '230101014', file: 'Laporan_Siti_Rev1.docx', time: 'Kemarin, 21:05', isLate: false },
-                        { name: 'Budi Santoso', nim: '230101032', file: 'Proyek_Budi.zip', time: '2 hari lalu, 18:45', isLate: false },
-                        { name: 'Rizky Pratama', nim: '230101045', file: 'Tugas02_Rizky.pdf', time: '3 hari lalu, 08:15', isLate: true },
-                    ];
-
-                    let html = '';
-                    mockStudents.forEach(s => {
-                        const lateBadge = s.isLate
-                            ? '<span style="background: #FEF2F2; color: #DC2626; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;">Terlambat</span>'
-                            : '<span style="background: #ECFDF5; color: #059669; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;">Tepat Waktu</span>';
-
-                        html += `
-                            <tr>
-                                <td>
-                                    <div class="student-info-cell">
-                                        <div class="student-avatar">${s.name.substring(0, 2).toUpperCase()}</div>
-                                        <div class="student-meta">
-                                            <strong>${s.name}</strong>
-                                            <small>${s.nim}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <strong style="font-size: 11.5px; color: #039FFA; display: block;">${s.file}</strong>
-                                    <small style="color: #64748B; font-size: 10px;">2.4 MB</small>
-                                </td>
-                                <td style="font-size: 11px; color: #475569;">${s.time}</td>
-                                <td>${lateBadge}</td>
-                                <td style="text-align: right;">
-                                    <button type="button" class="btn-primary-action" style="padding: 4px 9px; font-size: 10.5px;" onclick="alert('Mengunduh berkas simulasi: ${s.file}')">
-                                        Unduh
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    submissionsTableBody.innerHTML = html;
-                }
-
-                subModal.classList.add('show');
-            };
-
-            function closeSubmissionsModal() {
-                subModal.classList.remove('show');
-            }
-
-            btnCloseSubModal.addEventListener('click', closeSubmissionsModal);
-            subModal.addEventListener('click', (e) => {
-                if (e.target === subModal) closeSubmissionsModal();
             });
+
+            // Toast Notifications
+            function showToast(message, isSuccess = true) {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                toast.className = 'dosen-toast';
+                if (!isSuccess) toast.style.borderLeftColor = '#EF4444';
+
+                const icon = `
+                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#10B981' : '#EF4444'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>`;
+                toast.innerHTML = icon;
+
+                const text = document.createElement('span');
+                text.textContent = message;
+                toast.appendChild(text);
+
+                container.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 50);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 350);
+                }, 3500);
+            }
+
+            @if (session('success'))
+                showToast(@json(session('success')), true);
+            @endif
+            @if (session('error'))
+                showToast(@json(session('error')), false);
+            @endif
         });
     </script>
 </body>
