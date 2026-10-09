@@ -1,0 +1,570 @@
+/* ==========================================================================
+   ADMIN.NILAI.CSS — Rekapitulasi Nilai & Evaluasi Mahasiswa (Portal Admin)
+   Standar Visual: 100% Selaras dengan admin.common.css, admin.materi.css, admin.pendaftaran.css
+   ========================================================================== */
+
+@import './admin.common.css';
+
+/* Badges Header Khusus */
+.badges-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.badge-blue {
+    background: #EFF6FF;
+    color: var(--admin-primary);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 800;
+    border: 1px solid rgba(3, 159, 250, 0.25);
+    display: inline-flex;
+    align-items: center;
+}
+
+.badge-green {
+    background: #ECFDF5;
+    color: var(--admin-success);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 800;
+    border: 1px solid #A7F3D0;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ==========================================================================
+   Baris Statistik Cepat (Identik dengan materi-stats-bar)
+   ========================================================================== */
+.nilai-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.nilai-stat-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 14px -3px rgba(3, 159, 250, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nilai-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(3, 159, 250, 0.1);
+}
+
+.nilai-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-blue {
+    background: rgba(3, 159, 250, 0.1);
+    color: #039FFA;
+}
+
+.icon-green {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+}
+
+.icon-orange {
+    background: rgba(245, 158, 11, 0.12);
+    color: #D97706;
+}
+
+.icon-gold {
+    background: rgba(249, 184, 4, 0.15);
+    color: #D97706;
+}
+
+.nilai-stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.nilai-stat-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--admin-muted);
+    margin-bottom: 2px;
+}
+
+.nilai-stat-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--admin-text);
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   Toolbar Filter & Pencarian (Identik dengan materi-filter-toolbar)
+   ========================================================================== */
+.nilai-filter-toolbar {
+    background: #FFFFFF;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 14px -3px rgba(3, 159, 250, 0.06);
+}
+
+.nilai-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+    min-width: 220px;
+}
+
+.nilai-search-box input {
+    width: 100%;
+    padding: 8px 14px 8px 36px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(3, 159, 250, 0.22);
+    font-size: 12.5px;
+    font-weight: 600;
+    background: #F8FAFC;
+    color: var(--admin-text);
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.nilai-search-box input:focus {
+    background: #FFFFFF;
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.nilai-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-muted);
+    pointer-events: none;
+}
+
+.toolbar-right-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.filter-select-wrapper {
+    position: relative;
+    min-width: 210px;
+}
+
+.filter-select-wrapper.filter-type-wrapper {
+    min-width: 160px;
+}
+
+.filter-select-wrapper select {
+    width: 100%;
+    padding: 8px 32px 8px 12px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(3, 159, 250, 0.22);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--admin-text);
+    background: #F8FAFC;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.filter-select-wrapper select:focus {
+    background: #FFFFFF;
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.15);
+}
+
+.filter-select-arrow {
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--admin-muted);
+    display: flex;
+    align-items: center;
+}
+
+/* ==========================================================================
+   Tabel Scrollable & Sticky Header (Identik dengan admin.pendaftaran & admin.pengguna)
+   ========================================================================== */
+.table-scrollable {
+    max-height: 560px;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid rgba(3, 159, 250, 0.16);
+    border-radius: 14px;
+    background: #FFFFFF;
+}
+
+.table-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #F8FAFC !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.td-mk-name {
+    font-weight: 800 !important;
+    color: var(--admin-text) !important;
+}
+
+.nilai-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.nilai-row:hover {
+    background-color: rgba(3, 159, 250, 0.04);
+}
+
+/* Grade Pills */
+.grade-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    padding: 1.5px 6px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 800;
+}
+
+.grade-pill-a {
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #A7F3D0;
+}
+
+.grade-pill-b {
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #BFDBFE;
+}
+
+.grade-pill-c {
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+}
+
+.grade-pill-d,
+.grade-pill-e {
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.grade-pill-pending {
+    background: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+    font-size: 10px;
+}
+
+/* Tombol Aksi Rincian */
+.btn-action-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #F0F9FF;
+    color: var(--admin-primary);
+    border: 1px solid rgba(3, 159, 250, 0.3);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-action-view:hover {
+    background: var(--admin-primary);
+    color: #FFFFFF;
+    border-color: var(--admin-primary);
+    box-shadow: 0 2px 6px rgba(3, 159, 250, 0.25);
+}
+
+/* ==========================================================================
+   Modal Lembar Nilai & Feedback
+   (Desain Bersih: Hanya Tombol Tutup 'x' di Header, Tanpa Tombol Ganda di Bawah)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content-nilai {
+    background: #FFFFFF;
+    width: 100%;
+    max-width: 560px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.22);
+    overflow: hidden;
+    border: 1px solid rgba(3, 159, 250, 0.2);
+    animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header-nilai {
+    background: linear-gradient(135deg, #039FFA 0%, #0284C7 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #FFFFFF;
+}
+
+.modal-header-nilai h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close-modal {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #FFFFFF;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: all 0.15s ease;
+}
+
+.btn-close-modal:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body-nilai {
+    padding: 20px 22px;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.grade-sheet-hero {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 14px;
+}
+
+.sheet-student-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sheet-score-badge {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.sheet-score-val {
+    font-size: 24px;
+    font-weight: 900;
+    color: #0284C7;
+    line-height: 1;
+    font-family: ui-monospace, monospace;
+}
+
+.sheet-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.meta-field-box {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 9px 12px;
+}
+
+.meta-field-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--admin-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+}
+
+.meta-field-val {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+
+.feedback-detail-box {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: 11px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+}
+
+.feedback-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #166534;
+}
+
+.feedback-detail-text {
+    font-size: 12px;
+    color: #14532D;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.submission-file-box {
+    background: #F8FAFC;
+    border: 1px dashed #CBD5E1;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.file-info-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-icon {
+    color: var(--admin-primary);
+}
+
+.file-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+
+.file-size {
+    font-size: 10.5px;
+    color: var(--admin-muted);
+}
+
+/* Toast */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #0F172A;
+    color: #FFFFFF;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1100;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Responsif */
+@media (max-width: 1024px) {
+    .nilai-stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .nilai-stats-bar {
+        grid-template-columns: 1fr;
+    }
+    .sheet-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}

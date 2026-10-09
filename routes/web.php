@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminAssignmentController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\AdminMaterialController;
+use App\Http\Controllers\Admin\AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
@@ -138,6 +139,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/tugas/{assignment}', [AdminAssignmentController::class, 'destroy'])->name('tugas.destroy');
 
         Route::get('/nilai', [AdminGradeController::class, 'index'])->name('nilai');
+        Route::get('/pendaftaran', [AdminStudentController::class, 'index'])->name('pendaftaran');
+        Route::post('/pendaftaran', [AdminStudentController::class, 'store'])->name('pendaftaran.store');
+        Route::delete('/pendaftaran/{course}/{student}', [AdminStudentController::class, 'destroy'])->name('pendaftaran.destroy');
     });
 
 });

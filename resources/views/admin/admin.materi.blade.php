@@ -49,7 +49,8 @@
             </header>
 
             @php
-                $coursesList = \App\Models\Course::with('lecturer')->orderBy('code')->get();
+                $materials = $materials ?? \App\Models\Material::with(['course', 'uploader'])->latest()->get();
+                $coursesList = $coursesList ?? \App\Models\Course::with('lecturer')->orderBy('code')->get();
                 $totalDoc = $materials->where('type', 'file')->count();
                 $totalLink = $materials->where('type', 'link')->count();
             @endphp

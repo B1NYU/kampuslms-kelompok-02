@@ -83,25 +83,33 @@
         $roleTag = $nip ? 'NIP: ' . $nip : ($authUser ? ucfirst($authUser->role ?? 'Dosen Pengampu') : 'Dosen Pengampu');
     @endphp
 
-    <!-- Kanan: Identitas Dosen & Tombol Logout -->
+    <!-- Kanan: Identitas Dosen dengan Dropdown Profil untuk Fitur Keluar -->
     <div class="navbar-right-group">
-        <div class="dosen-avatar-badge">
-            <div class="dosen-avatar">{{ $initials }}</div>
-            <div class="dosen-badge-info">
-                <span class="dosen-name">{{ $authName }}</span>
-                <span class="dosen-role-tag">{{ $roleTag }}</span>
+        <div class="dosen-profile-wrapper" style="position: relative;">
+            <div class="dosen-avatar-badge" id="dosenProfileTrigger" style="cursor: pointer; user-select: none;" title="Buka menu profil">
+                <div class="dosen-avatar">{{ $initials }}</div>
+                <div class="dosen-badge-info">
+                    <span class="dosen-name">{{ $authName }}</span>
+                    <span class="dosen-role-tag">{{ $roleTag }}</span>
+                </div>
+                <svg class="dosen-profile-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 2px; color: var(--dosen-muted); transition: transform 0.2s ease;">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+
+            <!-- Extension / Dropdown Profil untuk Fitur Keluar -->
+            <div class="dosen-profile-dropdown" id="dosenProfileDropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 8px); background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); padding: 8px; min-width: 140px; z-index: 1000;">
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+                <a href="#" class="btn-logout" title="Keluar dari Portal Dosen" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="width: 100%; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Logout</span>
+                </a>
             </div>
         </div>
-
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
-        <a href="#" class="btn-logout" title="Keluar dari Portal Dosen" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            <span>Logout</span>
-        </a>
     </div>
 </nav>
 
@@ -118,3 +126,29 @@
         <button onclick="this.parentElement.style.display='none'" style="background: transparent; border: none; color: #991b1b; cursor: pointer; font-size: 16px; font-weight: bold;">&times;</button>
     </div>
 @endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileTrigger = document.getElementById('dosenProfileTrigger');
+        const profileDropdown = document.getElementById('dosenProfileDropdown');
+        const profileChevron = profileTrigger ? profileTrigger.querySelector('.dosen-profile-chevron') : null;
+
+        if (profileTrigger && profileDropdown) {
+            profileTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = profileDropdown.style.display === 'block';
+                profileDropdown.style.display = isOpen ? 'none' : 'block';
+                if (profileChevron) {
+                    profileChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.style.display = 'none';
+                    if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    });
+</script>

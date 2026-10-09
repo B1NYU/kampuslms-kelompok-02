@@ -27,34 +27,41 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PANEL ADMIN • PENDAFTARAN MATA KULIAH
-                        </span>
                         <h1>Pendaftaran Mahasiswa ke Mata Kuliah</h1>
                     </div>
                 </div>
             </header>
 
+            {{-- Pesan hasil aksi. Hapus blok ini kalau <x-navbar-admin /> sudah menampilkannya (agar tidak dobel). --}}
+            @if (session('success'))
+                <div style="background:#ECFDF5; border:1px solid #A7F3D0; color:#047857; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:700; margin-bottom:14px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if ($errors->any())
+                <div style="background:#FEF2F2; border:1px solid #FECACA; color:#B91C1C; border-radius:10px; padding:10px 14px; font-size:13px; font-weight:700; margin-bottom:14px;">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
+
             <!-- Fitur: Pendaftaran -->
             <section>
                 @php
-                    $coursesList = \App\Models\Course::with(['lecturer', 'students'])->get();
-                    $mahasiswaList = \App\Models\User::where('role', 'mahasiswa')->orderBy('name')->get();
+                    // $courses, $mahasiswaList, $selectedCode dikirim AdminEnrollmentController.
                     $allEnrollments = collect();
-                    foreach ($coursesList as $course) {
+                    foreach ($courses as $course) {
                         foreach ($course->students as $student) {
-                            $allEnrollments->push([
-                                'mhs' => $student->name,
-                                'nim' => $student->nim_nip,
-                                'mk' => $course->code . ' • ' . $course->name,
-                                'mk_code' => $course->code,
-                                'kelas' => 'SI-A',
-                                'smt' => 'Genap 2026',
-                                'dosen' => $course->lecturer?->name ?? 'Dosen Pengampu',
-                            ]);
+                            $allEnrollments->push(['course' => $course, 'student' => $student]);
                         }
                     }
+
+                    // Hanya MK aktif yang bisa dipilih untuk pendaftaran baru.
+                    $activeCourses = $courses->where('status', 'active');
+
+                    // Kriteria 4.4: tiap MK >= 15 mahasiswa.
+                    $kurang15 = $courses->filter(fn ($c) => $c->students_count < 15)->count();
                 @endphp
                 <div class="section-card">
                     <div class="section-header">
@@ -68,23 +75,14 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Daftarkan Mahasiswa ke Mata Kuliah</h2>
-                                <p>Admin dapat mendaftarkan mahasiswa ke mata kuliah aktif. Sesuai Kriteria 4.4, tiap mata kuliah memiliki &ge; 15 mahasiswa terdaftar.</p>
-                                <div class="badges-container">
-                                    <span class="badge-blue">
-                                        ✓ Tiap MK &ge; 15 Mahasiswa Terdaftar
-                                    </span>
-                                    <span class="badge-green">
-                                        Total {{ $allEnrollments->count() }} Pendaftaran Terdata
-                                    </span>
-                                </div>
                             </div>
                         </div>
-                        <span class="section-header-badge">Kelola Enrollment</span>
                     </div>
 
                     <div class="two-col-grid">
                         <!-- Form Pendaftaran -->
-                        <form id="formEnroll" class="card-form">
+                        <form id="formEnroll" class="card-form" method="POST" action="{{ route('admin.pendaftaran.store') }}">
+                            @csrf
                             <h4 class="card-form-title">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
@@ -96,41 +94,22 @@
 
                             <div class="form-group">
                                 <label for="enrollMahasiswa">Pilih Mahasiswa <span class="required">*</span></label>
-                                <select id="enrollMahasiswa" class="form-select" required>
+                                <select id="enrollMahasiswa" name="student_id" class="form-select" required>
                                     <option value="">— Pilih Mahasiswa ({{ $mahasiswaList->count() }} Terdaftar) —</option>
                                     @foreach ($mahasiswaList as $mhs)
-                                        <option value="{{ $mhs->name }}|{{ $mhs->nim_nip }}">{{ $mhs->name }} ({{ $mhs->nim_nip }})</option>
+                                        <option value="{{ $mhs->id }}" @selected((int) old('student_id') === $mhs->id)>{{ $mhs->name }} ({{ $mhs->nim_nip }})</option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label for="enrollMatkul">Pilih Mata Kuliah <span class="required">*</span></label>
-                                <select id="enrollMatkul" class="form-select" required>
+                                <select id="enrollMatkul" name="course_id" class="form-select" required>
                                     <option value="">— Pilih Mata Kuliah —</option>
-                                    @foreach ($coursesList as $c)
-                                        <option value="{{ $c->code }} • {{ $c->name }}">{{ $c->code }} • {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)</option>
+                                    @foreach ($activeCourses as $c)
+                                        <option value="{{ $c->id }}" @selected((int) old('course_id') === $c->id)>{{ $c->code }} • {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students_count }} Mhs)</option>
                                     @endforeach
                                 </select>
-                            </div>
-
-                            <div class="form-row-2">
-                                <div class="form-group">
-                                    <label for="enrollKelas">Kelas <span class="required">*</span></label>
-                                    <select id="enrollKelas" class="form-select" required>
-                                        <option value="SI-A">SI-A</option>
-                                        <option value="SI-B">SI-B</option>
-                                        <option value="TI-A">TI-A</option>
-                                        <option value="TI-B">TI-B</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="enrollSemester">Semester</label>
-                                    <select id="enrollSemester" class="form-select">
-                                        <option value="Genap 2026" selected>Genap 2026</option>
-                                        <option value="Ganjil 2026">Ganjil 2026</option>
-                                    </select>
-                                </div>
                             </div>
 
                             <button type="submit" class="btn-primary-action">
@@ -156,12 +135,12 @@
 
                             <!-- Filter per Mata Kuliah -->
                             <div class="filter-mk-container">
-                                <button type="button" class="btn-filter-mk active" data-mk="all">
+                                <button type="button" class="btn-filter-mk {{ $selectedCode === 'all' ? 'active' : '' }}" data-mk="all">
                                     Semua MK ({{ $allEnrollments->count() }})
                                 </button>
-                                @foreach ($coursesList as $c)
-                                    <button type="button" class="btn-filter-mk" data-mk="{{ $c->code }}">
-                                        {{ $c->code }} ({{ $c->students->count() }})
+                                @foreach ($courses as $c)
+                                    <button type="button" class="btn-filter-mk {{ $selectedCode === $c->code ? 'active' : '' }}" data-mk="{{ $c->code }}">
+                                        {{ $c->code }} ({{ $c->students_count }})
                                     </button>
                                 @endforeach
                             </div>
@@ -172,46 +151,54 @@
                                         <tr class="table-header-sticky">
                                             <th>Mahasiswa</th>
                                             <th>Mata Kuliah</th>
-                                            <th>Kelas</th>
-                                            <th>Semester</th>
+                                            <th>Tanggal Daftar</th>
                                             <th style="text-align:right;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="enrollTableBody">
                                         @forelse ($allEnrollments as $e)
                                         @php
-                                            $inits = collect(explode(' ', $e['mhs']))->map(fn($w)=>mb_substr($w,0,1))->join('');
+                                            $mhs   = $e['student'];
+                                            $mk    = $e['course'];
+                                            $inits = collect(explode(' ', $mhs->name))->map(fn ($w) => mb_substr($w, 0, 1))->join('');
                                             $inits = strtoupper(mb_substr($inits, 0, 2));
+                                            $tgl   = $mhs->pivot->enrolled_at
+                                                ? \Illuminate\Support\Carbon::parse($mhs->pivot->enrolled_at)->translatedFormat('d M Y')
+                                                : '-';
                                         @endphp
-                                        <tr data-mk="{{ $e['mk_code'] }}">
+                                        <tr data-mk="{{ $mk->code }}">
                                             <td>
                                                 <div class="user-cell">
                                                     <div class="user-avatar avatar-green">
                                                         {{ $inits }}
                                                     </div>
                                                     <div class="user-meta">
-                                                        <span class="user-name">{{ $e['mhs'] }}</span>
-                                                        <span class="user-id">{{ $e['nim'] }}</span>
+                                                        <span class="user-name">{{ $mhs->name }}</span>
+                                                        <span class="user-id">{{ $mhs->nim_nip }}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="td-mk-name">
-                                                <div>{{ $e['mk'] }}</div>
-                                                <small class="td-dosen-name">Dosen: {{ $e['dosen'] }}</small>
+                                                <div>{{ $mk->code }} • {{ $mk->name }}</div>
+                                                <small class="td-dosen-name">Dosen: {{ $mk->lecturer?->name ?? 'Belum ada dosen' }}</small>
                                             </td>
-                                            <td><span class="card-subtitle-tag tag-kelas">{{ $e['kelas'] }}</span></td>
-                                            <td class="td-semester">{{ $e['smt'] }}</td>
+                                            <td class="td-semester">{{ $tgl }}</td>
                                             <td>
                                                 <div class="btn-actions">
-                                                    <button class="btn-icon btn-icon-danger btn-delete-enroll" title="Batalkan pendaftaran">
-                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                                                    </button>
+                                                    <form method="POST" action="{{ route('admin.pendaftaran.destroy', [$mk, $mhs]) }}" style="margin:0; display:inline;"
+                                                          onsubmit="return confirm('Batalkan pendaftaran {{ e($mhs->name) }} dari {{ e($mk->code) }}?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn-icon btn-icon-danger btn-delete-enroll" title="Batalkan pendaftaran">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="5" class="td-empty">Belum ada pendaftaran mata kuliah.</td>
+                                            <td colspan="4" class="td-empty">Belum ada pendaftaran mata kuliah.</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -228,25 +215,28 @@
     </div>
 
     <script>
-        let currentMkFilter = 'all';
+        // Filter MK awal berasal dari server (?mk=KODE), default 'all'
+        let currentMkFilter = @json($selectedCode);
 
         function applyEnrollFilters() {
             const q = (document.getElementById('searchEnrollInput')?.value || '').toLowerCase().trim();
-            document.querySelectorAll('#enrollTableBody tr[data-mk]').forEach(row => {
-                const mk = row.dataset.mk;
-                const matchMk = (currentMkFilter === 'all' || mk === currentMkFilter);
-                const text = row.textContent.toLowerCase();
-                const matchSearch = !q || text.includes(q);
+            let visible = 0;
 
-                row.style.display = (matchMk && matchSearch) ? '' : 'none';
+            document.querySelectorAll('#enrollTableBody tr[data-mk]').forEach(row => {
+                const matchMk = (currentMkFilter === 'all' || row.dataset.mk === currentMkFilter);
+                const matchSearch = !q || row.textContent.toLowerCase().includes(q);
+                const show = matchMk && matchSearch;
+
+                row.style.display = show ? '' : 'none';
+                if (show) visible++;
             });
+
+            document.getElementById('enrollCount').textContent = visible;
         }
 
         document.querySelectorAll('.btn-filter-mk').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.btn-filter-mk').forEach(b => {
-                    b.classList.remove('active');
-                });
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.btn-filter-mk').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
 
                 currentMkFilter = this.dataset.mk;
@@ -256,42 +246,8 @@
 
         document.getElementById('searchEnrollInput').addEventListener('input', applyEnrollFilters);
 
-        document.getElementById('formEnroll').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const mhsRaw = document.getElementById('enrollMahasiswa').value;
-            const mk     = document.getElementById('enrollMatkul').value;
-            const kelas  = document.getElementById('enrollKelas').value;
-            const smt    = document.getElementById('enrollSemester').value;
-            if (!mhsRaw || !mk) return;
-
-            const [mhs, nim] = mhsRaw.split('|');
-            const inits = mhs.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-
-            const tbody = document.getElementById('enrollTableBody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><div class="user-cell"><div class="user-avatar avatar-red">${inits}</div><div class="user-meta"><span class="user-name">${mhs}</span><span class="user-id">${nim}</span></div></div></td>
-                <td class="td-mk-name">${mk}</td>
-                <td><span class="card-subtitle-tag tag-kelas">${kelas}</span></td>
-                <td class="td-semester">${smt}</td>
-                <td><div class="btn-actions"><button class="btn-icon btn-icon-danger btn-delete-enroll"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></button></div></td>`;
-            tbody.prepend(tr);
-            document.getElementById('enrollCount').textContent = tbody.rows.length;
-            this.reset();
-            bindEnrollDeleteButtons();
-        });
-
-        function bindEnrollDeleteButtons() {
-            document.querySelectorAll('.btn-delete-enroll').forEach(btn => {
-                btn.onclick = function() {
-                    if (confirm('Batalkan pendaftaran ini?')) {
-                        this.closest('tr').remove();
-                        document.getElementById('enrollCount').textContent = document.getElementById('enrollTableBody').rows.length;
-                    }
-                };
-            });
-        }
-        bindEnrollDeleteButtons();
+        // Terapkan filter awal saat halaman dimuat
+        applyEnrollFilters();
     </script>
 </body>
 </html>
