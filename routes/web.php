@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\AdminAssignmentController;
 use App\Http\Controllers\Admin\AdminCourseController;
-use App\Http\Controllers\Admin\AdminGradeController;
 use App\Http\Controllers\Admin\AdminMaterialController;
 use App\Http\Controllers\Admin\AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -118,9 +117,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/mata-kuliah/{matkul}', [AdminCourseController::class, 'update'])->name('matkul.update');
         Route::delete('/mata-kuliah/{matkul}', [AdminCourseController::class, 'destroy'])->name('matkul.destroy');
 
-        Route::get('/pendaftaran', [AdminStudentController::class, 'index'])->name('pendaftaran');
-        Route::post('/pendaftaran', [AdminStudentController::class, 'store'])->name('pendaftaran.store');
-        Route::delete('/pendaftaran/{course}/{student}', [AdminStudentController::class, 'destroy'])->name('pendaftaran.destroy');
+        Route::get('/pendaftaran', function () {
+            return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));
+        })->name('pendaftaran');
 
         Route::get('/materi', [AdminMaterialController::class, 'index'])->name('materi');
         Route::post('/materi', [AdminMaterialController::class, 'store'])->name('materi.store');
@@ -133,7 +132,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/tugas/{assignment}', [AdminAssignmentController::class, 'update'])->name('tugas.update');
         Route::delete('/tugas/{assignment}', [AdminAssignmentController::class, 'destroy'])->name('tugas.destroy');
 
-        Route::get('/nilai', [AdminGradeController::class, 'index'])->name('nilai');
+        Route::get('/pendaftaran', [AdminStudentController::class, 'index'])->name('pendaftaran');
+        Route::post('/pendaftaran', [AdminStudentController::class, 'store'])->name('pendaftaran.store');
+        Route::delete('/pendaftaran/{course}/{student}', [AdminStudentController::class, 'destroy'])->name('pendaftaran.destroy');
     });
 
 });
