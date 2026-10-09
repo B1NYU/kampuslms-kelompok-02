@@ -15,7 +15,7 @@
 .admin-navbar {
     background: #FFFFFF;
     border-bottom: 1px solid rgba(3, 159, 250, 0.18);
-    padding: 0 36px;
+    padding: 0 16px;
     height: 64px;
     width: 100%;
     display: flex;
@@ -38,7 +38,7 @@
 .navbar-left-group {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 16px;
 }
 
 .navbar-brand {

@@ -28,6 +28,7 @@ export default defineConfig({
                 'resources/css/admin/admin.pendaftaran.css',
                 'resources/css/admin/admin.materi.css',
                 'resources/css/admin/admin.tugas.css',
+                'resources/css/admin/admin.nilai.css',
                 // Fallbacks & JS
                 'resources/css/welcome.css',
                 'resources/css/index.css',

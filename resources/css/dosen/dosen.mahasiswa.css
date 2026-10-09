@@ -12,24 +12,13 @@
     gap: 16px;
 }
 
-.page-title .table-summary-info {
-    font-size: 13px;
-    font-weight: 600;
-    color: #64748B;
-}
-
-.page-title .table-summary-info strong {
-    color: #039FFA;
-    font-weight: 800;
-}
-
-/* Toolbar Row: Search di Kiri, Filter MK di sebelah kiri Tombol Daftarkan Mahasiswa */
+/* Toolbar Row di Luar Card Utama: Search di Kiri, Filter MK & Tombol Daftarkan di Kanan */
 .table-toolbar-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     flex-wrap: wrap;
 }
 
@@ -54,6 +43,11 @@
     box-shadow: 0 0 0 3px rgba(3, 159, 250, 0.12);
 }
 
+.table-toolbar-row .search-input-box svg {
+    color: #94A3B8;
+    flex-shrink: 0;
+}
+
 .table-toolbar-row .search-input-box input {
     border: none;
     background: transparent;
@@ -72,14 +66,18 @@
 }
 
 .toolbar-right-group .course-filter-bar {
+    position: relative;
     margin: 0;
     display: flex;
     align-items: center;
 }
 
 .toolbar-right-group .course-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     height: 44px;
-    padding: 0 16px;
+    padding: 0 36px 0 16px;
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
     border-radius: 12px;
@@ -97,6 +95,13 @@
     outline: none;
 }
 
+.toolbar-right-group .course-chevron {
+    position: absolute;
+    right: 14px;
+    pointer-events: none;
+    color: #64748B;
+}
+
 .toolbar-right-group .btn-primary-action {
     height: 44px;
     padding: 0 20px;
@@ -107,6 +112,105 @@
     font-size: 13.5px;
     font-weight: 800;
     white-space: nowrap;
+}
+
+/* Card Utama Bagian Tabel */
+#kelola-mahasiswa .section-card {
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+}
+
+/* Header di dalam Card Tabel (Mirip 'All Deals' & 'Sort by: Latest') */
+.table-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1.5px solid #F1F5F9;
+    background: #FFFFFF;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.table-card-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.table-card-header-left .table-summary-info {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #475569;
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.table-card-header-left .table-summary-info strong {
+    color: #039FFA;
+    font-weight: 800;
+}
+
+.table-card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Sort Control (Mirip 'Sort by: Latest v') */
+.sort-control-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+    white-space: nowrap;
+}
+
+.sort-select-box {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    border: none;
+    color: #0F172A;
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 4px 22px 4px 4px;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+    transition: color 0.15s ease;
+}
+
+.sort-select:hover,
+.sort-select:focus {
+    color: #039FFA;
+}
+
+.sort-chevron {
+    position: absolute;
+    right: 2px;
+    pointer-events: none;
+    color: #64748B;
+}
+
+.sort-select:focus + .sort-chevron {
+    color: #039FFA;
 }
 
 /* Style Tabel Pemisah Garis Sesuai Gambar Referensi (Tanpa Efek Kartu) */
@@ -123,15 +227,15 @@
     color: #64748B !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
-    padding: 16px 18px !important;
+    padding: 16px 24px !important;
     text-align: left !important;
     border: none !important;
     border-bottom: 1.5px solid #E2E8F0 !important;
-    background: transparent !important;
+    background: #FAFAFC !important;
 }
 
 .table-clean-style td {
-    padding: 18px 18px !important;
+    padding: 18px 24px !important;
     background: transparent !important;
     font-size: 13.5px !important;
     font-weight: 600 !important;
@@ -161,8 +265,8 @@
 }
 
 .student-avatar {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -176,15 +280,20 @@
     font-size: 13.5px;
     font-weight: 800;
     color: #0F172A;
-    display: block;
+    display: inline-block;
 }
 
 .student-nim {
-    font-size: 12px;
-    color: #64748B;
-    font-weight: 600;
-    display: block;
-    margin-top: 2px;
+    font-size: 12.5px;
+    color: #475569;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 3px 9px;
+    border-radius: 6px;
+    display: inline-block;
+    letter-spacing: 0.03em;
 }
 
 .badge-status-active {

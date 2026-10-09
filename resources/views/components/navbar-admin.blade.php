@@ -76,10 +76,19 @@
                         Tugas Kuliah
                     </a>
                 </li>
+                <li class="{{ request()->is('admin/nilai') ? 'active' : '' }}">
+                    <a href="{{ Route::has('admin.nilai') ? route('admin.nilai') : url('/admin/nilai') }}" class="nav-link-admin">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="7"></circle>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                        Rekap Nilai
+                    </a>
+                </li>
             </ul>
         </div>
 
-        <!-- Kanan: Identitas Admin & Tombol Logout -->
+        <!-- Kanan: Identitas Admin dengan Menu Dropdown Keluar -->
         <div class="navbar-right-group">
             @php
                 $adminUser = auth()->user();
@@ -87,23 +96,31 @@
                 $words = explode(' ', trim($adminName));
                 $initials = strtoupper(substr($words[0] ?? 'A', 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : 'D'));
             @endphp
-            <div class="admin-avatar-badge">
-                <div class="admin-avatar">{{ $initials }}</div>
-                <div class="admin-badge-info">
-                    <span class="admin-name">{{ $adminName }}</span>
-                    <span class="admin-role-tag">Akses Penuh Sistem</span>
+            <div class="admin-profile-wrapper" style="position: relative;">
+                <div class="admin-avatar-badge" id="adminProfileTrigger" style="cursor: pointer; user-select: none;" title="Buka menu profil">
+                    <div class="admin-avatar">{{ $initials }}</div>
+                    <div class="admin-badge-info">
+                        <span class="admin-name">{{ $adminName }}</span>
+                        <span class="admin-role-tag">Akses Penuh Sistem</span>
+                    </div>
+                    <svg class="admin-profile-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 2px; color: var(--admin-muted); transition: transform 0.2s ease;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <!-- Extension / Dropdown Profil untuk Fitur Keluar -->
+                <div class="admin-profile-dropdown" id="adminProfileDropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 8px); background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); padding: 8px; min-width: 140px; z-index: 1000;">
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+                    <a href="#" class="btn-logout" title="Keluar dari Portal Admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="width: 100%; justify-content: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Logout</span>
+                    </a>
                 </div>
             </div>
-
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
-            <a href="#" class="btn-logout" title="Keluar dari Portal Admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Logout</span>
-            </a>
         </div>
     </div>
 </nav>
@@ -141,5 +158,28 @@
                 setTimeout(function() { toast.remove(); }, 300);
             }, 4000);
         });
+
+        // Profile Dropdown Toggle
+        const profileTrigger = document.getElementById('adminProfileTrigger');
+        const profileDropdown = document.getElementById('adminProfileDropdown');
+        const profileChevron = profileTrigger ? profileTrigger.querySelector('.admin-profile-chevron') : null;
+
+        if (profileTrigger && profileDropdown) {
+            profileTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = profileDropdown.style.display === 'block';
+                profileDropdown.style.display = isOpen ? 'none' : 'block';
+                if (profileChevron) {
+                    profileChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.style.display = 'none';
+                    if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
     });
 </script>

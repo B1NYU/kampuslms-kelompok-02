@@ -27,10 +27,6 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PANEL KONTROL SISTEM • KAMPUSLMS
-                        </span>
                         <h1>Dashboard Admin</h1>
                     </div>
                 </div>
@@ -60,13 +56,68 @@
                 $dbAdminCount     = \App\Models\User::where('role', 'admin')->count();
                 $dbCourseCount    = \App\Models\Course::count();
                 $dbEnrollCount    = \Illuminate\Support\Facades\DB::table('course_user')->count();
+                $dbMaterialCount  = \App\Models\Material::count();
                 $dbAssignCount    = \App\Models\Assignment::count();
                 $dbSubmissCount   = \App\Models\Submission::count();
                 $dbGradeCount     = \App\Models\Grade::count();
                 $gradePercent     = $dbSubmissCount > 0 ? round(($dbGradeCount / $dbSubmissCount) * 100) : 0;
+
+                // Mengumpulkan riwayat aktivitas dinamis dari database
+                $activities = collect();
+
+                foreach (\App\Models\User::latest()->take(3)->get() as $u) {
+                    $activities->push([
+                        'time_sort' => $u->created_at ?? now(),
+                        'dot' => '#039FFA',
+                        'title' => 'Pengguna baru terdaftar',
+                        'desc' => e($u->name) . ' (' . ucfirst($u->role) . ')' . ($u->nim_nip ? ' &mdash; ' . e($u->nim_nip) : ''),
+                        'time' => $u->created_at ? $u->created_at->diffForHumans() : 'Baru saja',
+                    ]);
+                }
+
+                foreach (\App\Models\Course::with('lecturer')->latest()->take(3)->get() as $c) {
+                    $activities->push([
+                        'time_sort' => $c->created_at ?? now(),
+                        'dot' => '#10B981',
+                        'title' => 'Mata kuliah ditambahkan',
+                        'desc' => e($c->code) . ' &bull; ' . e($c->name) . ' (' . $c->sks . ' SKS)',
+                        'time' => $c->created_at ? $c->created_at->diffForHumans() : 'Baru saja',
+                    ]);
+                }
+
+                foreach (\App\Models\Material::with('course')->latest()->take(3)->get() as $m) {
+                    $activities->push([
+                        'time_sort' => $m->created_at ?? now(),
+                        'dot' => '#F59E0B',
+                        'title' => 'Materi kuliah diunggah',
+                        'desc' => e($m->title) . ($m->course ? ' pada ' . e($m->course->code) : ''),
+                        'time' => $m->created_at ? $m->created_at->diffForHumans() : 'Baru saja',
+                    ]);
+                }
+
+                foreach (\App\Models\Assignment::with('course')->latest()->take(3)->get() as $a) {
+                    $activities->push([
+                        'time_sort' => $a->created_at ?? now(),
+                        'dot' => '#F96305',
+                        'title' => 'Tugas kuliah dibuat',
+                        'desc' => e($a->title) . ($a->course ? ' &bull; ' . e($a->course->code) : ''),
+                        'time' => $a->created_at ? $a->created_at->diffForHumans() : 'Baru saja',
+                    ]);
+                }
+
+                foreach (\App\Models\Submission::with(['student', 'assignment'])->latest('submitted_at')->take(3)->get() as $s) {
+                    $subTime = $s->submitted_at ? \Carbon\Carbon::parse($s->submitted_at) : ($s->created_at ?? now());
+                    $activities->push([
+                        'time_sort' => $subTime,
+                        'dot' => '#8B5CF6',
+                        'title' => 'Pengumpulan tugas masuk',
+                        'desc' => e($s->student?->name ?? 'Mahasiswa') . ' &mdash; ' . e($s->assignment?->title ?? 'Tugas'),
+                        'time' => $subTime->diffForHumans(),
+                    ]);
+                }
+
+                $recentActivities = $activities->sortByDesc('time_sort')->take(6);
             @endphp
-
-
 
             <!-- Stat Cards -->
             <section class="admin-stats-grid">
@@ -131,24 +182,14 @@
             <!-- Middle: Aktivitas + Right Column -->
             <section class="admin-middle-grid">
 
-                <!-- Aktivitas Terkini -->
+                <!-- Aktivitas Terkini (Real-time Database Log) -->
                 <div class="card-box">
                     <div class="card-header-clean">
                         <h3>Aktivitas Sistem Terkini</h3>
                         <span class="card-subtitle-tag">Real-time Log</span>
                     </div>
                     <div class="activity-list">
-                        @php
-                            $activities = [
-                                ['dot' => '#039FFA', 'title' => 'Pengguna baru didaftarkan', 'desc' => 'Baihaqi Abimanyu (Mahasiswa) &mdash; NIM 10241014', 'time' => '2 mnt lalu'],
-                                ['dot' => '#10B981', 'title' => 'Mata kuliah ditambahkan', 'desc' => 'SI104 &bull; Pemrograman Mobile (3 SKS)', 'time' => '14 mnt lalu'],
-                                ['dot' => '#F59E0B', 'title' => 'Pendaftaran mahasiswa', 'desc' => 'Calvin Adithya didaftarkan ke SI101', 'time' => '31 mnt lalu'],
-                                ['dot' => '#EF4444', 'title' => 'Pengguna dinonaktifkan', 'desc' => 'Akun mahasiswa IF312-C dibekukan admin', 'time' => '1 jam lalu'],
-                                ['dot' => '#F96305', 'title' => 'Role diperbarui', 'desc' => 'Dr. Rina Marlina &mdash; role diubah menjadi Dosen', 'time' => '2 jam lalu'],
-                                ['dot' => '#10B981', 'title' => 'Data mata kuliah diperbarui', 'desc' => 'IF305 &bull; Kecerdasan Buatan &mdash; SKS diubah ke 4', 'time' => '3 jam lalu'],
-                            ];
-                        @endphp
-                        @foreach ($activities as $act)
+                        @forelse ($recentActivities as $act)
                             <div class="activity-item">
                                 <div class="activity-dot" style="background: {{ $act['dot'] }}; box-shadow: 0 0 6px {{ $act['dot'] }}66;"></div>
                                 <div class="activity-info">
@@ -157,13 +198,17 @@
                                 </div>
                                 <span class="activity-time">{{ $act['time'] }}</span>
                             </div>
-                        @endforeach
+                        @empty
+                            <div style="padding: 24px; text-align: center; color: #64748B; font-size: 13px;">
+                                Belum ada aktivitas baru tercatat pada sistem.
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
                 <!-- Right Column: Status Sistem -->
                 <div class="admin-side-col">
-                    <!-- Status Sistem & Akademik -->
+                    <!-- Status Sistem & Akademik (Real-time Metric) -->
                     <div class="card-box sys-status-card">
                         <div class="card-header-clean">
                             <h3>Status Sistem & Akademik</h3>
@@ -174,22 +219,22 @@
                         <div class="sys-status-list">
                             <div class="sys-item">
                                 <div class="sys-item-text">
-                                    <span class="sys-item-label">Tahun Akademik</span>
-                                    <strong class="sys-item-val">Ganjil 2026/2027</strong>
+                                    <span class="sys-item-label">Server & Framework</span>
+                                    <strong class="sys-item-val">PHP {{ PHP_VERSION }} &bull; Laravel {{ app()->version() }}</strong>
                                 </div>
                                 <span class="sys-pill sys-pill-primary">Aktif</span>
                             </div>
                             <div class="sys-item">
                                 <div class="sys-item-text">
-                                    <span class="sys-item-label">Periode KRS Mahasiswa</span>
-                                    <strong class="sys-item-val">01 Sep &mdash; 30 Sep 2026</strong>
+                                    <span class="sys-item-label">Progres Penilaian</span>
+                                    <strong class="sys-item-val">{{ $dbGradeCount }} dari {{ $dbSubmissCount }} berkas dinilai ({{ $gradePercent }}%)</strong>
                                 </div>
-                                <span class="sys-pill sys-pill-success">Berjalan</span>
+                                <span class="sys-pill sys-pill-success">{{ $gradePercent }}% Selesai</span>
                             </div>
                             <div class="sys-item">
                                 <div class="sys-item-text">
-                                    <span class="sys-item-label">Server & Database</span>
-                                    <strong class="sys-item-val">MySQL 8.0 &bull; PHP 8.5 &bull; Laravel 12</strong>
+                                    <span class="sys-item-label">Database & Penyimpanan</span>
+                                    <strong class="sys-item-val">{{ config('database.default') == 'sqlite' ? 'SQLite' : 'MySQL' }} &bull; {{ $dbMaterialCount }} Materi &bull; {{ $dbAssignCount }} Tugas</strong>
                                 </div>
                                 <span class="sys-pill sys-pill-ok">Optimal</span>
                             </div>

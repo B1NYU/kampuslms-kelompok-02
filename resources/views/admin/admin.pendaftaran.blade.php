@@ -27,10 +27,6 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PANEL ADMIN • PENDAFTARAN MATA KULIAH
-                        </span>
                         <h1>Pendaftaran Mahasiswa ke Mata Kuliah</h1>
                     </div>
                 </div>
@@ -79,22 +75,8 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Daftarkan Mahasiswa ke Mata Kuliah</h2>
-                                <p>Admin dapat mendaftarkan mahasiswa ke mata kuliah aktif. Sesuai Kriteria 4.4, tiap mata kuliah memiliki &ge; 15 mahasiswa terdaftar.</p>
-                                <div class="badges-container">
-                                    <span class="badge-blue">
-                                        @if ($courses->isNotEmpty() && $kurang15 === 0)
-                                            ✓ Tiap MK &ge; 15 Mahasiswa Terdaftar
-                                        @else
-                                            ⚠ {{ $kurang15 }} MK belum mencapai 15 Mahasiswa
-                                        @endif
-                                    </span>
-                                    <span class="badge-green">
-                                        Total {{ $allEnrollments->count() }} Pendaftaran Terdata
-                                    </span>
-                                </div>
                             </div>
                         </div>
-                        <span class="section-header-badge">Kelola Enrollment</span>
                     </div>
 
                     <div class="two-col-grid">
