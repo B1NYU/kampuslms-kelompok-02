@@ -50,76 +50,16 @@
             </header>
 
             @php
-                // Query data asli dari database
-                $dbSubmissions = \App\Models\Submission::with(['student', 'assignment.course.lecturer', 'grade.grader'])
-                    ->latest('submitted_at')
-                    ->get();
-                $dbCourses = \App\Models\Course::with('lecturer')->orderBy('code')->get();
-
-                // Helper kalkulasi predikat huruf mutu
-                $getGradeLetter = function($score) {
-                    if ($score === null) return '-';
-                    $s = (float) $score;
-                    if ($s >= 85) return 'A';
-                    if ($s >= 80) return 'A-';
-                    if ($s >= 75) return 'B+';
-                    if ($s >= 70) return 'B';
-                    if ($s >= 65) return 'B-';
-                    if ($s >= 60) return 'C+';
-                    if ($s >= 55) return 'C';
-                    if ($s >= 40) return 'D';
-                    return 'E';
-                };
-
-                $getGradeClass = function($letter) {
-                    if (str_starts_with($letter, 'A')) return 'grade-pill-a';
-                    if (str_starts_with($letter, 'B')) return 'grade-pill-b';
-                    if (str_starts_with($letter, 'C')) return 'grade-pill-c';
-                    if (in_array($letter, ['D', 'E'])) return 'grade-pill-d';
-                    return 'grade-pill-pending';
-                };
-
-                // Susun dataset lengkap
-                $gradeItems = collect();
-
-                foreach ($dbSubmissions as $sub) {
-                    $score = $sub->grade ? (float) $sub->grade->score : null;
-                    $letter = $getGradeLetter($score);
-                    $gradeItems->push([
-                        'id' => $sub->id,
-                        'student_name' => $sub->student?->name ?? 'Mahasiswa',
-                        'student_nim' => $sub->student?->nim_nip ?? '10221000',
-                        'course_code' => $sub->assignment?->course?->code ?? 'MK001',
-                        'course_name' => $sub->assignment?->course?->name ?? 'Mata Kuliah',
-                        'lecturer_name' => $sub->assignment?->course?->lecturer?->name ?? ($sub->grade?->grader?->name ?? 'Dosen Pengampu'),
-                        'assignment_title' => $sub->assignment?->title ?? 'Tugas Kuliah',
-                        'submitted_at' => $sub->submitted_at ? \Carbon\Carbon::parse($sub->submitted_at)->format('d M Y, H:i') : '-',
-                        'is_late' => (bool) $sub->is_late,
-                        'score' => $score !== null ? number_format($score, 1) : null,
-                        'letter' => $letter,
-                        'letter_class' => $getGradeClass($letter),
-                        'status' => $sub->grade ? 'graded' : 'pending',
-                        'feedback' => $sub->grade?->feedback ?? 'Belum ada catatan umpan balik.',
-                        'graded_at' => $sub->grade?->graded_at ? \Carbon\Carbon::parse($sub->grade->graded_at)->format('d M Y, H:i') : '-',
-                        'file_name' => $sub->original_name ?? 'tugas_mahasiswa.pdf',
-                        'file_size' => $sub->file_size ? number_format($sub->file_size / 1024, 1) . ' KB' : '1.4 MB',
-                    ]);
-                }
-
-                // Kalkulasi statistik KPI murni dari database
-                $totalCount = $gradeItems->count();
-                $gradedCount = $gradeItems->where('status', 'graded')->count();
-                $pendingCount = $gradeItems->where('status', 'pending')->count();
-                $gradedItems = $gradeItems->where('status', 'graded');
-                $avgScore = $gradedItems->isNotEmpty() ? round($gradedItems->avg(fn($i) => (float)$i['score']), 1) : 0;
-                $pctGraded = $totalCount > 0 ? round(($gradedCount / $totalCount) * 100) : 0;
-
-                // Distribusi predikat
-                $countA = $gradeItems->filter(fn($i) => str_starts_with($i['letter'], 'A'))->count();
-                $countB = $gradeItems->filter(fn($i) => str_starts_with($i['letter'], 'B'))->count();
-
-                // Daftar Mata Kuliah Unik untuk Filter
-                $uniqueCourses = $gradeItems->pluck('course_name', 'course_code')->unique();
+                // Data disediakan oleh AdminGradeController
+                $gradeItems    = $gradeItems ?? collect();
+                $totalCount    = $totalCount ?? $gradeItems->count();
+                $gradedCount   = $gradedCount ?? $gradeItems->where('status', 'graded')->count();
+                $pendingCount  = $pendingCount ?? $gradeItems->where('status', 'pending')->count();
+                $avgScore      = $avgScore ?? 0;
+                $pctGraded     = $pctGraded ?? 0;
+                $countA        = $countA ?? 0;
+                $countB        = $countB ?? 0;
+                $uniqueCourses = $uniqueCourses ?? $gradeItems->pluck('course_name', 'course_code')->unique();
 
                 $avatarColors = [
                     ['bg' => 'rgba(3, 159, 250, 0.1)', 'text' => '#039FFA'],

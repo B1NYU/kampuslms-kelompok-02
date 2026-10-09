@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAssignmentController;
 use App\Http\Controllers\Admin\AdminCourseController;
+use App\Http\Controllers\Admin\AdminGradeController;
 use App\Http\Controllers\Admin\AdminMaterialController;
 use App\Http\Controllers\Admin\AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -132,9 +133,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/tugas/{assignment}', [AdminAssignmentController::class, 'update'])->name('tugas.update');
         Route::delete('/tugas/{assignment}', [AdminAssignmentController::class, 'destroy'])->name('tugas.destroy');
 
-        Route::get('/nilai', function () {
-            return view()->file(resource_path('views/admin/admin.nilai.blade.php'));
-        })->name('nilai');
+        Route::get('/nilai', [AdminGradeController::class, 'index'])->name('nilai');
     });
 
 });
