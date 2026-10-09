@@ -31,18 +31,10 @@
         <!-- Konten Utama Kelola Mahasiswa -->
         <main class="dosen-content">
 
+            {{-- Data ($courses, $registeredStudents, $selectedCode) disiapkan oleh Dosen\StudentController@index --}}
             @php
-                $dosenUser = auth()->user();
-                $dosenCourses = $dosenUser
-                    ? $dosenUser->taughtCourses()->with('students')->get()
-                    : collect();
-                if ($dosenCourses->isEmpty()) {
-                    $dosenCourses = \App\Models\Course::where('status', 'active')->with('students')->get();
-                }
-                $firstCourse = $dosenCourses->first();
-                $registeredStudents = \App\Models\User::where('role', 'mahasiswa')
-                    ->select('id', 'name', 'nim_nip')
-                    ->get();
+                $dosenCourses = $courses;
+                $firstCourse = $dosenCourses->firstWhere('code', $selectedCode);
             @endphp
 
             <!-- Topbar Header / Judul di Luar Container Utama -->
@@ -72,8 +64,8 @@
                     <div class="toolbar-right-group">
                         <div class="course-filter-bar">
                             <select id="selectCurrentCourse" class="course-select" {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
-                                @forelse ($dosenCourses as $idx => $c)
-                                    <option value="{{ $c->code }}" {{ $idx === 0 ? 'selected' : '' }}>
+                                @forelse ($dosenCourses as $c)
+                                    <option value="{{ $c->code }}" {{ $c->code === ($selectedCode ?? ($firstCourse?->code ?? '')) ? 'selected' : '' }}>
                                         {{ $c->code }} &bull; {{ $c->name }} ({{ $c->sks }} SKS - {{ $c->students->count() }} Mhs)
                                     </option>
                                 @empty
@@ -196,12 +188,19 @@
                                                         <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
                                                         <td><span class="badge-status badge-status-active">Aktif</span></td>
                                                         <td style="text-align: right;">
-                                                            <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                                </svg>
-                                                            </button>
+                                                            <form method="POST"
+                                                                  action="{{ route('dosen.mahasiswa.destroy', [$course, $mhs]) }}"
+                                                                  onsubmit="return confirm(@js('Keluarkan ' . $mhs->name . ' dari mata kuliah ini?'))"
+                                                                  style="display:inline; margin:0;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                    </svg>
+                                                                </button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -236,33 +235,24 @@
                     <button type="button" class="btn-close-modal" id="btnCloseStudentModal" aria-label="Tutup modal">&times;</button>
                 </div>
 
-                <form id="formAddStudent" style="margin: 0; display: flex; flex-direction: column;">
+                <form id="formAddStudent" method="POST" action="{{ route('dosen.mahasiswa.store') }}" style="margin: 0; display: flex; flex-direction: column;">
+                    @csrf
                     <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="form-group">
                             <label for="mhsMatkul">Mata Kuliah Target <span class="required">*</span></label>
-                            <select id="mhsMatkul" class="form-select" required {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
+                            <select id="mhsMatkul" name="course_id" class="form-select" required {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
                                 @forelse ($dosenCourses as $c)
-                                    <option value="{{ $c->code }} - {{ $c->name }}">{{ $c->code }} - {{ $c->name }}</option>
+                                    <option value="{{ $c->id }}" data-code="{{ $c->code }}" {{ (string) old('course_id') === (string) $c->id ? 'selected' : '' }}>{{ $c->code }} - {{ $c->name }}</option>
                                 @empty
                                     <option value="">Belum ada mata kuliah yang diampu</option>
                                 @endforelse
                             </select>
                         </div>
 
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label for="mhsNim">Nomor Induk Mahasiswa (NIM) <span class="required">*</span></label>
-                                <input type="text" id="mhsNim" class="form-control" placeholder="Ketik NIM mahasiswa, cth: 10241001" required autocomplete="off">
-                                <small id="nimLookupStatus" style="display:block; font-size:11px; margin-top:4px; color:#64748B; font-weight:600;">Masukkan NIM untuk melengkapi nama secara otomatis</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="mhsKelas">Kelas <span class="required">*</span></label>
-                                <select id="mhsKelas" class="form-select" required>
-                                    <option value="SI-A">SI-A</option>
-                                    <option value="SI-B">SI-B</option>
-                                    <option value="TI-A">TI-A</option>
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label for="mhsNim">Nomor Induk Mahasiswa (NIM) <span class="required">*</span></label>
+                            <input type="text" id="mhsNim" name="nim" value="{{ old('nim') }}" class="form-control" placeholder="Ketik NIM mahasiswa, cth: 10241001" required autocomplete="off">
+                            <small id="nimLookupStatus" style="display:block; font-size:11px; margin-top:4px; color:#64748B; font-weight:600;">Masukkan NIM untuk melengkapi nama secara otomatis</small>
                         </div>
 
                         <div class="form-group">
@@ -330,6 +320,12 @@
                 if (!selectCurrentCourse || !selectCurrentCourse.value) {
                     alert('Anda belum memiliki mata kuliah yang diampu untuk mendaftarkan mahasiswa.');
                     return;
+                }
+                // Mata kuliah di modal mengikuti filter yang sedang aktif
+                const mhsMatkul = document.getElementById('mhsMatkul');
+                if (mhsMatkul) {
+                    const opt = Array.from(mhsMatkul.options).find(o => o.dataset.code === selectCurrentCourse.value);
+                    if (opt) mhsMatkul.value = opt.value;
                 }
                 if (studentModal) studentModal.classList.add('active');
             }
@@ -399,70 +395,13 @@
                 mhsNimInput.addEventListener('change', handleNimLookup);
             }
 
+            // Submit sungguhan ke server; di sini hanya cegah kirim jika NIM belum dikenali
             formAddStudent.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const nim = document.getElementById('mhsNim').value.trim();
-                const nama = document.getElementById('mhsNama').value.trim();
-                const kelas = document.getElementById('mhsKelas').value;
-                const matkulSelect = document.getElementById('mhsMatkul').value;
-                const currentMkVal = selectCurrentCourse ? selectCurrentCourse.value : '';
-
-                if (!nim || !nama) {
+                if (!mhsNimInput.value.trim() || !mhsNamaInput.value.trim()) {
+                    e.preventDefault();
                     alert('Harap masukkan NIM yang valid dan terdaftar di database agar nama terisi otomatis!');
-                    return;
                 }
 
-                const initials = nama.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-                const colors = [
-                    { bg: 'rgba(3, 159, 250, 0.12)', text: '#039FFA' },
-                    { bg: 'rgba(50, 179, 241, 0.14)', text: '#0284C7' },
-                    { bg: 'rgba(16, 185, 129, 0.14)', text: '#10B981' },
-                    { bg: 'rgba(249, 184, 4, 0.14)', text: '#D97706' },
-                    { bg: 'rgba(249, 99, 5, 0.12)', text: '#F96305' }
-                ];
-                const pickedColor = colors[Math.floor(Math.random() * colors.length)];
-
-                const newRow = document.createElement('tr');
-                if (currentMkVal) {
-                    newRow.setAttribute('data-mk', currentMkVal);
-                }
-                newRow.setAttribute('data-name', nama.toLowerCase());
-                newRow.setAttribute('data-nim', nim);
-                newRow.setAttribute('data-order', '0');
-                newRow.innerHTML = `
-                    <td>
-                        <div class="student-cell">
-                            <div class="student-avatar" style="background:${pickedColor.bg}; color:${pickedColor.text};">${initials}</div>
-                            <span class="student-name">${nama}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="student-nim">${nim}</span>
-                    </td>
-                    <td>${prodi}</td>
-                    <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">${kelas}</span></td>
-                    <td><span class="badge-status badge-status-active">Aktif</span></td>
-                    <td style="text-align: right;">
-                        <button class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                        </button>
-                    </td>
-                `;
-
-                studentTableBody.prepend(newRow);
-                formAddStudent.reset();
-                if (nimLookupStatus) {
-                    nimLookupStatus.textContent = 'Masukkan NIM untuk melengkapi nama secara otomatis';
-                    nimLookupStatus.style.color = '#64748B';
-                }
-                closeStudentModal();
-                sortStudentRows();
-                applyCourseFilter();
-                attachDeleteStudentEvents();
-                showToast(`Mahasiswa ${nama} (${nim}) berhasil didaftarkan ke kelas!`);
             });
 
             const selectCurrentCourse = document.getElementById('selectCurrentCourse');
@@ -543,23 +482,17 @@
                 searchStudentInput.addEventListener('input', applyCourseFilter);
             }
 
-            function attachDeleteStudentEvents() {
-                const deleteBtns = document.querySelectorAll('.btn-delete-student');
-                deleteBtns.forEach(btn => {
-                    btn.onclick = function() {
-                        const tr = btn.closest('tr');
-                        const studentName = tr.querySelector('.student-name').textContent;
-                        if (confirm(`Keluarkan ${studentName} dari mata kuliah ini?`)) {
-                            tr.remove();
-                            applyCourseFilter();
-                            showToast(`${studentName} telah dikeluarkan dari kelas.`, false);
-                        }
-                    };
-                });
-            }
-            attachDeleteStudentEvents();
             sortStudentRows();
             applyCourseFilter();
+
+            @if (session('success'))
+                showToast(@js(session('success')));
+            @endif
+            @if ($errors->any())
+                showToast(@js($errors->first()), false);
+                if (studentModal) studentModal.classList.add('active');
+                handleNimLookup();
+            @endif
 
         });
     </script>

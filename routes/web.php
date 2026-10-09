@@ -1,14 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminCourseController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dosen\AssignmentController as DosenAssignmentController;
+use App\Http\Controllers\Dosen\GradingController;
 use App\Http\Controllers\Dosen\MaterialController as DosenMaterialController;
+use App\Http\Controllers\Dosen\StudentController as DosenStudentController;
+use App\Http\Controllers\Mahasiswa\MahasiswaCourseController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SubmissionController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Mahasiswa\MahasiswaCourseController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -63,9 +65,10 @@ Route::middleware('auth')->group(function () {
             return view('dosen.dashboard');
         })->name('dashboard');
 
-        Route::get('/mahasiswa', function () {
-            return view()->file(resource_path('views/dosen/mahasiswa.blade.php'));
-        })->name('mahasiswa');
+        // Kelola mahasiswa: daftar / keluarkan mahasiswa dari mata kuliah yang diampu.
+        Route::get('/mahasiswa', [DosenStudentController::class, 'index'])->name('mahasiswa');
+        Route::post('/mahasiswa', [DosenStudentController::class, 'store'])->name('mahasiswa.store');
+        Route::delete('/mahasiswa/{course}/{student}', [DosenStudentController::class, 'destroy'])->name('mahasiswa.destroy');
 
         // Materi: nama 'dosen.materi' dipertahankan agar link di navbar tidak putus.
         Route::get('/materi', [DosenMaterialController::class, 'index'])->name('materi');
@@ -78,9 +81,9 @@ Route::middleware('auth')->group(function () {
         // Pintu masuk menu "Buat Tugas": diarahkan ke mata kuliah pertama yang diampu.
         Route::get('/tugas', [DosenAssignmentController::class, 'landing'])->name('tugas');
 
-        Route::get('/penilaian', function () {
-            return view()->file(resource_path('views/dosen/penilaian.blade.php'));
-        })->name('penilaian');
+        // Penilaian & Feedback Dosen
+        Route::get('/penilaian', [GradingController::class, 'index'])->name('penilaian');
+        Route::put('/penilaian/{submission}', [GradingController::class, 'update'])->name('penilaian.update');
 
         // /dosen/courses/{course}/assignments (index, create, store)
         // /dosen/assignments/{assignment}     (edit, update, destroy)
@@ -115,11 +118,9 @@ Route::middleware('auth')->group(function () {
             return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));
         })->name('pendaftaran');
 
-        Route::get('/materi', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'index'])->name('materi');
-        Route::post('/materi', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'store'])->name('materi.store');
-        Route::put('/materi/{material}', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'update'])->name('materi.update');
-        Route::delete('/materi/{material}', [\App\Http\Controllers\Admin\AdminMaterialController::class, 'destroy'])->name('materi.destroy');
-        Route::get('/materi/{material}/download', [\App\Http\Controllers\MaterialController::class, 'download'])->name('materi.download');
+        Route::get('/materi', function () {
+            return view()->file(resource_path('views/admin/admin.materi.blade.php'));
+        })->name('materi');
 
         Route::get('/tugas', function () {
             return view()->file(resource_path('views/admin/admin.tugas.blade.php'));

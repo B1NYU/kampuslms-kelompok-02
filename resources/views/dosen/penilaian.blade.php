@@ -1,93 +1,12 @@
-@php
-    // Penanganan penyimpanan nilai langsung ke database
-    if (request()->has('action') && request('action') === 'save_grade') {
-        $subId = request('submission_id');
-        $score = floatval(request('score'));
-        $feedback = request('feedback');
-
-        $sub = \App\Models\Submission::find($subId);
-        if ($sub) {
-            $graderId = auth()->id() ?? ($sub->assignment?->course?->lecturer_id ?? 1);
-            $grade = \App\Models\Grade::updateOrCreate(
-                ['submission_id' => $sub->id],
-                [
-                    'graded_by' => $graderId,
-                    'score'     => $score,
-                    'feedback'  => $feedback,
-                    'graded_at' => now(),
-                ]
-            );
-
-            if (request()->ajax() || request()->wantsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
-                response()->json([
-                    'success' => true,
-                    'grade'   => $grade,
-                    'message' => 'Nilai dan feedback berhasil disimpan ke database.'
-                ])->send();
-                exit;
-            }
-        }
-    }
-
-    $dosenUser = auth()->user();
-    if ($dosenUser && $dosenUser->role === 'dosen') {
-        $courses = $dosenUser->taughtCourses()->where('status', 'active')->with([
-            'assignments.submissions.grade',
-            'assignments.submissions.student',
-            'lecturer'
-        ])->get();
-        if ($courses->isEmpty()) {
-            $courses = $dosenUser->taughtCourses()->with([
-                'assignments.submissions.grade',
-                'assignments.submissions.student',
-                'lecturer'
-            ])->get();
-        }
-    } else {
-        $courses = \App\Models\Course::where('status', 'active')->with([
-            'assignments.submissions.grade',
-            'assignments.submissions.student',
-            'lecturer'
-        ])->get();
-    }
-
-    if ($courses->isEmpty()) {
-        $courses = \App\Models\Course::with([
-            'assignments.submissions.grade',
-            'assignments.submissions.student',
-            'lecturer'
-        ])->get();
-    }
-
-    $courseIds = $courses->pluck('id');
-    $assignmentIds = \App\Models\Assignment::whereIn('course_id', $courseIds)->pluck('id');
-
-    $allSubmissions = \App\Models\Submission::whereIn('assignment_id', $assignmentIds)
-        ->with([
-            'assignment.course',
-            'student',
-            'grade'
-        ])->latest('submitted_at')->get();
-
-    if ($allSubmissions->isEmpty()) {
-        $allSubmissions = \App\Models\Submission::with([
-            'assignment.course',
-            'student',
-            'grade'
-        ])->latest('submitted_at')->get();
-    }
-
-    $totalSubmissions = $allSubmissions->count();
-    $totalGraded = $allSubmissions->whereNotNull('grade')->count();
-    $totalPending = $totalSubmissions - $totalGraded;
-    $persenGraded = $totalSubmissions > 0 ? round(($totalGraded / $totalSubmissions) * 100) : 0;
-@endphp
+{{-- Data ($courses, $allSubmissions, $totalSubmissions, $totalGraded, $totalPending, $persenGraded)
+     disiapkan oleh Dosen\GradingController@index --}}
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Penilaian & Feedback — Portal Dosen KampusLMS</title>
 
     <!-- Google Fonts Nunito -->
@@ -124,7 +43,7 @@
                         <option value="all">Semua Mata Kuliah Aktif ({{ $totalSubmissions }} Pengumpulan)</option>
                         @foreach ($courses as $c)
                             @php
-                                $cSubmissionsCount = $c->assignments->flatMap->submissions->count();
+                                $cSubmissionsCount = $allSubmissions->filter(fn ($s) => $s->assignment?->course_id === $c->id)->count();
                             @endphp
                             <option value="{{ $c->id }}">
                                 {{ $c->code }} &bull; {{ $c->name }} ({{ $cSubmissionsCount }} Pengumpulan)
@@ -272,7 +191,7 @@
                                         ];
                                         $color = $palette[$sub->user_id % 5];
 
-                                        $nim = $student?->nim_nip ?? ('102410' . str_pad($sub->user_id, 2, '0', STR_PAD_LEFT));
+                                        $nim = $student?->nim_nip ?? '-';
                                         $filename = $sub->original_name ?? basename($sub->file_path);
                                         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
                                         $icon = match($ext) {
@@ -296,7 +215,7 @@
                                                 </div>
                                                 <div class="student-meta">
                                                     <span class="student-name">{{ $name }}</span>
-                                                    <span class="student-nim">{{ $nim }} &middot; SI-{{ chr(65 + ($sub->user_id % 3)) }}</span>
+                                                    <span class="student-nim">{{ $nim }}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -376,7 +295,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="7" style="text-align:center; padding: 30px; color: #64748B;">
-                                            Tidak ada data submission yang ditemukan di database.
+                                            Belum ada pengumpulan tugas dari mahasiswa di mata kuliah Anda.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -522,22 +441,22 @@
                 btnSaveGrading.innerHTML = 'Menyimpan ke Database...';
 
                 try {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('action', 'save_grade');
-                    url.searchParams.set('submission_id', activeSubmissionId);
-                    url.searchParams.set('score', score);
-                    url.searchParams.set('feedback', feedback);
+                    const gradeUrl = @json(route('dosen.penilaian.update', ['submission' => '__ID__'])).replace('__ID__', activeSubmissionId);
 
-                    const res = await fetch(url.toString(), {
+                    const res = await fetch(gradeUrl, {
+                        method: 'PUT',
                         headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ score: score, feedback: feedback })
                     });
 
-                    const data = await res.json();
+                    const data = await res.json().catch(() => ({}));
 
-                    if (data && data.success) {
+                    if (res.ok && data && data.success) {
                         const targetRow = document.querySelector(`#submissionTableBody tr[data-id="${activeSubmissionId}"]`);
                         if (targetRow) {
                             targetRow.setAttribute('data-status', 'graded');
@@ -569,7 +488,8 @@
                         closeModal();
                         showToast(`Nilai (${Math.round(score)}) & Feedback berhasil disimpan ke database!`);
                     } else {
-                        alert('Gagal menyimpan nilai ke database. Silakan coba lagi.');
+                        const firstError = data.errors ? Object.values(data.errors).flat()[0] : null;
+                        alert(firstError || data.message || 'Gagal menyimpan nilai ke database. Silakan coba lagi.');
                     }
                 } catch (err) {
                     console.error('Grading save error:', err);
