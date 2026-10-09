@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAssignmentController;
 use App\Http\Controllers\Admin\AdminCourseController;
+use App\Http\Controllers\Admin\AdminMaterialController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
@@ -46,9 +48,9 @@ Route::middleware('auth')->group(function () {
             ->name('assignments.submissions.store');
     });
 
-    // ===== Mahasiswa & dosen: detail tugas (kepemilikan dicek di controller) =====
+    // ===== Mahasiswa, dosen & admin: detail tugas (kepemilikan dicek di controller) =====
     Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])
-        ->middleware('role:mahasiswa,dosen')
+        ->middleware('role:mahasiswa,dosen,admin')
         ->name('assignments.show');
 
     // ===== Semua peran login: pemilik / dosen pengampu / admin (dicek di controller) =====
@@ -118,13 +120,16 @@ Route::middleware('auth')->group(function () {
             return view()->file(resource_path('views/admin/admin.pendaftaran.blade.php'));
         })->name('pendaftaran');
 
-        Route::get('/materi', function () {
-            return view()->file(resource_path('views/admin/admin.materi.blade.php'));
-        })->name('materi');
+        Route::get('/materi', [AdminMaterialController::class, 'index'])->name('materi');
+        Route::post('/materi', [AdminMaterialController::class, 'store'])->name('materi.store');
+        Route::put('/materi/{material}', [AdminMaterialController::class, 'update'])->name('materi.update');
+        Route::delete('/materi/{material}', [AdminMaterialController::class, 'destroy'])->name('materi.destroy');
+        Route::get('/materi/{material}/download', [AdminMaterialController::class, 'download'])->name('materi.download');
 
-        Route::get('/tugas', function () {
-            return view()->file(resource_path('views/admin/admin.tugas.blade.php'));
-        })->name('tugas');
+        Route::get('/tugas', [AdminAssignmentController::class, 'index'])->name('tugas');
+        Route::post('/tugas', [AdminAssignmentController::class, 'store'])->name('tugas.store');
+        Route::put('/tugas/{assignment}', [AdminAssignmentController::class, 'update'])->name('tugas.update');
+        Route::delete('/tugas/{assignment}', [AdminAssignmentController::class, 'destroy'])->name('tugas.destroy');
 
         Route::get('/nilai', function () {
             return view()->file(resource_path('views/admin/admin.nilai.blade.php'));

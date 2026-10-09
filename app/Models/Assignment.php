@@ -42,6 +42,10 @@ class Assignment extends Model
      */
     public function isVisibleTo(User $user): bool
     {
+        if ($user->role === 'admin') {
+            return true;
+        }
+
         if ($user->role === 'dosen') {
             return $this->isManageableBy($user);
         }
@@ -49,6 +53,11 @@ class Assignment extends Model
         return $user->role === 'mahasiswa'
             && $this->status === 'published'
             && $this->course->isEnrolledBy($user);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function course()

@@ -26,11 +26,7 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            PANEL ADMIN • MANAJEMEN PENGGUNA
-                        </span>
-                        <h1>CRUD Pengguna & Role</h1>
+                        <h1>Manajemen Pengguna</h1>
                     </div>
                 </div>
             </header>
@@ -57,26 +53,7 @@
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
                             </div>
-                            <div class="section-header-text">
-                                <h2>Manajemen Pengguna</h2>
-                                <p>Kelola seluruh akun pengguna dan role (Admin / Dosen / Mahasiswa) sesuai data database.</p>
-                                <div class="seeder-criteria-badges" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                                    <span style="background:rgba(249, 99, 5, 0.1);color:#F96305;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(249, 99, 5, 0.25);">
-                                        👑 Admin: <span id="badgeCountAdmin">{{ $countAdmin }}</span>
-                                    </span>
-                                    <span style="background:rgba(249, 184, 4, 0.14);color:#D97706;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(249, 184, 4, 0.3);">
-                                        🎓 Dosen: <span id="badgeCountDosen">{{ $countDosen }}</span>
-                                    </span>
-                                    <span style="background:rgba(16, 185, 129, 0.12);color:#10B981;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(16, 185, 129, 0.25);">
-                                        👥 Mahasiswa: <span id="badgeCountMhs">{{ $countMahasiswa }}</span>
-                                    </span>
-                                    <span style="background:rgba(3, 159, 250, 0.1);color:#039FFA;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:800;border:1px solid rgba(3, 159, 250, 0.25);">
-                                        ✓ Kriteria 4.4 Seeder Terpenuhi (<span id="badgeCountTotal">{{ $countTotal }}</span> Users)
-                                    </span>
-                                </div>
-                            </div>
                         </div>
-                        <span class="section-header-badge">CRUD Pengguna</span>
                     </div>
 
                     <div class="two-col-grid">

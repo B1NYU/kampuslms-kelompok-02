@@ -241,6 +241,15 @@
     color: var(--admin-text) !important;
 }
 
+.nilai-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.nilai-row:hover {
+    background-color: rgba(3, 159, 250, 0.04);
+}
+
 /* Grade Pills */
 .grade-pill {
     display: inline-flex;

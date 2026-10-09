@@ -106,131 +106,7 @@
                     ]);
                 }
 
-                // Tambahkan data representatif jika data di DB masih sedikit
-                if ($gradeItems->count() < 6) {
-                    $mockGrades = [
-                        [
-                            'id' => 901,
-                            'student_name' => 'Budi Santoso',
-                            'student_nim' => '10221001',
-                            'course_code' => 'SI2514024',
-                            'course_name' => 'Pemrograman Web',
-                            'lecturer_name' => 'Dr. Hendra Gunawan, M.T.',
-                            'assignment_title' => 'Tugas 1: Implementasi Blade Template & Auth',
-                            'submitted_at' => '04 Okt 2026, 21:15',
-                            'is_late' => false,
-                            'score' => '92.5',
-                            'letter' => 'A',
-                            'letter_class' => 'grade-pill-a',
-                            'status' => 'graded',
-                            'feedback' => 'Implementasi arsitektur Blade rapi, pemisahan komponen dan styling terstruktur sangat baik.',
-                            'graded_at' => '05 Okt 2026, 14:20',
-                            'file_name' => 'Tugas1_BudiSantoso_10221001.zip',
-                            'file_size' => '2.4 MB',
-                        ],
-                        [
-                            'id' => 902,
-                            'student_name' => 'Siti Nurhaliza',
-                            'student_nim' => '10221002',
-                            'course_code' => 'SI2514024',
-                            'course_name' => 'Pemrograman Web',
-                            'lecturer_name' => 'Dr. Hendra Gunawan, M.T.',
-                            'assignment_title' => 'Tugas 1: Implementasi Blade Template & Auth',
-                            'submitted_at' => '04 Okt 2026, 22:45',
-                            'is_late' => false,
-                            'score' => '88.0',
-                            'letter' => 'A',
-                            'letter_class' => 'grade-pill-a',
-                            'status' => 'graded',
-                            'feedback' => 'Kode bersih dan validasi form lengkap. Penanganan respons error pada controller sangat rapi.',
-                            'graded_at' => '05 Okt 2026, 15:10',
-                            'file_name' => 'Laporan_Siti_10221002.pdf',
-                            'file_size' => '1.8 MB',
-                        ],
-                        [
-                            'id' => 903,
-                            'student_name' => 'Ahmad Fajar Pratama',
-                            'student_nim' => '10221015',
-                            'course_code' => 'SI2514025',
-                            'course_name' => 'Basis Data Lanjut',
-                            'lecturer_name' => 'Prof. Ir. Bambang Riyanto, Ph.D.',
-                            'assignment_title' => 'Latihan 2: Optimasi Kueri & Indexing MySQL',
-                            'submitted_at' => '05 Okt 2026, 23:30',
-                            'is_late' => false,
-                            'score' => '78.5',
-                            'letter' => 'B+',
-                            'letter_class' => 'grade-pill-b',
-                            'status' => 'graded',
-                            'feedback' => 'Penggunaan composite index sudah tepat, tetapi penjelasan execution plan masih perlu diperdalam.',
-                            'graded_at' => '06 Okt 2026, 10:15',
-                            'file_name' => 'AhmadFajar_QueryOptimization.sql',
-                            'file_size' => '850 KB',
-                        ],
-                        [
-                            'id' => 904,
-                            'student_name' => 'Rina Wijayanti',
-                            'student_nim' => '10221028',
-                            'course_code' => 'SI2514026',
-                            'course_name' => 'Rekayasa Perangkat Lunak',
-                            'lecturer_name' => 'Siti Aminah, S.Kom., M.Kom.',
-                            'assignment_title' => 'Dokumen SRS & Diagram Use Case Sistem',
-                            'submitted_at' => '06 Okt 2026, 08:12',
-                            'is_late' => true,
-                            'score' => '74.0',
-                            'letter' => 'B',
-                            'letter_class' => 'grade-pill-b',
-                            'status' => 'graded',
-                            'feedback' => 'Ada pengurangan skor karena pengumpulan terlambat 4 jam. Diagram use case sudah lengkap dan konsisten.',
-                            'graded_at' => '06 Okt 2026, 17:00',
-                            'file_name' => 'SRS_Final_RinaW.pdf',
-                            'file_size' => '3.1 MB',
-                        ],
-                        [
-                            'id' => 905,
-                            'student_name' => 'Dimas Arya Pamungkas',
-                            'student_nim' => '10221034',
-                            'course_code' => 'SI2514025',
-                            'course_name' => 'Basis Data Lanjut',
-                            'lecturer_name' => 'Prof. Ir. Bambang Riyanto, Ph.D.',
-                            'assignment_title' => 'Latihan 2: Optimasi Kueri & Indexing MySQL',
-                            'submitted_at' => '06 Okt 2026, 19:20',
-                            'is_late' => false,
-                            'score' => '62.0',
-                            'letter' => 'C+',
-                            'letter_class' => 'grade-pill-c',
-                            'status' => 'graded',
-                            'feedback' => 'Perhatikan normalisasi tabel sebelum menerapkan indexing. Masih terdapat kueri N+1 pada demonstrasi.',
-                            'graded_at' => '07 Okt 2026, 09:30',
-                            'file_name' => 'Dimas_Arya_Tugas2.pdf',
-                            'file_size' => '1.2 MB',
-                        ],
-                        [
-                            'id' => 906,
-                            'student_name' => 'Dewi Anggraini',
-                            'student_nim' => '10221042',
-                            'course_code' => 'SI2514024',
-                            'course_name' => 'Pemrograman Web',
-                            'lecturer_name' => 'Dr. Hendra Gunawan, M.T.',
-                            'assignment_title' => 'Tugas 2: REST API & Role-Based Middleware',
-                            'submitted_at' => '07 Okt 2026, 21:05',
-                            'is_late' => false,
-                            'score' => null,
-                            'letter' => '-',
-                            'letter_class' => 'grade-pill-pending',
-                            'status' => 'pending',
-                            'feedback' => 'Menunggu evaluasi penilaian dan umpan balik dari dosen pengampu.',
-                            'graded_at' => '-',
-                            'file_name' => 'Dewi_API_Project.zip',
-                            'file_size' => '4.2 MB',
-                        ]
-                    ];
-
-                    foreach ($mockGrades as $mock) {
-                        $gradeItems->push($mock);
-                    }
-                }
-
-                // Kalkulasi statistik KPI
+                // Kalkulasi statistik KPI murni dari database
                 $totalCount = $gradeItems->count();
                 $gradedCount = $gradeItems->where('status', 'graded')->count();
                 $pendingCount = $gradeItems->where('status', 'pending')->count();
@@ -367,32 +243,9 @@
                 </div>
             </section>
 
-            <!-- Section Utama: Card Tabel Rekap Nilai (Format Identik admin.pendaftaran & admin.pengguna) -->
+            <!-- Section Utama: Card Tabel Rekap Nilai -->
             <section>
                 <div class="section-card">
-                    <div class="section-header">
-                        <div class="section-header-left">
-                            <div class="section-header-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="8" r="7"></circle>
-                                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                                </svg>
-                            </div>
-                            <div class="section-header-text">
-                                <h2>Rekapitulasi Nilai &amp; Hasil Evaluasi Mahasiswa</h2>
-                                <p>Hak Akses Administrator untuk memantau capaian nilai seluruh mahasiswa di semua mata kuliah.</p>
-                                <div class="badges-container">
-                                    <span class="badge-blue">
-                                        ✓ Spesifikasi Bagian 3: Melihat Nilai Seluruh Mahasiswa
-                                    </span>
-                                    <span class="badge-green" id="badgeTotalCount">
-                                        Total {{ $gradeItems->count() }} Pengumpulan Terdata
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="section-header-badge">Rekapitulasi Nilai</span>
-                    </div>
 
                     <!-- Tabel Scrollable dengan Sticky Header -->
                     <div class="table-scrollable">
@@ -400,22 +253,16 @@
                             <thead class="table-header-sticky">
                                 <tr>
                                     <th>Mahasiswa</th>
+                                    <th>NIM</th>
                                     <th>Mata Kuliah</th>
                                     <th>Tugas Kuliah</th>
                                     <th style="text-align: center;">Nilai</th>
                                     <th>Feedback Dosen</th>
                                     <th style="text-align: center;">Status</th>
-                                    <th style="text-align: right;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="nilaiTableBody">
-                                @foreach ($gradeItems as $idx => $item)
-                                    @php
-                                        $cIdx = $idx % count($avatarColors);
-                                        $pickedColor = $avatarColors[$cIdx];
-                                        $parts = explode(' ', trim($item['student_name']));
-                                        $initials = strtoupper(substr($parts[0] ?? 'M', 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
-                                    @endphp
+                                @forelse ($gradeItems as $idx => $item)
                                     <tr class="nilai-row"
                                         data-name="{{ strtolower($item['student_name']) }}"
                                         data-nim="{{ $item['student_nim'] }}"
@@ -426,52 +273,42 @@
                                         data-score="{{ $item['score'] ?? '' }}"
                                         data-item="{{ htmlspecialchars(json_encode($item), ENT_QUOTES, 'UTF-8') }}">
                                         
-                                        <!-- Mahasiswa (Format .user-cell standar admin) -->
+                                        <!-- Mahasiswa -->
                                         <td>
-                                            <div class="user-cell">
-                                                <div class="user-avatar" style="background: {{ $pickedColor['bg'] }}; color: {{ $pickedColor['text'] }};">
-                                                    {{ $initials }}
-                                                </div>
-                                                <div class="user-meta">
-                                                    <span class="user-name">{{ $item['student_name'] }}</span>
-                                                    <span class="user-id">NIM: {{ $item['student_nim'] }}</span>
-                                                </div>
-                                            </div>
+                                            <span class="user-name">{{ $item['student_name'] }}</span>
                                         </td>
 
-                                        <!-- Mata Kuliah -->
+                                        <!-- NIM -->
+                                        <td>
+                                            <span class="user-id" style="font-size: 12px; font-weight: 600;">{{ $item['student_nim'] }}</span>
+                                        </td>
+
+                                        <!-- Mata Kuliah: Hanya Nama MK dan Dosen -->
                                         <td>
                                             <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <span style="font-size: 10px; font-weight: 800; color: #0284C7; background: #EFF6FF; padding: 1.5px 6px; border-radius: 4px; align-self: flex-start; font-family: monospace;">{{ $item['course_code'] }}</span>
                                                 <span class="td-mk-name" style="font-size: 12px; font-weight: 700; color: var(--admin-text);" title="{{ $item['course_name'] }}">{{ $item['course_name'] }}</span>
                                                 <span style="font-size: 10.5px; color: var(--admin-muted);">{{ $item['lecturer_name'] }}</span>
                                             </div>
                                         </td>
 
-                                        <!-- Tugas Kuliah -->
+                                        <!-- Tugas Kuliah: Nama Tugas dan Waktu dengan Keterangan dalam Kurung -->
                                         <td>
-                                            <div style="display: flex; flex-direction: column; gap: 2px; max-width: 190px;">
+                                            <div style="display: flex; flex-direction: column; gap: 2px; max-width: 220px;">
                                                 <span style="font-size: 12px; font-weight: 700; color: var(--admin-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $item['assignment_title'] }}">{{ $item['assignment_title'] }}</span>
-                                                <div style="display: flex; align-items: center; gap: 6px;">
-                                                    <span style="font-size: 10.5px; color: var(--admin-muted);">{{ $item['submitted_at'] }}</span>
-                                                    @if ($item['is_late'])
-                                                        <span style="font-size: 9.5px; font-weight: 800; color: #DC2626; background: #FEF2F2; padding: 1px 5px; border-radius: 4px; border: 1px solid #FECACA;">Terlambat</span>
-                                                    @else
-                                                        <span style="font-size: 9.5px; font-weight: 800; color: #059669; background: #ECFDF5; padding: 1px 5px; border-radius: 4px; border: 1px solid #A7F3D0;">Tepat Waktu</span>
-                                                    @endif
-                                                </div>
+                                                <span style="font-size: 10.5px; color: var(--admin-muted);">
+                                                    {{ $item['submitted_at'] }} ({{ $item['is_late'] ? 'Terlambat' : 'Tepat Waktu' }})
+                                                </span>
                                             </div>
                                         </td>
 
                                         <!-- Nilai -->
                                         <td style="text-align: center;">
                                             @if ($item['score'] !== null)
-                                                <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                                    <strong style="font-size: 13.5px; font-family: monospace; color: var(--admin-text);">{{ $item['score'] }}</strong>
-                                                    <span class="grade-pill {{ $item['letter_class'] }}">{{ $item['letter'] }}</span>
-                                                </div>
+                                                <span style="font-size: 13px; font-weight: 800; color: var(--admin-text);">
+                                                    {{ $item['score'] }} ({{ $item['letter'] }})
+                                                </span>
                                             @else
-                                                <span style="font-size: 11px; color: #94A3B8; font-weight: 700;">-</span>
+                                                <span style="font-size: 12px; color: #94A3B8; font-weight: 700;">-</span>
                                             @endif
                                         </td>
 
@@ -498,19 +335,20 @@
                                                 </span>
                                             @endif
                                         </td>
-
-                                        <!-- Aksi -->
-                                        <td style="text-align: right;">
-                                            <button type="button" class="btn-action-view btnViewDetail" title="Lihat lembar nilai dan feedback">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
-                                                </svg>
-                                                <span>Rincian</span>
-                                            </button>
+                                    </tr>
+                                @empty
+                                    <tr id="emptyDbRow">
+                                        <td colspan="7" style="text-align: center; padding: 48px 20px; color: #94A3B8;">
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                                <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(3, 159, 250, 0.08); display: flex; align-items: center; justify-content: center; color: var(--admin-primary); font-size: 22px;">
+                                                    📝
+                                                </div>
+                                                <span style="font-size: 14px; font-weight: 800; color: #0F172A;">Belum Ada Data Pengumpulan &amp; Nilai</span>
+                                                <span style="font-size: 12px; color: #64748B; max-width: 420px; line-height: 1.5;">Saat ini belum ada riwayat tugas yang dikumpulkan mahasiswa atau dievaluasi oleh dosen pengampu di database.</span>
+                                            </div>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @endforelse
 
                                 <tr id="emptySearchRow" style="display: none;">
                                     <td colspan="7" style="text-align: center; padding: 36px 20px; color: #94A3B8;">
@@ -558,7 +396,7 @@
                         </div>
                         <div>
                             <h4 id="modalStudentName" style="margin: 0; font-size: 14px; font-weight: 800; color: #0F172A;">Budi Santoso</h4>
-                            <span id="modalStudentNim" style="font-size: 11.5px; color: var(--admin-muted); font-family: monospace;">NIM: 10221001</span>
+                            <span id="modalStudentNim" style="font-size: 11.5px; color: var(--admin-muted);">NIM: 10221001</span>
                         </div>
                     </div>
                     <div class="sheet-score-badge">
@@ -742,10 +580,9 @@
                 modal.classList.remove('active');
             }
 
-            document.querySelectorAll('.btnViewDetail').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const row = this.closest('.nilai-row');
-                    const rawData = row.getAttribute('data-item');
+            document.querySelectorAll('.nilai-row').forEach(row => {
+                row.addEventListener('click', function () {
+                    const rawData = this.getAttribute('data-item');
                     try {
                         const itemData = JSON.parse(rawData);
                         openModal(itemData);
