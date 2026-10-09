@@ -5,10 +5,12 @@ namespace Database\Seeders;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Grade;
+use App\Models\Material;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -99,6 +101,40 @@ class DatabaseSeeder extends Seeder
             $course->students()->attach($pivot->all());
         });
 
+        // Materi per mata kuliah: berkas PDF sungguhan di disk privat (supaya tombol
+        // unduh mahasiswa benar-benar berfungsi) + satu materi berupa tautan.
+        $courses->each(function (Course $course) {
+            foreach (range(1, 5) as $pertemuan) {
+                $judul = "Materi Pertemuan {$pertemuan} - {$course->code}";
+                $path = "materials/{$course->id}/pertemuan-{$pertemuan}.pdf";
+                Storage::put($path, self::pdfSederhana($judul));
+
+                Material::factory()->create([
+                    'course_id' => $course->id,
+                    'uploaded_by' => $course->lecturer_id,
+                    'session' => $pertemuan,
+                    'title' => $judul,
+                    'file_path' => $path,
+                    'original_name' => "pertemuan-{$pertemuan}.pdf",
+                    'file_size' => Storage::size($path),
+                ]);
+            }
+
+            Material::factory()->link('https://laravel.com/docs/12.x')->create([
+                'course_id' => $course->id,
+                'uploaded_by' => $course->lecturer_id,
+                'session' => 1,
+                'title' => 'Referensi: Dokumentasi Laravel 12',
+            ]);
+
+            Material::factory()->link('https://developer.mozilla.org/id/')->create([
+                'course_id' => $course->id,
+                'uploaded_by' => $course->lecturer_id,
+                'session' => null, // materi umum
+                'title' => 'Referensi umum: MDN Web Docs',
+            ]);
+        });
+
         $publishedAssignments = collect();
 
         $courses->each(function (Course $course) use (&$publishedAssignments) {
@@ -186,5 +222,33 @@ class DatabaseSeeder extends Seeder
 
         $this->command?->info("Total dinilai: {$submissionDinilai->count()} (~{$persen}%).");
         $this->command?->info('Seeding selesai. Login demo: admin@kampuslms.test / dosen@kampuslms.test / mahasiswa@kampuslms.test — password: password');
+    }
+
+    /** PDF satu halaman minimal yang valid (tanpa dependensi) untuk data demo. */
+    private static function pdfSederhana(string $teks): string
+    {
+        $teks = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $teks);
+        $isi = "BT /F1 18 Tf 72 720 Td ({$teks}) Tj ET";
+        $objek = [
+            '<< /Type /Catalog /Pages 2 0 R >>',
+            '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+            '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+            '<< /Length ' . strlen($isi) . " >>\nstream\n{$isi}\nendstream",
+            '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+        ];
+
+        $pdf = "%PDF-1.4\n";
+        $offset = [];
+        foreach ($objek as $i => $o) {
+            $offset[$i + 1] = strlen($pdf);
+            $pdf .= ($i + 1) . " 0 obj\n{$o}\nendobj\n";
+        }
+        $xref = strlen($pdf);
+        $pdf .= "xref\n0 " . (count($objek) + 1) . "\n0000000000 65535 f \n";
+        foreach ($offset as $o) {
+            $pdf .= sprintf("%010d 00000 n \n", $o);
+        }
+
+        return $pdf . "trailer\n<< /Size " . (count($objek) + 1) . " /Root 1 0 R >>\nstartxref\n{$xref}\n%%EOF";
     }
 }

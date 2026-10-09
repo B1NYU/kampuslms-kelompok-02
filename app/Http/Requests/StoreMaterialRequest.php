@@ -15,6 +15,7 @@ class StoreMaterialRequest extends FormRequest
     {
         return [
             'course_id'    => ['required', 'integer', 'exists:courses,id'],
+            'session'      => ['nullable', 'integer', 'between:1,16'],
             'title'        => ['required', 'string', 'max:255'],
             'description'  => ['nullable', 'string', 'max:2000'],
             'type'         => ['required', 'in:file,link'],

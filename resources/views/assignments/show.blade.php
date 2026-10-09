@@ -155,13 +155,34 @@
                             <span class="section-header-badge">{{ $mySubmission ? 'Sudah Dikumpulkan' : 'Menunggu Pengumpulan' }}</span>
                         </div>
 
+                        @php
+                            $tenggatLewat = $assignment->due_at->isPast();
+                            $ditutup = $tenggatLewat && ! $assignment->allow_late;
+                            $nilaiSaya = $mySubmission?->grade;
+                        @endphp
+
+                        @if (session('success'))
+                            <div role="status" style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; font-weight: 700;">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if ($errors->any())
+                            <div role="alert" style="background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; font-weight: 700;">
+                                @foreach ($errors->all() as $pesan)
+                                    <div>{{ $pesan }}</div>
+                                @endforeach
+                            </div>
+                        @endif
+
                         @if($mySubmission)
                             <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <span style="font-size: 20px;">✓</span>
                                     <span style="font-size: 13px; font-weight: 700; color: #065F46;">
                                         Sudah dikumpulkan: <strong>{{ $mySubmission->original_name }}</strong>
-                                        (<a href="{{ route('submissions.show', $mySubmission) }}" style="color: #039FFA; font-weight: 800; text-decoration: underline;">detail</a>)
+                                        (<a href="{{ route('submissions.show', $mySubmission) }}" style="color: #039FFA; font-weight: 800; text-decoration: underline;">detail</a>
+                                        &middot; <a href="{{ route('submissions.download', $mySubmission) }}" style="color: #039FFA; font-weight: 800; text-decoration: underline;">unduh</a>)
                                     </span>
                                 </div>
                                 <span class="badge-status badge-status-active">
@@ -170,18 +191,41 @@
                             </div>
                         @endif
 
+
+                        @if ($nilaiSaya)
+                            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 14px 18px; margin-bottom: 8px;">
+                                <div style="font-size: 13px; font-weight: 800; color: #1E40AF;">
+                                    Nilai: {{ rtrim(rtrim(number_format((float) $nilaiSaya->score, 2), '0'), '.') }} / {{ $assignment->max_score }}
+                                </div>
+                                @if ($nilaiSaya->feedback)
+                                    <div style="font-size: 13px; color: #334155; margin-top: 6px; font-weight: 600;">{!! nl2br(e($nilaiSaya->feedback)) !!}</div>
+                                @endif
+                                <div style="font-size: 12px; color: #64748B; margin-top: 6px; font-weight: 600;">Tugas yang sudah dinilai tidak dapat dikumpulkan ulang.</div>
+                            </div>
+                        @elseif ($ditutup)
+                            <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 12px; padding: 14px 18px; font-size: 13px; font-weight: 700; color: #92400E;">
+                                Batas waktu pengumpulan telah berakhir dan tugas ini tidak menerima pengumpulan terlambat.
+                                Hubungi dosen pengampu bila memerlukan dispensasi.
+                            </div>
+                        @else
+                            @if ($tenggatLewat)
+                                <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 13px; font-weight: 700; color: #92400E;">
+                                    Tenggat sudah lewat. Pengumpulan tetap diterima tetapi akan ditandai terlambat.
+                                </div>
+                            @endif
                         <form action="{{ route('mahasiswa.assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data" class="card-form">
                             @csrf
                             <div class="form-group">
                                 <label for="file">
                                     Berkas (pdf, doc, docx, zip, txt; maks 10 MB) <span class="required">*</span>
                                 </label>
-                                <input type="file" id="file" name="file" class="form-control" required style="padding-top: 6px;">
+                                <input type="file" id="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.zip,.txt" style="padding-top: 6px;">
+                                @error('file')<small style="color:#B91C1C;font-weight:700;">{{ $message }}</small>@enderror
                             </div>
 
                             <div class="form-group">
                                 <label for="note">Catatan</label>
-                                <textarea id="note" name="note" class="form-textarea" rows="3" placeholder="Tuliskan catatan atau keterangan pengumpulan bila diperlukan...">{{ old('note') }}</textarea>
+                                <textarea id="note" name="note" class="form-textarea" rows="3" maxlength="1000" placeholder="Tuliskan catatan atau keterangan pengumpulan bila diperlukan...">{{ old('note') }}</textarea>
                             </div>
 
                             <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
@@ -193,6 +237,7 @@
                                 </button>
                             </div>
                         </form>
+                        @endif
                     </div>
                 </section>
             @else

@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SubmissionController extends Controller
 {
@@ -26,6 +27,24 @@ class SubmissionController extends Controller
     }
 
     /**
+     * Unduh berkas pengumpulan. Aturan akses sama dengan show(): pemilik,
+     * dosen pengampu, atau admin. Berkas ada di disk privat, jadi satu-satunya
+     * jalan keluar adalah lewat method ini.
+     */
+    public function download(Submission $submission): StreamedResponse
+    {
+        abort_unless($submission->isViewableBy(auth()->user()), 403);
+
+        abort_unless(
+            $submission->file_path && Storage::exists($submission->file_path),
+            404,
+            'Berkas pengumpulan tidak ditemukan di server.'
+        );
+
+        return Storage::download($submission->file_path, $submission->original_name);
+    }
+
+    /**
      * Mahasiswa mengumpulkan tugas. user_id SELALU dari auth(), tidak dari input.
      */
     public function store(Request $request, Assignment $assignment): RedirectResponse
@@ -37,9 +56,28 @@ class SubmissionController extends Controller
         $isLate = $assignment->due_at->isPast();
         abort_if($isLate && ! $assignment->allow_late, 403, 'Batas waktu pengumpulan sudah lewat.');
 
+        // Pengumpulan yang sudah dinilai dikunci supaya nilai tidak berpisah dari berkas yang dinilai.
+        $sudahDinilai = Submission::where('assignment_id', $assignment->id)
+            ->where('user_id', $user->id)
+            ->whereHas('grade')
+            ->exists();
+
+        if ($sudahDinilai) {
+            return back()->withErrors(['file' => 'Tugas ini sudah dinilai dosen sehingga tidak dapat dikumpulkan ulang.']);
+        }
+
         $data = $request->validate([
-            'file' => ['required', 'file', 'max:10240', 'mimes:pdf,doc,docx,zip,txt'],
+            // mimes = cek ISI berkas, extensions = cek EKSTENSI nama aslinya. Keduanya wajib lolos,
+            // supaya berkas bernama .exe yang isinya teks biasa pun tidak tersimpan.
+            'file' => ['required', 'file', 'max:10240', 'mimes:pdf,doc,docx,zip,txt', 'extensions:pdf,doc,docx,zip,txt'],
             'note' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'file.required' => 'Pilih berkas jawaban yang akan dikumpulkan.',
+            'file.file'     => 'Berkas gagal diunggah. Ukurannya mungkin melebihi batas server.',
+            'file.mimes'      => 'Berkas harus berformat PDF, DOC, DOCX, ZIP, atau TXT.',
+            'file.extensions' => 'Berkas harus berformat PDF, DOC, DOCX, ZIP, atau TXT.',
+            'file.max'      => 'Ukuran berkas maksimal 10 MB.',
+            'note.max'      => 'Catatan maksimal 1000 karakter.',
         ]);
 
         $file = $request->file('file');

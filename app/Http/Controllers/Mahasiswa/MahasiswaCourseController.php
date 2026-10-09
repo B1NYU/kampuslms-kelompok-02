@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -11,16 +12,37 @@ use Illuminate\View\View;
 class MahasiswaCourseController extends Controller
 {
     /**
-     * Tampilkan katalog seluruh mata kuliah untuk mahasiswa.
+     * Daftar mata kuliah yang DIIKUTI mahasiswa yang sedang login.
+     * Mata kuliah lain tidak ditampilkan (membukanya pun akan 403).
      */
     public function index(): View
     {
-        $courses = Course::with(['lecturer', 'students', 'assignments'])->orderBy('code')->get();
+        $student = Auth::user();
+
+        $courses = $student->courses()
+            ->with('lecturer')
+            ->withCount([
+                'students',
+                'assignments as published_assignments_count' => fn ($q) => $q->where('status', 'published'),
+                'materials',
+            ])
+            ->orderBy('code')
+            ->get();
+
+        // Jumlah tugas published yang sudah dikumpulkan mahasiswa ini, per mata kuliah.
+        $terkumpul = Submission::query()
+            ->join('assignments', 'assignments.id', '=', 'submissions.assignment_id')
+            ->where('submissions.user_id', $student->id)
+            ->where('assignments.status', 'published')
+            ->selectRaw('assignments.course_id, COUNT(*) AS total')
+            ->groupBy('assignments.course_id')
+            ->pluck('total', 'course_id');
+
         $matkulList = $courses;
 
         return view()->file(
             resource_path('views/courses/index.blade.php'),
-            compact('courses', 'matkulList')
+            compact('courses', 'matkulList', 'terkumpul')
         );
     }
 
@@ -36,10 +58,13 @@ class MahasiswaCourseController extends Controller
 
         abort_unless($mata_kuliah->isEnrolledBy($student), 403, 'Anda tidak terdaftar di mata kuliah ini.');
 
+        // Mahasiswa hanya boleh melihat tugas yang sudah dipublikasikan, dan hanya
+        // pengumpulan/nilai miliknya sendiri.
         $course = $mata_kuliah->load([
             'lecturer',
             'students',
-            'materials',
+            'materials' => fn ($q) => $q->orderBy('created_at'),
+            'assignments' => fn ($q) => $q->where('status', 'published')->orderBy('due_at'),
             'assignments.submissions' => fn ($q) => $q->where('user_id', $student->id),
             'assignments.submissions.grade',
         ]);
@@ -118,6 +143,8 @@ class MahasiswaCourseController extends Controller
             }
 
             $items[] = [
+                'id'             => $assignment->id,
+                'url'            => route('assignments.show', $assignment),
                 'pertemuan'      => 'Sesi ' . ($index + 1),
                 'tipe'           => 'Tugas Kuliah',
                 'judul'          => $assignment->title,

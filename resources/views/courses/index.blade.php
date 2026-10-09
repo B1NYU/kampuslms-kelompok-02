@@ -43,15 +43,19 @@
             <section class="courses-grid">
 
                 @php
-                    $dbCourses = $courses ?? \App\Models\Course::with(['lecturer', 'students', 'assignments'])->get();
+                    // Dikirim MahasiswaCourseController::index(): hanya MK yang diikuti mahasiswa ini.
+                    $dbCourses = $courses ?? collect();
+                    $terkumpul = $terkumpul ?? collect();
                     $colorList = ['banner-violet', 'banner-gold', 'banner-rose', 'banner-teal', 'banner-blue', 'banner-plum'];
                 @endphp
 
                 @forelse ($dbCourses as $idx => $item)
                     @php
                         $warna = $colorList[$idx % count($colorList)];
-                        $studentCount = $item->students->count();
-                        $assignCount = $item->assignments->count();
+                        $studentCount = $item->students_count ?? 0;
+                        $assignCount = $item->published_assignments_count ?? 0;
+                        $doneCount = (int) ($terkumpul[$item->id] ?? 0);
+                        $materiCount = $item->materials_count ?? 0;
                     @endphp
                     <a href="{{ route('mahasiswa.mata-kuliah.show', ['mata_kuliah' => $item->id]) }}" class="course-card">
                         <div class="course-banner {{ $warna }}">
@@ -69,13 +73,14 @@
                             <span class="course-dosen">{{ $item->lecturer?->name ?? 'Dosen Pengampu' }} • {{ $item->sks }} SKS</span>
 
                             <div style="margin-top: 4px; font-size: 11.5px; color: #8E6570; font-weight: 700;">
-                                📝 {{ $assignCount }} Tugas Terdaftar
+                                📝 {{ $doneCount }}/{{ $assignCount }} Tugas Terkumpul
+                                &nbsp;•&nbsp; 📄 {{ $materiCount }} Materi
                             </div>
                         </div>
                     </a>
                 @empty
                     <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #94A3B8;">
-                        Belum ada data mata kuliah di database.
+                        Anda belum terdaftar di mata kuliah mana pun. Hubungi admin atau dosen pengampu untuk didaftarkan.
                     </div>
                 @endforelse
 

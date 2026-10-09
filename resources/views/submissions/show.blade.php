@@ -121,6 +121,9 @@
                                             <span style="font-size: 12px; color: #64748B;">
                                                 ({{ number_format($submission->file_size / 1024, 1) }} KB)
                                             </span>
+                                            <a href="{{ route('submissions.download', $submission) }}" class="btn-secondary-action" style="font-size: 11px; padding: 6px 14px; margin-left: 6px;">
+                                                Unduh Berkas
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
