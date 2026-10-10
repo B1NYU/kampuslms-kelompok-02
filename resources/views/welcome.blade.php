@@ -75,8 +75,8 @@
             </h1>
 
             <p class="description">
-                Sistem manajemen perkuliahan daring terpusat untuk seluruh civitas akademika. 
-                Mempermudah mahasiswa, dosen, dan administrator dalam mengakses materi pembelajaran, 
+                Sistem manajemen perkuliahan daring terpusat untuk seluruh civitas akademika.
+                Mempermudah mahasiswa, dosen, dan administrator dalam mengakses materi pembelajaran,
                 jadwal perkuliahan, pengumpulan tugas, dan evaluasi akademik secara transparan dan efisien.
             </p>
 
@@ -216,6 +216,12 @@
                                     </svg>
                                 </button>
                             </div>
+                        </div>
+
+                        <div style="text-align: right; margin: -6px 0 18px;">
+                            <a href="{{ route('password.request') }}" style="font-size: 13px; font-weight: 800; color: #039FFA; text-decoration: none;">
+                                Lupa kata sandi?
+                            </a>
                         </div>
 
                         <!-- Tombol Submit -->
