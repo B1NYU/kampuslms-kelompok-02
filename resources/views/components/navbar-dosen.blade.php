@@ -1,3 +1,7 @@
+<style>
+    .btn-ubah-sandi { display: inline-flex; align-items: center; gap: 6px; background: #EFF6FF; border: 1px solid rgba(3, 159, 250, 0.3); color: #0369A1; text-decoration: none; font-size: 12px; font-weight: 800; padding: 7px 14px; border-radius: 10px; transition: background .2s, color .2s; }
+    .btn-ubah-sandi:hover { background: #039FFA; color: #FFFFFF; border-color: #039FFA; }
+</style>
 <nav class="top-navbar dosen-navbar">
     <!-- Kiri: Brand Logo, Portal Dosen Badge, dan Menu Navigasi Khusus Dosen -->
     <div class="navbar-left-group">
@@ -98,7 +102,14 @@
             </div>
 
             <!-- Extension / Dropdown Profil untuk Fitur Keluar -->
-            <div class="dosen-profile-dropdown" id="dosenProfileDropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 8px); background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); padding: 8px; min-width: 140px; z-index: 1000;">
+            <div class="dosen-profile-dropdown" id="dosenProfileDropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 8px); background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); padding: 8px; min-width: 180px; z-index: 1000;">
+                <a href="{{ route('akun.kata-sandi') }}" class="btn-ubah-sandi" title="Ubah kata sandi akun" style="width: 100%; justify-content: center; margin-bottom: 6px; box-sizing: border-box;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Ubah Kata Sandi</span>
+                </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
                 <a href="#" class="btn-logout" title="Keluar dari Portal Dosen" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="width: 100%; justify-content: center;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

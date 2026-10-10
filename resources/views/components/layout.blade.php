@@ -1,3 +1,7 @@
+<style>
+    .btn-ubah-sandi { display: inline-flex; align-items: center; gap: 6px; background: #EFF6FF; border: 1px solid rgba(3, 159, 250, 0.3); color: #0369A1; text-decoration: none; font-size: 12px; font-weight: 800; padding: 7px 14px; border-radius: 10px; transition: background .2s, color .2s; }
+    .btn-ubah-sandi:hover { background: #039FFA; color: #FFFFFF; border-color: #039FFA; }
+</style>
 <nav class="top-navbar">
     <!-- Kiri: Brand Logo, Judul, dan Menu Navigasi -->
     <div class="navbar-left-group">
@@ -39,13 +43,27 @@
 
     <!-- Kanan: Profil Mahasiswa & Tombol Logout -->
     <div class="navbar-right-group">
+        @php
+            $mhsAuth = auth()->user();
+            $mhsParts = preg_split('/\s+/', trim($mhsAuth?->name ?? 'Mahasiswa'));
+            $mhsInitials = strtoupper(mb_substr($mhsParts[0], 0, 1) . mb_substr($mhsParts[1] ?? '', 0, 1));
+        @endphp
         <div class="mhs-avatar-badge">
-            <div class="mhs-avatar">BA</div>
+            <div class="mhs-avatar">{{ $mhsInitials }}</div>
             <div class="mhs-badge-info">
-                <span class="mhs-name">Baihaqi Abimanyu</span>
-                <span class="mhs-role">Mahasiswa Aktif</span>
+                <span class="mhs-name">{{ $mhsAuth?->name ?? 'Mahasiswa' }}</span>
+                <span class="mhs-role">{{ $mhsAuth?->nim_nip ? 'NIM: ' . $mhsAuth->nim_nip : 'Mahasiswa Aktif' }}</span>
             </div>
         </div>
+
+        <a href="{{ route('akun.kata-sandi') }}" class="btn-ubah-sandi" title="Ubah kata sandi akun"
+           style="margin-right: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Kata Sandi</span>
+        </a>
 
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
         <a href="#" class="btn-logout" title="Keluar dari Akun Mahasiswa" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

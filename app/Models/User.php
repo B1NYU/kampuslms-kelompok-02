@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetKataSandi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,6 +31,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /** Email reset kata sandi memakai templat bahasa Indonesia. */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetKataSandi($token));
     }
 
     /**

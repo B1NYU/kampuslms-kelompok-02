@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\Admin\AdminAssignmentController;
 use App\Http\Controllers\Admin\AdminCourseController;
+use App\Http\Controllers\Admin\AdminGradeController;
 use App\Http\Controllers\Admin\AdminMaterialController;
 use App\Http\Controllers\Admin\AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AkunKataSandiController;
+use App\Http\Controllers\Auth\LupaKataSandiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dosen\AssignmentController as DosenAssignmentController;
 use App\Http\Controllers\Dosen\GradingController;
@@ -29,9 +32,27 @@ Route::get('/tentang', function () {
 Route::get('/login', fn () => redirect('/'))->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest')->name('login.attempt');
 
+// Lupa / reset kata sandi lewat email (dosen & mahasiswa). Nama 'password.reset' dipakai
+// Laravel untuk membentuk tautan di email, jadi jangan diubah.
+Route::middleware('guest')->group(function () {
+    Route::get('/lupa-sandi', [LupaKataSandiController::class, 'formPermintaan'])->name('password.request');
+    Route::post('/lupa-sandi', [LupaKataSandiController::class, 'kirimTautan'])
+        ->middleware('throttle:5,1')->name('password.email');
+    Route::get('/reset-sandi/{token}', [LupaKataSandiController::class, 'formReset'])->name('password.reset');
+    Route::post('/reset-sandi', [LupaKataSandiController::class, 'reset'])
+        ->middleware('throttle:5,1')->name('password.update');
+});
+
 Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Ubah kata sandi (sudah login): dosen & mahasiswa.
+    Route::middleware('role:dosen,mahasiswa')->prefix('akun')->name('akun.')->group(function () {
+        Route::get('/kata-sandi', [AkunKataSandiController::class, 'edit'])->name('kata-sandi');
+        Route::put('/kata-sandi', [AkunKataSandiController::class, 'update'])
+            ->middleware('throttle:6,1')->name('kata-sandi.update');
+    });
 
     // ===== Mahasiswa =====
     Route::middleware('role:mahasiswa')->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
