@@ -46,6 +46,4 @@
             <span>Kirim Tautan Reset</span>
         </button>
     </form>
-
-    <a href="{{ url('/') }}" class="auth-back">&larr; Kembali ke halaman login</a>
 @endsection

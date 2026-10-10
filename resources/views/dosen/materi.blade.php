@@ -248,6 +248,53 @@
                                        style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: block;">
                             </div>
 
+                            <!-- PREVIEW CONTAINER BERKAS MATERI DOSEN -->
+                            <div id="materialPreviewContainer" style="display: none; margin-top: 10px; background: #FFFFFF; border: 1.5px solid rgba(3, 159, 250, 0.3); border-radius: 12px; padding: 14px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                                        <div id="materialFileTypeBadge" style="width: 42px; height: 42px; border-radius: 10px; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11.5px; font-weight: 900;">
+                                            PDF
+                                        </div>
+                                        <div style="min-width: 0;">
+                                            <div id="materialPreviewName" style="font-size: 13.5px; font-weight: 800; color: #0F172A; word-break: break-all;">-</div>
+                                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11.5px; font-weight: 700;">
+                                                <span id="materialPreviewSize" style="color: #64748B;">-</span>
+                                                <span style="color: #CBD5E1;">&bull;</span>
+                                                <span style="background: #ECFDF5; color: #059669; padding: 1px 8px; border-radius: 6px; border: 1px solid #A7F3D0;">✓ Siap Dipublikasikan</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button type="button" id="btnChangeMaterial" style="background: #F1F5F9; border: 1px solid #CBD5E1; color: #334155; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                                            </svg>
+                                            Ganti Berkas
+                                        </button>
+                                        <button type="button" id="btnRemoveMaterial" style="background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- EMBEDDED PREVIEW JIKA BERKAS PDF -->
+                                <div id="materialInteractivePreview" style="display: none; margin-top: 12px; border-top: 1px solid #F1F5F9; padding-top: 10px;">
+                                    <div style="font-size: 12px; font-weight: 800; color: #475569; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        Pratinjau Dokumen PDF
+                                    </div>
+                                    <div id="materialEmbedHolder" style="width: 100%; height: 380px; border-radius: 8px; overflow: hidden; background: #F8FAFC; border: 1px solid #E2E8F0;"></div>
+                                </div>
+                            </div>
+
                             {{-- Kotak status berkas: gaya inline agar tidak bergantung pada CSS lain --}}
                             <div id="fileStatus" role="status" aria-live="polite"
                                  style="display: none; margin-top: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; word-break: break-all;"></div>
@@ -355,6 +402,16 @@
 
             const defaultDropzoneText = dropzoneText.textContent;
 
+            const materialPreviewContainer = document.getElementById('materialPreviewContainer');
+            const materialFileTypeBadge = document.getElementById('materialFileTypeBadge');
+            const materialPreviewName = document.getElementById('materialPreviewName');
+            const materialPreviewSize = document.getElementById('materialPreviewSize');
+            const materialInteractivePreview = document.getElementById('materialInteractivePreview');
+            const materialEmbedHolder = document.getElementById('materialEmbedHolder');
+            const btnChangeMaterial = document.getElementById('btnChangeMaterial');
+            const btnRemoveMaterial = document.getElementById('btnRemoveMaterial');
+            let materialCurrentObjectUrl = null;
+
             // Tampilkan status berkas di bawah dropzone (hijau = berhasil, merah = ditolak)
             function showFileStatus(ok, message) {
                 fileStatus.textContent = message;
@@ -368,6 +425,33 @@
                 fileStatus.textContent = '';
                 fileStatus.style.display = 'none';
                 dropzoneText.textContent = defaultDropzoneText;
+                if (materialPreviewContainer) materialPreviewContainer.style.display = 'none';
+                if (materialDropzone) materialDropzone.style.display = 'block';
+                if (materialInteractivePreview) materialInteractivePreview.style.display = 'none';
+                if (materialEmbedHolder) materialEmbedHolder.innerHTML = '';
+                if (materialCurrentObjectUrl) {
+                    URL.revokeObjectURL(materialCurrentObjectUrl);
+                    materialCurrentObjectUrl = null;
+                }
+            }
+
+            function clearMaterialPreview() {
+                materialFileInput.value = '';
+                resetFileStatus();
+            }
+
+            if (btnRemoveMaterial) {
+                btnRemoveMaterial.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearMaterialPreview();
+                });
+            }
+
+            if (btnChangeMaterial) {
+                btnChangeMaterial.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    materialFileInput.click();
+                });
             }
 
             function setType(activeType) {
@@ -378,8 +462,7 @@
                     fileUploadContainer.style.display = 'none';
                     linkInputContainer.style.display = 'block';
                     // Kosongkan berkas agar tidak ikut terkirim
-                    materialFileInput.value = '';
-                    resetFileStatus();
+                    clearMaterialPreview();
                 } else {
                     fileUploadContainer.style.display = 'block';
                     linkInputContainer.style.display = 'none';
@@ -417,8 +500,6 @@
             });
 
             // Dijalankan setiap kali berkas dipilih (lewat klik maupun seret).
-            // Atribut accept tidak berlaku untuk berkas yang diseret, jadi dicek di sini juga
-            // (server tetap memvalidasi ulang di StoreMaterialRequest).
             materialFileInput.addEventListener('change', () => {
                 const file = materialFileInput.files[0];
 
@@ -432,6 +513,8 @@
                 if (!['pdf', 'ppt', 'pptx'].includes(ext)) {
                     materialFileInput.value = '';
                     dropzoneText.textContent = defaultDropzoneText;
+                    if (materialPreviewContainer) materialPreviewContainer.style.display = 'none';
+                    if (materialDropzone) materialDropzone.style.display = 'block';
                     showFileStatus(false, '✕ Format tidak didukung. Pilih berkas PDF, PPT, atau PPTX.');
                     return;
                 }
@@ -439,6 +522,8 @@
                 if (file.size > 50 * 1024 * 1024) {
                     materialFileInput.value = '';
                     dropzoneText.textContent = defaultDropzoneText;
+                    if (materialPreviewContainer) materialPreviewContainer.style.display = 'none';
+                    if (materialDropzone) materialDropzone.style.display = 'block';
                     showFileStatus(false, '✕ Ukuran berkas maksimal 50 MB.');
                     return;
                 }
@@ -446,6 +531,47 @@
                 const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
                 dropzoneText.textContent = file.name;
                 showFileStatus(true, `✓ Berkas dipilih: ${file.name} (${sizeMb} MB)`);
+
+                // Update Preview Card Details
+                if (materialPreviewName) materialPreviewName.textContent = file.name;
+                if (materialPreviewSize) materialPreviewSize.textContent = `${sizeMb} MB`;
+
+                if (materialFileTypeBadge) {
+                    if (ext === 'pdf') {
+                        materialFileTypeBadge.textContent = 'PDF';
+                        materialFileTypeBadge.style.background = '#FEE2E2';
+                        materialFileTypeBadge.style.color = '#DC2626';
+                    } else {
+                        materialFileTypeBadge.textContent = ext.toUpperCase();
+                        materialFileTypeBadge.style.background = '#FFEDD5';
+                        materialFileTypeBadge.style.color = '#EA580C';
+                    }
+                }
+
+                // Interactive preview untuk berkas PDF
+                if (materialCurrentObjectUrl) {
+                    URL.revokeObjectURL(materialCurrentObjectUrl);
+                    materialCurrentObjectUrl = null;
+                }
+                if (materialEmbedHolder) materialEmbedHolder.innerHTML = '';
+
+                if (ext === 'pdf' && materialEmbedHolder && materialInteractivePreview) {
+                    materialCurrentObjectUrl = URL.createObjectURL(file);
+                    const embed = document.createElement('embed');
+                    embed.src = materialCurrentObjectUrl;
+                    embed.type = 'application/pdf';
+                    embed.style.width = '100%';
+                    embed.style.height = '100%';
+                    embed.style.border = 'none';
+                    embed.style.display = 'block';
+                    materialEmbedHolder.appendChild(embed);
+                    materialInteractivePreview.style.display = 'block';
+                } else if (materialInteractivePreview) {
+                    materialInteractivePreview.style.display = 'none';
+                }
+
+                if (materialPreviewContainer) materialPreviewContainer.style.display = 'block';
+                if (materialDropzone) materialDropzone.style.display = 'none';
             });
 
             // ===== Modal Controls =====

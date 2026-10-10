@@ -213,28 +213,112 @@
                                     Tenggat sudah lewat. Pengumpulan tetap diterima tetapi akan ditandai terlambat.
                                 </div>
                             @endif
-                        <form action="{{ route('mahasiswa.assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data" class="card-form">
+                        <style>
+                            @media (max-width: 860px) {
+                                .submission-grid-layout {
+                                    grid-template-columns: 1fr !important;
+                                    gap: 18px !important;
+                                }
+                            }
+                        </style>
+                        <form id="submissionForm" action="{{ route('mahasiswa.assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data" class="card-form">
                             @csrf
-                            <div class="form-group">
-                                <label for="file">
-                                    Berkas (pdf, doc, docx, zip, txt; maks 10 MB) <span class="required">*</span>
-                                </label>
-                                <input type="file" id="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.zip,.txt" style="padding-top: 6px;">
-                                @error('file')<small style="color:#B91C1C;font-weight:700;">{{ $message }}</small>@enderror
-                            </div>
+                            <div class="submission-grid-layout" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; align-items: start;">
+                                <!-- KOLOM KIRI: UNGGAH BERKAS TUGAS -->
+                                <div class="submission-col-left">
+                                    <label style="display: block; font-size: 13.5px; font-weight: 800; color: #1E293B; margin-bottom: 8px;">
+                                        Unggah Berkas Tugas <span class="required">*</span>
+                                    </label>
 
-                            <div class="form-group">
-                                <label for="note">Catatan</label>
-                                <textarea id="note" name="note" class="form-textarea" rows="3" maxlength="1000" placeholder="Tuliskan catatan atau keterangan pengumpulan bila diperlukan...">{{ old('note') }}</textarea>
-                            </div>
+                                    <!-- DROPZONE INTERAKTIF -->
+                                    <div class="submission-dropzone" id="submissionDropzone" style="width: 100%; border: 2px dashed rgba(3, 159, 250, 0.4); border-radius: 16px; padding: 32px 20px; background: #F8FAFC; text-align: center; cursor: pointer; transition: all 0.25s ease; position: relative; box-sizing: border-box;">
+                                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #EFF6FF; color: #039FFA; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; transition: transform 0.2s ease;">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                        </div>
+                                        <div style="font-size: 14px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">
+                                            Tarik &amp; letakkan berkas di sini, atau <span style="color: #039FFA; text-decoration: underline;">Pilih File</span>
+                                        </div>
+                                        <div style="font-size: 12px; font-weight: 600; color: #64748B;">
+                                            Mendukung: <strong style="color: #0284C7;">PDF, DOC, DOCX, ZIP, TXT</strong> &bull; Maksimal 10 MB
+                                        </div>
 
-                            <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                                <button type="submit" class="btn-primary-action">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                    {{ $mySubmission ? 'Kumpulkan Ulang' : 'Kumpulkan' }}
-                                </button>
+                                        <input type="file" id="submissionFileInput" name="file" required accept=".pdf,.doc,.docx,.zip,.txt"
+                                               style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: block;">
+                                    </div>
+
+                                    <!-- PREVIEW CONTAINER BERKAS TUGAS -->
+                                    <div id="submissionPreviewContainer" style="display: none; width: 100%; background: #FFFFFF; border: 1.5px solid rgba(3, 159, 250, 0.3); border-radius: 16px; padding: 16px 18px; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05); box-sizing: border-box;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                                            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                                                <div id="fileTypeIcon" style="width: 40px; height: 40px; border-radius: 10px; background: #EFF6FF; color: #039FFA; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 900;">
+                                                    DOC
+                                                </div>
+                                                <div style="min-width: 0;">
+                                                    <div id="previewFileName" style="font-size: 13px; font-weight: 800; color: #0F172A; word-break: break-all;">-</div>
+                                                    <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 11px; font-weight: 700;">
+                                                        <span id="previewFileSize" style="color: #64748B;">-</span>
+                                                        <span style="color: #CBD5E1;">&bull;</span>
+                                                        <span style="background: #ECFDF5; color: #059669; padding: 1px 6px; border-radius: 5px; border: 1px solid #A7F3D0;">✓ Siap Dikumpulkan</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <button type="button" id="btnChangeFile" style="background: #F1F5F9; border: 1px solid #CBD5E1; color: #334155; font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                                                    </svg>
+                                                    Ganti
+                                                </button>
+                                                <button type="button" id="btnRemoveFile" style="background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- PRATINJAU DOKUMEN INTERAKTIF (PDF / TEKS) -->
+                                        <div id="interactivePreviewBox" style="display: none; margin-top: 14px; border-top: 1px solid #F1F5F9; padding-top: 12px;">
+                                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                                <span style="font-size: 11.5px; font-weight: 800; color: #475569; display: flex; align-items: center; gap: 6px;">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                        <circle cx="12" cy="12" r="3"></circle>
+                                                    </svg>
+                                                    Pratinjau Dokumen
+                                                </span>
+                                            </div>
+                                            <div id="docPreviewHolder" style="width: 100%; height: 460px; border-radius: 10px; overflow: hidden; background: #F8FAFC; border: 1.5px solid #E2E8F0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="fileUploadError" role="alert" style="display: none; margin-top: 8px; padding: 8px 12px; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; font-size: 12.5px; font-weight: 700; color: #B91C1C;"></div>
+                                    @error('file')<small style="color:#B91C1C;font-weight:700;display:block;margin-top:6px;">{{ $message }}</small>@enderror
+                                </div>
+
+                                <!-- KOLOM KANAN: CATATAN PENGUMPULAN & SUBMIT -->
+                                <div class="submission-col-right" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <label for="note" style="display: block; font-size: 13.5px; font-weight: 800; color: #1E293B;">
+                                        Catatan Pengumpulan
+                                    </label>
+                                    <textarea id="note" name="note" class="form-textarea" rows="6" maxlength="1000" placeholder="Tuliskan catatan atau keterangan pengumpulan bila diperlukan..." style="width: 100%; min-height: 140px; box-sizing: border-box; resize: vertical;">{{ old('note') }}</textarea>
+
+                                    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                                        <button type="submit" class="btn-primary-action" style="padding: 10px 24px; font-size: 13.5px;">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            {{ $mySubmission ? 'Kumpulkan Ulang' : 'Kumpulkan Tugas' }}
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                         @endif
@@ -351,6 +435,177 @@
         <x-footer />
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('submissionFileInput');
+            const dropzone = document.getElementById('submissionDropzone');
+            const previewContainer = document.getElementById('submissionPreviewContainer');
+            const previewFileName = document.getElementById('previewFileName');
+            const previewFileSize = document.getElementById('previewFileSize');
+            const fileTypeIcon = document.getElementById('fileTypeIcon');
+            const interactivePreviewBox = document.getElementById('interactivePreviewBox');
+            const docPreviewHolder = document.getElementById('docPreviewHolder');
+            const fileUploadError = document.getElementById('fileUploadError');
+            const btnChangeFile = document.getElementById('btnChangeFile');
+            const btnRemoveFile = document.getElementById('btnRemoveFile');
+
+            if (!fileInput) return;
+
+            let currentObjectUrl = null;
+
+            function formatBytes(bytes) {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function getFileBadgeConfig(ext) {
+                switch(ext) {
+                    case 'pdf':
+                        return { label: 'PDF', bg: '#FEE2E2', color: '#DC2626' };
+                    case 'doc':
+                    case 'docx':
+                        return { label: 'DOC', bg: '#EFF6FF', color: '#2563EB' };
+                    case 'zip':
+                        return { label: 'ZIP', bg: '#FEF3C7', color: '#D97706' };
+                    case 'txt':
+                        return { label: 'TXT', bg: '#F1F5F9', color: '#475569' };
+                    default:
+                        return { label: ext.toUpperCase().slice(0, 4) || 'FILE', bg: '#EFF6FF', color: '#039FFA' };
+                }
+            }
+
+            function clearPreview() {
+                if (currentObjectUrl) {
+                    URL.revokeObjectURL(currentObjectUrl);
+                    currentObjectUrl = null;
+                }
+                fileInput.value = '';
+                previewContainer.style.display = 'none';
+                interactivePreviewBox.style.display = 'none';
+                docPreviewHolder.innerHTML = '';
+                dropzone.style.display = 'block';
+                if (fileUploadError) {
+                    fileUploadError.style.display = 'none';
+                    fileUploadError.textContent = '';
+                }
+            }
+
+            if (btnRemoveFile) {
+                btnRemoveFile.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    clearPreview();
+                });
+            }
+
+            if (btnChangeFile) {
+                btnChangeFile.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fileInput.click();
+                });
+            }
+
+            // Drag effects
+            if (dropzone) {
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, function(e) {
+                        e.preventDefault();
+                        dropzone.style.borderColor = '#039FFA';
+                        dropzone.style.background = 'rgba(3, 159, 250, 0.08)';
+                    });
+                });
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, function(e) {
+                        e.preventDefault();
+                        dropzone.style.borderColor = 'rgba(3, 159, 250, 0.4)';
+                        dropzone.style.background = '#F8FAFC';
+                    });
+                });
+            }
+
+            fileInput.addEventListener('change', function() {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    clearPreview();
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                const ext = file.name.split('.').pop().toLowerCase();
+                const allowedExts = ['pdf', 'doc', 'docx', 'zip', 'txt'];
+
+                if (fileUploadError) {
+                    fileUploadError.style.display = 'none';
+                    fileUploadError.textContent = '';
+                }
+
+                if (!allowedExts.includes(ext)) {
+                    fileUploadError.textContent = '✕ Format berkas tidak didukung. Harap pilih PDF, DOC, DOCX, ZIP, atau TXT.';
+                    fileUploadError.style.display = 'block';
+                    fileInput.value = '';
+                    return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                    fileUploadError.textContent = '✕ Ukuran berkas melebihi batas maksimal 10 MB.';
+                    fileUploadError.style.display = 'block';
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Update preview details
+                previewFileName.textContent = file.name;
+                previewFileSize.textContent = formatBytes(file.size);
+
+                const badge = getFileBadgeConfig(ext);
+                fileTypeIcon.textContent = badge.label;
+                fileTypeIcon.style.background = badge.bg;
+                fileTypeIcon.style.color = badge.color;
+
+                // Handle interactive preview
+                if (currentObjectUrl) {
+                    URL.revokeObjectURL(currentObjectUrl);
+                    currentObjectUrl = null;
+                }
+                docPreviewHolder.innerHTML = '';
+                interactivePreviewBox.style.display = 'none';
+
+                if (ext === 'pdf') {
+                    currentObjectUrl = URL.createObjectURL(file);
+                    const embed = document.createElement('embed');
+                    embed.src = currentObjectUrl;
+                    embed.type = 'application/pdf';
+                    embed.style.width = '100%';
+                    embed.style.height = '100%';
+                    embed.style.border = 'none';
+                    embed.style.display = 'block';
+                    docPreviewHolder.appendChild(embed);
+                    interactivePreviewBox.style.display = 'block';
+                } else if (ext === 'txt') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const pre = document.createElement('pre');
+                        pre.style.margin = '0';
+                        pre.style.padding = '12px 14px';
+                        pre.style.maxHeight = '200px';
+                        pre.style.overflowY = 'auto';
+                        pre.style.fontSize = '12px';
+                        pre.style.fontFamily = 'monospace';
+                        pre.style.color = '#334155';
+                        pre.style.whiteSpace = 'pre-wrap';
+                        pre.textContent = e.target.result.slice(0, 1500) + (e.target.result.length > 1500 ? '\n\n... (konten terpotong untuk pratinjau)' : '');
+                        docPreviewHolder.appendChild(pre);
+                        interactivePreviewBox.style.display = 'block';
+                    };
+                    reader.readAsText(file);
+                }
+
+                previewContainer.style.display = 'block';
+                dropzone.style.display = 'none';
+            });
+        });
+    </script>
 </body>
 
 </html>
