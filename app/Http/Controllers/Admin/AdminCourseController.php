@@ -3,23 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Course;
-use App\Models\User;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\Models\Course;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class AdminCourseController extends Controller
 {
     private const STATUSES = ['draft', 'active', 'archived'];
 
     /**
-     * Tampilkan daftar mata kuliah dengan pencarian, filter status & dosen, dan pagination.
+     * Daftar mata kuliah dengan pencarian, filter status & dosen, dan pagination.
      */
     public function index(Request $request): View
     {
+        Gate::authorize('viewAny', Course::class);
+
         $search = trim((string) $request->query('q', ''));
 
         // Whitelist: nilai di luar daftar dianggap "tidak memfilter".
@@ -61,6 +63,8 @@ class AdminCourseController extends Controller
 
     public function store(StoreCourseRequest $request)
     {
+        Gate::authorize('create', Course::class);
+
         Course::create($request->validated());
 
         return redirect()
@@ -70,6 +74,8 @@ class AdminCourseController extends Controller
 
     public function update(UpdateCourseRequest $request, Course $matkul)
     {
+        Gate::authorize('update', $matkul);
+
         $matkul->update($request->validated());
 
         return redirect()
@@ -77,21 +83,18 @@ class AdminCourseController extends Controller
             ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
+    /**
+     * Hanya admin. MK yang masih punya tugas, materi, atau mahasiswa ditolak
+     * CoursePolicy@delete dengan 409; handler di bootstrap/app.php mengubahnya
+     * menjadi redirect back() dengan flash 'error' (filter di URL tetap terjaga).
+     * Pemeriksaan ini sengaja di aplikasi, karena FK materials/assignments
+     * memakai cascadeOnDelete (Bagian 4.2) dan database tidak akan menolak.
+     */
     public function destroy(Request $request, Course $matkul)
     {
-        try {
-            $matkul->delete();
-        } catch (QueryException $e) {
-            // 23000 = MySQL/MariaDB integrity violation, 23503 = PostgreSQL foreign key violation.
-            if (in_array((string) $e->getCode(), ['23000', '23503'], true)) {
-                return redirect()
-                    ->action([self::class, 'index'], $this->redirectFilters($request))
-                    ->with('error', 'Mata kuliah tidak dapat dihapus karena masih memiliki data terkait '
-                        . '(tugas, materi, atau mahasiswa). Ubah statusnya menjadi archived sebagai gantinya.');
-            }
+        Gate::authorize('delete', $matkul);
 
-            throw $e;
-        }
+        $matkul->delete();
 
         return redirect()
             ->action([self::class, 'index'], $this->redirectFilters($request))
@@ -100,8 +103,7 @@ class AdminCourseController extends Controller
 
     /**
      * Ambil filter yang sedang aktif dari hidden field form (redirect_q,
-     * redirect_status, redirect_lecturer_id), lalu buang yang kosong agar
-     * tidak muncul sebagai ?status=&lecturer_id= di URL hasil redirect.
+     * redirect_status, redirect_lecturer_id), lalu buang yang kosong.
      */
     private function redirectFilters(Request $request): array
     {
@@ -125,6 +127,4 @@ class AdminCourseController extends Controller
             'description'   => $course->description,
         ];
     }
-
-
 }

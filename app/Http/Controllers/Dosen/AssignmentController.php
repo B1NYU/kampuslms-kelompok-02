@@ -7,21 +7,17 @@ use App\Models\Assignment;
 use App\Models\Course;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
  * Pengelolaan tugas oleh dosen. Middleware role:dosen hanya membuka pintu;
- * dosen hanya boleh mengelola tugas di mata kuliah yang ia AMPU.
- *
- * Tampilan: satu halaman (dosen/tugas.blade.php) berisi form + daftar tugas.
+ * seluruh aturan akses (pengampu, status MK, penghapusan) ada di AssignmentPolicy.
  */
 class AssignmentController extends Controller
 {
-    /**
-     * /dosen/tugas — pintu masuk dari menu "Buat Tugas".
-     * Diarahkan ke mata kuliah pertama yang diampu dosen.
-     */
+    /** /dosen/tugas — diarahkan ke mata kuliah pertama yang diampu. */
     public function landing(Request $request): RedirectResponse
     {
         $course = $request->user()->taughtCourses()->orderBy('code')->first();
@@ -36,25 +32,22 @@ class AssignmentController extends Controller
 
     public function index(Course $course): View
     {
-        $this->authorizeCourse($course);
+        Gate::authorize('viewAny', [Assignment::class, $course]);
 
         return $this->page($course, new Assignment());
     }
 
-    /**
-     * Form tambah sudah ada di halaman index, jadi cukup diarahkan ke sana.
-     * (Method ini dipertahankan agar route resource lama tetap valid.)
-     */
+    /** Form tambah ada di halaman index; method ini menjaga route resource lama tetap valid. */
     public function create(Course $course): RedirectResponse
     {
-        $this->authorizeCourse($course);
+        Gate::authorize('create', [Assignment::class, $course]);
 
         return redirect()->route('dosen.courses.assignments.index', $course);
     }
 
     public function store(Request $request, Course $course): RedirectResponse
     {
-        $this->authorizeCourse($course);
+        Gate::authorize('create', [Assignment::class, $course]);
 
         $assignment = new Assignment($this->validated($request));
         // course_id dan created_by dari server, bukan dari input pengguna.
@@ -66,17 +59,16 @@ class AssignmentController extends Controller
             ->with('success', 'Tugas berhasil dibuat.');
     }
 
-    /** Halaman yang sama dengan index, form terisi data tugas yang diubah. */
     public function edit(Assignment $assignment): View
     {
-        $this->authorizeAssignment($assignment);
+        Gate::authorize('update', $assignment);
 
         return $this->page($assignment->course, $assignment);
     }
 
     public function update(Request $request, Assignment $assignment): RedirectResponse
     {
-        $this->authorizeAssignment($assignment);
+        Gate::authorize('update', $assignment);
 
         $assignment->update($this->validated($request));
 
@@ -86,11 +78,9 @@ class AssignmentController extends Controller
 
     public function destroy(Assignment $assignment): RedirectResponse
     {
-        $this->authorizeAssignment($assignment);
-
-        if ($assignment->submissions()->exists()) {
-            return back()->with('error', 'Tugas tidak dapat dihapus karena sudah ada pengumpulan mahasiswa.');
-        }
+        // Tugas yang sudah punya pengumpulan ditolak 409 oleh policy; handler di
+        // bootstrap/app.php mengubahnya menjadi redirect back()->with('error', ...).
+        Gate::authorize('delete', $assignment);
 
         $courseId = $assignment->course_id;
         $assignment->delete();
@@ -99,7 +89,6 @@ class AssignmentController extends Controller
             ->with('success', 'Tugas berhasil dihapus.');
     }
 
-    /** Data untuk view: dropdown mata kuliah, daftar tugas, dan tugas yang sedang diubah. */
     private function page(Course $course, Assignment $assignment): View
     {
         $courses = auth()->user()->taughtCourses()->orderBy('code')->get();
@@ -114,22 +103,8 @@ class AssignmentController extends Controller
         return view('dosen.tugas', compact('courses', 'course', 'assignments', 'assignment', 'studentCount'));
     }
 
-    private function authorizeCourse(Course $course): void
-    {
-        abort_unless($course->isTaughtBy(auth()->user()), 403);
-    }
-
-    private function authorizeAssignment(Assignment $assignment): void
-    {
-        abort_unless($assignment->isManageableBy(auth()->user()), 403);
-    }
-
     private function validated(Request $request): array
     {
-        // Form memakai dua input (tanggal + jam); digabung menjadi satu nilai due_at.
-        // Checkbox yang tidak dicentang tidak dikirim browser, jadi dipaksa menjadi boolean.
-        // Keduanya di-merge ke request supaya ikut tersimpan sebagai old input
-        // bila validasi gagal.
         $request->merge([
             'due_at' => $request->filled('due_date') && $request->filled('due_time')
                 ? $request->input('due_date') . ' ' . $request->input('due_time')
@@ -149,6 +124,8 @@ class AssignmentController extends Controller
             'instructions' => 'instruksi',
             'due_at'       => 'batas waktu',
             'max_score'    => 'nilai maksimal',
+            'allow_late'   => 'boleh keterlambatan',
+            'status'       => 'status',
         ]);
     }
 }

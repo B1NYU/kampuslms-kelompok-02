@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 class Submission extends Model
 {
@@ -29,15 +30,10 @@ class Submission extends Model
         ];
     }
 
-    /**
-     * Boleh melihat pengumpulan: pemilik, dosen pengampu, atau admin.
-     * (Versi sementara minggu 5; dipindah ke SubmissionPolicy di minggu 7.)
-     */
+    /** Aturan ada di SubmissionPolicy@view. Dipertahankan untuk pemanggil lama. */
     public function isViewableBy(User $user): bool
     {
-        return $user->role === 'admin'
-            || $this->user_id === $user->id
-            || $this->assignment->course->isTaughtBy($user);
+        return Gate::forUser($user)->allows('view', $this);
     }
 
     public function assignment()

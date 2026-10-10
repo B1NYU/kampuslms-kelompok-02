@@ -17,13 +17,14 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
 
-        // Baca: dosen pengampu, mahasiswa terdaftar, admin (dicek di controller).
+        // Baca: aturan akses di CoursePolicy / AssignmentPolicy (dicek di controller).
         Route::get('courses', [CourseController::class, 'index']);
         Route::get('courses/{course}', [CourseController::class, 'show']);
         Route::get('courses/{course}/assignments', [AssignmentController::class, 'index']);
 
-        // 3. Khusus dosen. Mahasiswa mendapat 403 (bukan 401).
-        Route::middleware('role:dosen')->group(function () {
+        // 3. Tulis tugas: admin dan dosen (keputusan B3, melengkapi Bagian 5).
+        //    Mahasiswa mendapat 403 (bukan 401). Kepemilikan MK dicek policy.
+        Route::middleware('role:admin,dosen')->group(function () {
             Route::post('assignments', [AssignmentController::class, 'store']);
             Route::match(['put', 'patch'], 'assignments/{assignment}', [AssignmentController::class, 'update']);
             Route::delete('assignments/{assignment}', [AssignmentController::class, 'destroy']);

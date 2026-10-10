@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 class Material extends Model
 {
@@ -31,10 +32,10 @@ class Material extends Model
         ];
     }
 
-    /** Admin, dosen pengampu, atau mahasiswa terdaftar di mata kuliahnya. */
+    /** Aturan ada di MaterialPolicy@view. Dipertahankan untuk pemanggil lama. */
     public function isViewableBy(User $user): bool
     {
-        return $this->course->isViewableBy($user);
+        return Gate::forUser($user)->allows('view', $this);
     }
 
     public function isLink(): bool

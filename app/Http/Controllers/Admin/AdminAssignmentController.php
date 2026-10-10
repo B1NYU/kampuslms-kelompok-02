@@ -7,14 +7,13 @@ use App\Models\Assignment;
 use App\Models\Course;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AdminAssignmentController extends Controller
 {
-    /**
-     * Tampilkan halaman manajemen tugas di panel admin.
-     */
     public function index(Request $request): View
     {
         $coursesList = Course::with('lecturer')->orderBy('code')->get();
@@ -24,7 +23,6 @@ class AdminAssignmentController extends Controller
             ->orderBy('due_at')
             ->get();
 
-        // Hitung statistik untuk bar metrik ringkasan
         $totalAssignments = $assignments->count();
         $totalPublished   = $assignments->where('status', 'published')->count();
         $totalDraft       = $assignments->where('status', 'draft')->count();
@@ -40,43 +38,41 @@ class AdminAssignmentController extends Controller
         ]);
     }
 
-    /**
-     * Simpan penugasan baru yang dibuat oleh admin.
-     */
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validateAssignment($request);
 
+        $course = Course::findOrFail($data['course_id']);
+        Gate::authorize('create', [Assignment::class, $course]);
+
         $assignment = new Assignment($data);
-        $assignment->course_id  = $data['course_id'];
-        $assignment->created_by = $request->user()->id;
+        $assignment->course_id  = $course->id;
+        $assignment->created_by = $request->user()->id;   // id admin yang sedang login (keputusan B3)
         $assignment->save();
 
         return redirect()->route('admin.tugas')
             ->with('success', "Tugas \"{$assignment->title}\" berhasil ditambahkan.");
     }
 
-    /**
-     * Perbarui data tugas yang ada.
-     */
     public function update(Request $request, Assignment $assignment): RedirectResponse
     {
+        Gate::authorize('update', $assignment);
+
         $data = $this->validateAssignment($request);
 
-        $assignment->update($data);
+        // course_id sengaja dibuang: tugas tidak boleh dipindah antar mata kuliah,
+        // karena submission dan enrollment-nya terikat ke mata kuliah asal.
+        $assignment->update(Arr::except($data, ['course_id']));
 
         return redirect()->route('admin.tugas')
             ->with('success', "Tugas \"{$assignment->title}\" berhasil diperbarui.");
     }
 
-    /**
-     * Hapus tugas jika belum ada pengumpulan dari mahasiswa.
-     */
     public function destroy(Assignment $assignment): RedirectResponse
     {
-        if ($assignment->submissions()->exists()) {
-            return back()->with('error', 'Tugas tidak dapat dihapus karena sudah ada pengumpulan dari mahasiswa.');
-        }
+        // Ditolak 409 oleh policy bila sudah ada pengumpulan; handler global
+        // mengubahnya menjadi redirect back() dengan flash 'error'.
+        Gate::authorize('delete', $assignment);
 
         $title = $assignment->title;
         $assignment->delete();
@@ -85,12 +81,8 @@ class AdminAssignmentController extends Controller
             ->with('success', "Tugas \"{$title}\" berhasil dihapus.");
     }
 
-    /**
-     * Validasi data input tugas dari form admin.
-     */
     private function validateAssignment(Request $request): array
     {
-        // Mendukung format input tanggal & jam terpisah (seperti mode dosen) atau input tunggal due_at
         if ($request->filled('due_date') && $request->filled('due_time')) {
             $request->merge([
                 'due_at' => $request->input('due_date') . ' ' . $request->input('due_time'),
