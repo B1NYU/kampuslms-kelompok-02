@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GradeSubmissionRequest;
 use App\Models\Grade;
 use App\Models\Submission;
 use Illuminate\Http\JsonResponse;
@@ -12,7 +13,9 @@ use Illuminate\View\View;
 class GradingController extends Controller
 {
     /**
-     * Halaman Penilaian & Feedback: pengumpulan dari mata kuliah aktif yang diampu dosen login.
+     * Pengumpulan dari mata kuliah AKTIF yang diampu dosen login.
+     * Penyaringan baris dilakukan di query (taughtCourses), sejalan dengan
+     * aturan SubmissionPolicy@grade: hanya MK active yang bisa dinilai.
      */
     public function index(Request $request): View
     {
@@ -44,26 +47,12 @@ class GradingController extends Controller
     }
 
     /**
-     * Simpan (baru / ubah) nilai & feedback untuk satu pengumpulan. Dipanggil via fetch (JSON).
+     * Simpan (baru / ubah) nilai & feedback. Otorisasi 'grade' dan validasi
+     * dijalankan GradeSubmissionRequest sebelum method ini dipanggil.
      */
-    public function update(Request $request, Submission $submission): JsonResponse
+    public function update(GradeSubmissionRequest $request, Submission $submission): JsonResponse
     {
-        $submission->loadMissing('assignment.course');
-
-        // Hanya dosen pengampu mata kuliah tersebut yang boleh menilai.
-        abort_unless($submission->assignment?->course?->isTaughtBy($request->user()), 403);
-
-        $data = $request->validate([
-            'score'    => ['required', 'numeric', 'min:0', 'max:100'],
-            'feedback' => ['required', 'string', 'max:2000'],
-        ], [
-            'score.required'    => 'Nilai wajib diisi.',
-            'score.numeric'     => 'Nilai harus berupa angka.',
-            'score.min'         => 'Nilai minimal 0.',
-            'score.max'         => 'Nilai maksimal 100.',
-            'feedback.required' => 'Feedback wajib diisi.',
-            'feedback.max'      => 'Feedback maksimal 2000 karakter.',
-        ]);
+        $data = $request->validated();
 
         $grade = Grade::updateOrCreate(
             ['submission_id' => $submission->id],

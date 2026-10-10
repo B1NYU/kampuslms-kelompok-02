@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -30,7 +31,6 @@ class AdminStudentController extends Controller
         // Filter MK yang sedang aktif (?mk=KODE), default semua.
         $selectedCode = $courses->firstWhere('code', $request->query('mk'))?->code ?? 'all';
 
-        // Blade ini diakses lewat file path (nama file memakai titik), bukan nama view.
         return view()->file(
             resource_path('views/admin/admin.pendaftaran.blade.php'),
             compact('courses', 'mahasiswaList', 'selectedCode')
@@ -38,7 +38,8 @@ class AdminStudentController extends Controller
     }
 
     /**
-     * Daftarkan mahasiswa ke mata kuliah.
+     * Daftarkan mahasiswa ke mata kuliah. MK draft boleh (dosen perlu mendaftarkan
+     * mahasiswa sebelum MK dibuka), MK archived tidak.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -51,17 +52,19 @@ class AdminStudentController extends Controller
             'course_id' => [
                 'required',
                 'integer',
-                Rule::exists('courses', 'id')->where('status', 'active'),
+                Rule::exists('courses', 'id')->whereIn('status', ['draft', 'active']),
             ],
         ], [
             'student_id.required' => 'Silakan pilih mahasiswa.',
             'student_id.exists'   => 'Mahasiswa yang dipilih tidak ditemukan.',
             'course_id.required'  => 'Silakan pilih mata kuliah.',
-            'course_id.exists'    => 'Mata kuliah tidak ditemukan atau belum berstatus aktif.',
+            'course_id.exists'    => 'Mata kuliah tidak ditemukan atau sudah diarsipkan.',
         ]);
 
         $course  = Course::findOrFail($data['course_id']);
         $student = User::findOrFail($data['student_id']);
+
+        Gate::authorize('manageEnrollment', $course);
 
         // Cegah enroll ganda dengan pesan yang jelas
         // (unique composite course_id + user_id di database tetap jadi pengaman terakhir).
@@ -80,9 +83,12 @@ class AdminStudentController extends Controller
 
     /**
      * Batalkan pendaftaran mahasiswa dari mata kuliah.
+     * Submission dan nilainya tidak dihapus; mahasiswa hanya kehilangan akses (Q3b).
      */
     public function destroy(Course $course, User $student): RedirectResponse
     {
+        Gate::authorize('manageEnrollment', $course);
+
         $removed = $course->students()->detach($student->id);
 
         if ($removed === 0) {

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMaterialRequest;
 use App\Models\Course;
 use App\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreMaterialRequest;
 
 class AdminMaterialController extends Controller
 {
@@ -26,6 +27,8 @@ class AdminMaterialController extends Controller
     {
         $data   = $request->validated();
         $course = Course::findOrFail($data['course_id']);
+
+        Gate::authorize('create', [Material::class, $course]);
 
         $payload = [
             'uploaded_by' => $request->user()->id,
@@ -54,6 +57,8 @@ class AdminMaterialController extends Controller
 
     public function update(Request $request, Material $material)
     {
+        Gate::authorize('update', $material);
+
         $rules = [
             'title'       => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -103,6 +108,8 @@ class AdminMaterialController extends Controller
 
     public function destroy(Material $material)
     {
+        Gate::authorize('delete', $material);
+
         if ($material->type === 'file' && $material->file_path) {
             Storage::disk('local')->delete($material->file_path);
         }

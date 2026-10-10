@@ -6,7 +6,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -44,9 +43,24 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // 409 — penolakan dari Policy karena data bertaut (MK/tugas yang masih punya data),
+        //       lewat Response::denyWithStatus(409, ...). Pesannya sudah ramah pengguna:
+        //       API → JSON {"message": ...}; web → kembali ke halaman asal dengan flash 'error'
+        //       (konvensi yang sama dengan controller lama).
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, Request $request) {
+            if ($e->getStatusCode() !== 409) {
+                return null;
+            }
+
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage()], 409);
+            }
+
+            return back()->with('error', $e->getMessage());
+        });
+
         // 403 / 429 / 405 — dari abort(), AuthorizationException, throttle, dll.
-        // Selalu JSON bersih tanpa stack trace (walau APP_DEBUG=true). Status lain
-        // dikembalikan null → diteruskan ke handler berikutnya.
+        // Selalu JSON bersih tanpa stack trace (walau APP_DEBUG=true).
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, Request $request) {
             if (! $request->is('api/*')) {
                 return null;

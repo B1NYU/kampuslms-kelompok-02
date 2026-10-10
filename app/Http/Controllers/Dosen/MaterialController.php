@@ -7,6 +7,7 @@ use App\Http\Requests\StoreMaterialRequest;
 use App\Models\Course;
 use App\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class MaterialController extends Controller
@@ -28,7 +29,8 @@ class MaterialController extends Controller
         $data   = $request->validated();
         $course = Course::findOrFail($data['course_id']);
 
-        // TODO (Policy): pastikan MK ini diampu dosen yang sedang login.
+        // Dosen pengampu, MK draft atau active (MK archived tidak boleh diubah).
+        Gate::authorize('create', [Material::class, $course]);
 
         $payload = [
             'uploaded_by' => $request->user()->id,
@@ -59,11 +61,7 @@ class MaterialController extends Controller
 
     public function update(Request $request, Material $material)
     {
-        // Hanya dosen pengampu mata kuliah materi ini yang boleh mengubahnya.
-        abort_unless(
-            $request->user()->taughtCourses()->whereKey($material->course_id)->exists(),
-            403
-        );
+        Gate::authorize('update', $material);
 
         $rules = [
             'title'       => ['required', 'string', 'max:255'],
@@ -114,7 +112,7 @@ class MaterialController extends Controller
 
     public function destroy(Material $material)
     {
-        // TODO (Policy): hanya dosen pengampu MK ini yang boleh menghapus.
+        Gate::authorize('delete', $material);
 
         if ($material->type === 'file' && $material->file_path) {
             Storage::disk('local')->delete($material->file_path);

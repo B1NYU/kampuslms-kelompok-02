@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class StudentController extends Controller
@@ -36,6 +37,7 @@ class StudentController extends Controller
 
     /**
      * Daftarkan mahasiswa (berdasarkan NIM) ke mata kuliah.
+     * CoursePolicy@manageEnrollment: dosen pengampu, MK draft atau active.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -50,8 +52,7 @@ class StudentController extends Controller
 
         $course = Course::findOrFail($data['course_id']);
 
-        // Dosen hanya boleh mengelola mata kuliah yang ia ampu.
-        abort_unless($course->isTaughtBy($request->user()), 403);
+        Gate::authorize('manageEnrollment', $course);
 
         $student = User::where('role', 'mahasiswa')
             ->where('nim_nip', trim($data['nim']))
@@ -77,11 +78,12 @@ class StudentController extends Controller
     }
 
     /**
-     * Keluarkan mahasiswa dari mata kuliah.
+     * Keluarkan mahasiswa dari mata kuliah. Submission dan nilainya tetap
+     * tersimpan untuk dosen dan admin; mahasiswa kehilangan akses (Q3b).
      */
     public function destroy(Request $request, Course $course, User $student): RedirectResponse
     {
-        abort_unless($course->isTaughtBy($request->user()), 403);
+        Gate::authorize('manageEnrollment', $course);
 
         $course->students()->detach($student->id);
 

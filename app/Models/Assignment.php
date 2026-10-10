@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 class Assignment extends Model
 {
@@ -29,30 +30,16 @@ class Assignment extends Model
         ];
     }
 
-    /** Dosen pengampu mata kuliah tugas ini boleh mengelola tugas. */
+    /** Aturan ada di AssignmentPolicy@update. Dipertahankan untuk pemanggil lama. */
     public function isManageableBy(User $user): bool
     {
-        return $this->course->isTaughtBy($user);
+        return Gate::forUser($user)->allows('update', $this);
     }
 
-    /**
-     * Boleh melihat tugas:
-     * - dosen pengampu (termasuk draft)
-     * - mahasiswa terdaftar, hanya bila tugas sudah dipublikasikan
-     */
+    /** Aturan ada di AssignmentPolicy@view (tugas draft tidak terlihat mahasiswa). */
     public function isVisibleTo(User $user): bool
     {
-        if ($user->role === 'admin') {
-            return true;
-        }
-
-        if ($user->role === 'dosen') {
-            return $this->isManageableBy($user);
-        }
-
-        return $user->role === 'mahasiswa'
-            && $this->status === 'published'
-            && $this->course->isEnrolledBy($user);
+        return Gate::forUser($user)->allows('view', $this);
     }
 
     public function creator()

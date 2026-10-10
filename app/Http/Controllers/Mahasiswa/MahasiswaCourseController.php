@@ -7,19 +7,21 @@ use App\Models\Course;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class MahasiswaCourseController extends Controller
 {
     /**
-     * Daftar mata kuliah yang DIIKUTI mahasiswa yang sedang login.
-     * Mata kuliah lain tidak ditampilkan (membukanya pun akan 403).
+     * Daftar mata kuliah yang DIIKUTI mahasiswa, tanpa yang berstatus draft
+     * (MK draft tidak terlihat mahasiswa — Q4).
      */
     public function index(): View
     {
         $student = Auth::user();
 
         $courses = $student->courses()
+            ->whereIn('courses.status', ['active', 'archived'])
             ->with('lecturer')
             ->withCount([
                 'students',
@@ -29,7 +31,6 @@ class MahasiswaCourseController extends Controller
             ->orderBy('code')
             ->get();
 
-        // Jumlah tugas published yang sudah dikumpulkan mahasiswa ini, per mata kuliah.
         $terkumpul = Submission::query()
             ->join('assignments', 'assignments.id', '=', 'submissions.assignment_id')
             ->where('submissions.user_id', $student->id)
@@ -47,19 +48,15 @@ class MahasiswaCourseController extends Controller
     }
 
     /**
-     * Tampilkan rincian alur 16 sesi perkuliahan dan rekapitulasi nilai tugas mahasiswa.
-     *
-     * Hanya mahasiswa yang TERDAFTAR di mata kuliah ini yang boleh membukanya,
-     * dan hanya pengumpulan/nilai MILIKNYA yang dimuat (bukan seluruh angkatan).
+     * Rincian MK. CoursePolicy@view memastikan mahasiswa terdaftar DAN MK bukan draft.
+     * Hanya tugas published, dan hanya pengumpulan/nilai MILIKNYA yang dimuat.
      */
     public function show(Course $mata_kuliah): View
     {
         $student = Auth::user();
 
-        abort_unless($mata_kuliah->isEnrolledBy($student), 403, 'Anda tidak terdaftar di mata kuliah ini.');
+        Gate::authorize('view', $mata_kuliah);
 
-        // Mahasiswa hanya boleh melihat tugas yang sudah dipublikasikan, dan hanya
-        // pengumpulan/nilai miliknya sendiri.
         $course = $mata_kuliah->load([
             'lecturer',
             'students',
@@ -78,9 +75,6 @@ class MahasiswaCourseController extends Controller
         );
     }
 
-    /**
-     * Helper: Format ringkasan metadata mata kuliah untuk tampilan detail.
-     */
     private function formatCourseMetadata(Course $course): array
     {
         return [
@@ -95,9 +89,6 @@ class MahasiswaCourseController extends Controller
         ];
     }
 
-    /**
-     * Helper: Kalkulasi status pengerjaan tugas, deadline WITA, umpan balik dosen, dan nilai.
-     */
     private function calculateGradesAndTasks(Course $course, ?User $student): array
     {
         $assignments = $course->assignments->sortBy('due_at')->values();
@@ -110,10 +101,10 @@ class MahasiswaCourseController extends Controller
             $submission = $student ? $assignment->submissions->firstWhere('user_id', $student->id) : null;
             $grade = $submission?->grade;
 
+            // Tugas draft tidak pernah sampai ke sini (disaring di query, Q5),
+            // jadi cabang "Belum Dibuka" dihapus.
             $status = 'Belum Dikumpulkan';
-            if ($assignment->status === 'draft') {
-                $status = 'Belum Dibuka';
-            } elseif ($submission) {
+            if ($submission) {
                 $status = $grade ? 'Dinilai' : 'Menunggu Penilaian';
             } elseif ($assignment->due_at && $assignment->due_at->isPast()) {
                 $status = 'Lewat Deadline';
@@ -131,15 +122,18 @@ class MahasiswaCourseController extends Controller
                 $tanggalKumpul = 'Batas: ' . $assignment->due_at->translatedFormat('d M Y, H:i') . ' WITA';
             }
 
-            $feedback = 'Tugas belum dibuka untuk pengumpulan.';
+            $feedback = 'Silakan selesaikan dan kumpulkan sebelum batas waktu.';
             if ($grade && !empty($grade->feedback)) {
                 $feedback = $grade->feedback;
             } elseif ($submission) {
-                $feedback = 'Tugas telah dikumpulkan tepat waktu. Sedang dalam proses evaluasi oleh dosen pengampu.';
+                // Sebelumnya selalu tertulis "tepat waktu" walau pengumpulan terlambat.
+                $feedback = $submission->is_late
+                    ? 'Tugas dikumpulkan setelah batas waktu (terlambat). Sedang dalam proses evaluasi oleh dosen pengampu.'
+                    : 'Tugas telah dikumpulkan tepat waktu. Sedang dalam proses evaluasi oleh dosen pengampu.';
             } elseif ($status === 'Lewat Deadline') {
                 $feedback = 'Tenggat waktu pengumpulan telah berakhir. Hubungi dosen pengampu jika memerlukan dispensasi.';
-            } elseif ($status === 'Belum Dikumpulkan') {
-                $feedback = !empty($assignment->instructions) ? 'Instruksi: ' . $assignment->instructions : 'Silakan selesaikan dan kumpulkan sebelum batas waktu.';
+            } elseif (!empty($assignment->instructions)) {
+                $feedback = 'Instruksi: ' . $assignment->instructions;
             }
 
             $items[] = [
@@ -150,13 +144,13 @@ class MahasiswaCourseController extends Controller
                 'judul'          => $assignment->title,
                 'tanggal_kumpul' => $tanggalKumpul,
                 'status'         => $status,
+                'terlambat'      => (bool) $submission?->is_late,   // untuk badge "Terlambat" di view
                 'bobot'          => round(100 / max(1, $totalAssignments)) . '%',
                 'nilai'          => $grade ? round((float) $grade->score, 1) : null,
                 'feedback'       => $feedback,
             ];
         }
 
-        // Kalkulasi nilai rata-rata dan indeks prestasi
         $avg = $gradedCount > 0 ? round($totalScore / $gradedCount, 1) : null;
         $indeksPredikat = $this->convertScoreToGrade($avg);
 
@@ -172,36 +166,18 @@ class MahasiswaCourseController extends Controller
         ];
     }
 
-    /**
-     * Helper: Konversi nilai numerik (0-100) ke Indeks Huruf & Predikat Akademik.
-     */
     private function convertScoreToGrade(?float $avg): array
     {
         if ($avg === null) {
-            return [
-                'indeks'   => '-',
-                'predikat' => 'Belum Ada Penilaian',
-            ];
+            return ['indeks' => '-', 'predikat' => 'Belum Ada Penilaian'];
         }
 
-        if ($avg >= 85) {
-            return ['indeks' => 'A',  'predikat' => 'Sangat Memuaskan'];
-        }
-        if ($avg >= 75) {
-            return ['indeks' => 'B+', 'predikat' => 'Memuaskan'];
-        }
-        if ($avg >= 70) {
-            return ['indeks' => 'B',  'predikat' => 'Baik'];
-        }
-        if ($avg >= 65) {
-            return ['indeks' => 'C+', 'predikat' => 'Cukup Baik'];
-        }
-        if ($avg >= 60) {
-            return ['indeks' => 'C',  'predikat' => 'Cukup'];
-        }
-        if ($avg >= 50) {
-            return ['indeks' => 'D',  'predikat' => 'Kurang'];
-        }
+        if ($avg >= 85) { return ['indeks' => 'A',  'predikat' => 'Sangat Memuaskan']; }
+        if ($avg >= 75) { return ['indeks' => 'B+', 'predikat' => 'Memuaskan']; }
+        if ($avg >= 70) { return ['indeks' => 'B',  'predikat' => 'Baik']; }
+        if ($avg >= 65) { return ['indeks' => 'C+', 'predikat' => 'Cukup Baik']; }
+        if ($avg >= 60) { return ['indeks' => 'C',  'predikat' => 'Cukup']; }
+        if ($avg >= 50) { return ['indeks' => 'D',  'predikat' => 'Kurang']; }
 
         return ['indeks' => 'E', 'predikat' => 'Tidak Lulus'];
     }
