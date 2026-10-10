@@ -24,7 +24,6 @@
         <x-navbar-admin />
 
         <main class="admin-content">
-
             <!-- Topbar -->
             <header class="dash-topbar">
                 <div class="topbar-left">
@@ -32,237 +31,259 @@
                         <h1>Manajemen Mata Kuliah</h1>
                     </div>
                 </div>
+                <div class="topbar-right">
+                    <button type="button" class="btn-primary-action" id="btnOpenAddMatkulModal" style="padding: 9px 18px; font-size: 13px; width: auto; height: auto;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Tambah Mata Kuliah</span>
+                    </button>
+                </div>
             </header>
 
             <!-- Fitur: CRUD Mata Kuliah -->
             <section>
+                @php
+                    $isEditing = (bool) old('id');
+                @endphp
                 <div class="section-card">
-                    <div class="two-col-grid">
-                        <!-- Form Tambah/Edit Mata Kuliah -->
-                        @php
-                            // Jika reload ini adalah hasil validasi gagal saat mengedit
-                            // (id lama ikut kebawa lewat old()), form harus tetap mengarah
-                            // ke route update, bukan kembali ke store.
-                            $isEditing = (bool) old('id');
-                        @endphp
-                        <form id="formAddMatkul" class="card-form" method="POST"
-                              action="{{ $isEditing ? route('admin.matkul.update', ['matkul' => old('id')]) : route('admin.matkul.store') }}">
-                            @csrf
-                            <input type="hidden" id="mkId" name="id" value="{{ old('id') }}">
-                            <input type="hidden" id="mkMethodField" name="_method" value="{{ $isEditing ? 'PUT' : '' }}">
-                            <input type="hidden" name="redirect_q" value="{{ $filters['q'] }}">
-                            <input type="hidden" name="redirect_status" value="{{ $filters['status'] }}">
-                            <input type="hidden" name="redirect_lecturer_id" value="{{ $filters['lecturer_id'] }}">
-
-                            <h4 class="card-form-title" id="formMkTitle">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                </svg>
-                                <span>Form Tambah / Edit MK</span>
-                            </h4>
-
-                            @if ($errors->any())
-                                <div class="alert-box" style="display:block;background:#FEE2E2;color:#B91C1C;">{{ $errors->first() }}</div>
-                            @endif
-
-                            <div class="form-row-2">
-                                <div class="form-group">
-                                    <label for="mkKode">Kode MK <span class="required">*</span></label>
-                                    <input type="text" id="mkKode" name="code" class="form-control" placeholder="Contoh: SI2514024" value="{{ old('code') }}" required>
-                                    @error('code')
-                                        <div class="text-danger mt-1 error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label for="mkSks">Jumlah SKS <span class="required">*</span></label>
-                                    <input type="number" id="mkSks" name="sks" class="form-control" placeholder="Contoh: 3" min="1" value="{{ old('sks', 3) }}" required>
-                                    @error('sks')
-                                        <div class="text-danger mt-1 error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="mkNama">Nama Mata Kuliah <span class="required">*</span></label>
-                                <input type="text" id="mkNama" name="name" class="form-control" placeholder="Nama lengkap mata kuliah..." value="{{ old('name') }}" required>
-                                @error('name')
-                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="mkDosen">Dosen Pengampu <span class="required">*</span></label>
-                                <select id="mkDosen" name="lecturer_id" class="form-select" required>
-                                    <option value="">— Pilih Dosen —</option>
-                                    @foreach ($dosenList as $dosen)
-                                        <option value="{{ $dosen->id }}" {{ old('lecturer_id') == $dosen->id ? 'selected' : '' }}>{{ $dosen->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('lecturer_id')
-                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
-                                @enderror
-                                @if ($dosenList->isEmpty())
-                                    <small class="error-text">Belum ada user dengan role "dosen". Tambahkan lewat Manajemen Pengguna dulu.</small>
+                    <!-- Tabel Mata Kuliah (Full Width) -->
+                    <div class="table-container">
+                        {{-- Filter & Tools Header --}}
+                        <div class="filter-header">
+                            {{-- Info Total Data & Badge Filter Aktif --}}
+                            <div class="filter-summary-group">
+                                <span class="table-summary-info">Total <strong id="mkTableCount">{{ $matkulList->total() }}</strong> Mata Kuliah</span>
+                                @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
+                                    <span class="badge-filter-active">
+                                        Filter Aktif
+                                    </span>
                                 @endif
                             </div>
 
-                            <div class="form-group">
-                                <label for="mkStatus">Status</label>
-                                <select id="mkStatus" name="status" class="form-select">
-                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Diarsipkan</option>
-                                </select>
-                                @error('status')
-                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="mkDeskripsi">Deskripsi Singkat</label>
-                                <textarea id="mkDeskripsi" name="description" class="form-textarea" rows="2" placeholder="Gambaran singkat mata kuliah ini...">{{ old('description') }}</textarea>
-                                @error('description')
-                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="btn-group-actions">
-                                <button type="submit" class="btn-primary-action" id="mkSubmitBtn">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
+                            {{-- Form Filter Otomatis --}}
+                            <form method="GET" action="{{ url()->current() }}" class="filter-form">
+                                {{-- Input Pencarian --}}
+                                <div class="search-box-container">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg>
-                                    <span>Simpan Mata Kuliah</span>
-                                </button>
-                                <button type="button" id="mkCancelEditBtn" class="btn-icon btn-cancel-edit">Batal Edit</button>
-                            </div>
-                        </form>
-
-                        <!-- Tabel Mata Kuliah -->
-                        <div class="table-container">
-                            {{-- Filter & Tools Header --}}
-                            <div class="filter-header">
-                                {{-- Info Total Data & Badge Filter Aktif --}}
-                                <div class="filter-summary-group">
-                                    <span class="table-summary-info">Total <strong id="mkTableCount">{{ $matkulList->total() }}</strong> Mata Kuliah</span>
-                                    @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
-                                        <span class="badge-filter-active">
-                                            Filter Aktif
-                                        </span>
-                                    @endif
+                                    <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Cari kode / nama MK..." class="search-input">
                                 </div>
 
-                                {{-- Form Filter Otomatis --}}
-                                <form method="GET" action="{{ url()->current() }}" class="filter-form">
-                                    {{-- Input Pencarian --}}
-                                    <div class="search-box-container">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="11" cy="11" r="8"></circle>
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                {{-- Dropdown Status --}}
+                                <select name="status" onchange="this.form.submit()" class="select-filter">
+                                    <option value="">Semua Status</option>
+                                    @foreach (['draft', 'active', 'archived'] as $s)
+                                        <option value="{{ $s }}" @selected($filters['status'] === $s)>
+                                            {{ ['draft' => 'Draft', 'active' => 'Aktif', 'archived' => 'Diarsipkan'][$s] ?? ucfirst($s) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                {{-- Dropdown Dosen --}}
+                                <select name="lecturer_id" onchange="this.form.submit()" class="select-filter filter-dosen">
+                                    <option value="">Semua Dosen</option>
+                                    @foreach ($dosenList as $d)
+                                        <option value="{{ $d->id }}" @selected($filters['lecturer_id'] == $d->id)>{{ $d->name }}</option>
+                                    @endforeach
+                                </select>
+
+                                {{-- Tombol Reset --}}
+                                @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
+                                    <a href="{{ url()->current() }}" class="btn-reset-filter">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
-                                        <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Cari kode / nama MK..." class="search-input">
-                                    </div>
+                                        <span>Reset</span>
+                                    </a>
+                                @endif
+                            </form>
+                        </div>
 
-                                    {{-- Dropdown Status --}}
-                                    <select name="status" onchange="this.form.submit()" class="select-filter">
-                                        <option value="">Semua Status</option>
-                                        @foreach (['draft', 'active', 'archived'] as $s)
-                                            <option value="{{ $s }}" @selected($filters['status'] === $s)>
-                                                {{ ['draft' => 'Draft', 'active' => 'Aktif', 'archived' => 'Diarsipkan'][$s] ?? ucfirst($s) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-
-                                    {{-- Dropdown Dosen --}}
-                                    <select name="lecturer_id" onchange="this.form.submit()" class="select-filter filter-dosen">
-                                        <option value="">Semua Dosen</option>
-                                        @foreach ($dosenList as $d)
-                                            <option value="{{ $d->id }}" @selected($filters['lecturer_id'] == $d->id)>{{ $d->name }}</option>
-                                        @endforeach
-                                    </select>
-
-                                    {{-- Tombol Reset --}}
-                                    @if ($filters['q'] || $filters['status'] || $filters['lecturer_id'])
-                                        <a href="{{ url()->current() }}" class="btn-reset-filter">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                            <span>Reset</span>
-                                        </a>
-                                    @endif
-                                </form>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="custom-admin-table" id="mkTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Kode</th>
-                                            <th>Nama Mata Kuliah</th>
-                                            <th>SKS</th>
-                                            <th>Dosen</th>
-                                            <th>Status</th>
-                                            <th style="text-align:right;">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="mkTableBody">
-                                        @forelse ($matkulList as $mk)
-                                        <tr data-id="{{ $mk->id }}"
-                                            data-kode="{{ $mk->code }}"
-                                            data-nama="{{ $mk->name }}"
-                                            data-sks="{{ $mk->sks }}"
-                                            data-lecturer-id="{{ $mk->lecturer_id }}"
-                                            data-lecturer-name="{{ $mk->lecturer?->name }}"
-                                            data-status="{{ $mk->status }}"
-                                            data-deskripsi="{{ $mk->description }}">
-                                            <td><span class="card-subtitle-tag tag-kode">{{ $mk->code }}</span></td>
-                                            <td class="td-nama">{{ $mk->name }}</td>
-                                            <td class="td-sks">{{ $mk->sks }} SKS</td>
-                                            <td class="td-dosen">{{ $mk->lecturer?->name ?? '—' }}</td>
-                                            <td>
-                                                <span class="badge-status {{ $mk->status === 'active' ? 'badge-status-active' : 'badge-status-inactive' }}">
-                                                    {{ ['draft' => 'DRAFT', 'active' => 'AKTIF', 'archived' => 'DIARSIPKAN'][$mk->status] ?? strtoupper($mk->status) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-actions">
-                                                    <button type="button" class="btn-icon btn-icon-edit btn-edit-mk" title="Edit mata kuliah">
-                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        <div class="table-responsive">
+                            <table class="custom-admin-table" id="mkTable">
+                                <thead>
+                                    <tr>
+                                        <th>Kode</th>
+                                        <th>Nama Mata Kuliah</th>
+                                        <th>SKS</th>
+                                        <th>Dosen</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mkTableBody">
+                                    @forelse ($matkulList as $mk)
+                                    <tr data-id="{{ $mk->id }}"
+                                        data-kode="{{ $mk->code }}"
+                                        data-nama="{{ $mk->name }}"
+                                        data-sks="{{ $mk->sks }}"
+                                        data-lecturer-id="{{ $mk->lecturer_id }}"
+                                        data-lecturer-name="{{ $mk->lecturer?->name }}"
+                                        data-status="{{ $mk->status }}"
+                                        data-deskripsi="{{ $mk->description }}">
+                                        <td><span class="card-subtitle-tag tag-kode">{{ $mk->code }}</span></td>
+                                        <td class="td-nama">{{ $mk->name }}</td>
+                                        <td class="td-sks">{{ $mk->sks }} SKS</td>
+                                        <td class="td-dosen">{{ $mk->lecturer?->name ?? '—' }}</td>
+                                        <td>
+                                            <span class="badge-status {{ $mk->status === 'active' ? 'badge-status-active' : 'badge-status-inactive' }}">
+                                                {{ ['draft' => 'DRAFT', 'active' => 'AKTIF', 'archived' => 'DIARSIPKAN'][$mk->status] ?? strtoupper($mk->status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-actions">
+                                                <button type="button" class="btn-icon btn-icon-edit btn-edit-mk" title="Edit mata kuliah">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                </button>
+                                                <form method="POST" action="{{ route('admin.matkul.destroy', ['matkul' => $mk->id]) }}"
+                                                      onsubmit="return confirm('Hapus mata kuliah ini?');" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="hidden" name="redirect_q" value="{{ $filters['q'] }}">
+                                                    <input type="hidden" name="redirect_status" value="{{ $filters['status'] }}">
+                                                    <input type="hidden" name="redirect_lecturer_id" value="{{ $filters['lecturer_id'] }}">
+                                                    <button type="submit" class="btn-icon btn-icon-danger" title="Hapus mata kuliah">
+                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
                                                     </button>
-                                                    <form method="POST" action="{{ route('admin.matkul.destroy', ['matkul' => $mk->id]) }}"
-                                                          onsubmit="return confirm('Hapus mata kuliah ini?');" style="display:inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <input type="hidden" name="redirect_q" value="{{ $filters['q'] }}">
-                                                        <input type="hidden" name="redirect_status" value="{{ $filters['status'] }}">
-                                                        <input type="hidden" name="redirect_lecturer_id" value="{{ $filters['lecturer_id'] }}">
-                                                        <button type="submit" class="btn-icon btn-icon-danger" title="Hapus mata kuliah">
-                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr id="mkEmptyRow">
-                                            <td colspan="6" class="td-empty">Belum ada data mata kuliah.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr id="mkEmptyRow">
+                                        <td colspan="6" class="td-empty">Belum ada data mata kuliah.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
 
-                            {{-- Navigasi Pagination Laravel --}}
-                            <div class="custom-pagination-wrapper">
-                                {{ $matkulList->links() }}
-                            </div>
+                        {{-- Navigasi Pagination Laravel --}}
+                        <div class="custom-pagination-wrapper">
+                            {{ $matkulList->links() }}
                         </div>
                     </div>
                 </div>
             </section>
 
         </main>
+
+        <!-- MODAL FORM TAMBAH / EDIT MATA KULIAH -->
+        <div class="admin-modal-overlay {{ ($errors->any() || $isEditing) ? 'active' : '' }}" id="matkulModalOverlay">
+            <div class="admin-modal-card" style="max-width: 620px;">
+                <div class="admin-modal-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="section-header-icon" style="width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(3, 159, 250, 0.1); color: #039FFA;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 id="formMkTitle" style="font-size: 15px; font-weight: 800; color: #0F172A; margin: 0; display:flex; align-items:center; gap:8px;">
+                                <span>{{ $isEditing ? 'Form Edit Mata Kuliah' : 'Form Tambah / Edit MK' }}</span>
+                            </h3>
+                            <span id="formMkSubtitle" style="font-size: 11px; color: #64748B; font-weight: 600;">Kelola data kurikulum, kode, SKS, dan dosen pengampu</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-modal" id="btnCloseMatkulModal" aria-label="Tutup modal">&times;</button>
+                </div>
+                <div class="admin-modal-body">
+                    @if ($errors->any())
+                        <div class="alert-box" style="display:block;background:#FEE2E2;color:#B91C1C;margin-bottom:14px;border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:700;">
+                            ⚠️ {{ $errors->first() }}
+                        </div>
+                    @endif
+
+                    <form id="formAddMatkul" method="POST"
+                          action="{{ $isEditing ? route('admin.matkul.update', ['matkul' => old('id')]) : route('admin.matkul.store') }}"
+                          style="display: flex; flex-direction: column; gap: 14px; margin: 0;">
+                        @csrf
+                        <input type="hidden" id="mkId" name="id" value="{{ old('id') }}">
+                        <input type="hidden" id="mkMethodField" name="_method" value="{{ $isEditing ? 'PUT' : '' }}">
+                        <input type="hidden" name="redirect_q" value="{{ $filters['q'] }}">
+                        <input type="hidden" name="redirect_status" value="{{ $filters['status'] }}">
+                        <input type="hidden" name="redirect_lecturer_id" value="{{ $filters['lecturer_id'] }}">
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="mkKode">Kode MK <span class="required">*</span></label>
+                                <input type="text" id="mkKode" name="code" class="form-control" placeholder="Contoh: SI2514024" value="{{ old('code') }}" required>
+                                @error('code')
+                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="mkSks">Jumlah SKS <span class="required">*</span></label>
+                                <input type="number" id="mkSks" name="sks" class="form-control" placeholder="Contoh: 3" min="1" value="{{ old('sks', 3) }}" required>
+                                @error('sks')
+                                    <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mkNama">Nama Mata Kuliah <span class="required">*</span></label>
+                            <input type="text" id="mkNama" name="name" class="form-control" placeholder="Nama lengkap mata kuliah..." value="{{ old('name') }}" required>
+                            @error('name')
+                                <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mkDosen">Dosen Pengampu <span class="required">*</span></label>
+                            <select id="mkDosen" name="lecturer_id" class="form-select" required>
+                                <option value="">— Pilih Dosen —</option>
+                                @foreach ($dosenList as $dosen)
+                                    <option value="{{ $dosen->id }}" {{ old('lecturer_id') == $dosen->id ? 'selected' : '' }}>{{ $dosen->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('lecturer_id')
+                                <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                            @enderror
+                            @if ($dosenList->isEmpty())
+                                <small class="error-text">Belum ada user dengan role "dosen". Tambahkan lewat Manajemen Pengguna dulu.</small>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mkStatus">Status</label>
+                            <select id="mkStatus" name="status" class="form-select">
+                                <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Aktif</option>
+                                <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Diarsipkan</option>
+                            </select>
+                            @error('status')
+                                <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mkDeskripsi">Deskripsi Singkat</label>
+                            <textarea id="mkDeskripsi" name="description" class="form-textarea" rows="2" placeholder="Gambaran singkat mata kuliah ini...">{{ old('description') }}</textarea>
+                            @error('description')
+                                <div class="text-danger mt-1 error-message">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div style="display:flex; gap:10px; margin-top:8px;">
+                            <button type="submit" class="btn-primary-action" id="mkSubmitBtn" style="flex:1;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Simpan Mata Kuliah</span>
+                            </button>
+                            <button type="button" id="mkCancelEditBtn" class="btn-icon" style="padding:0 18px; width:auto; border-radius:12px; background:#FFFFFF; border:1.5px solid #CBD5E1; color:var(--admin-muted); font-weight:800; font-size:13px; height:42px;">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <x-footer />
     </div>
@@ -280,17 +301,52 @@
             const submitLabel  = submitBtn.querySelector('span');
             const tableBody    = document.getElementById('mkTableBody');
 
+            const matkulModal        = document.getElementById('matkulModalOverlay');
+            const btnOpenAddMatkul   = document.getElementById('btnOpenAddMatkulModal');
+            const btnCloseMatkulModal= document.getElementById('btnCloseMatkulModal');
+
+            function openMatkulModal() {
+                if (matkulModal) matkulModal.classList.add('active');
+            }
+
+            function closeMatkulModal() {
+                if (matkulModal) matkulModal.classList.remove('active');
+            }
+
+            if (btnOpenAddMatkul) {
+                btnOpenAddMatkul.addEventListener('click', () => {
+                    resetForm();
+                    openMatkulModal();
+                });
+            }
+
+            if (btnCloseMatkulModal) btnCloseMatkulModal.addEventListener('click', closeMatkulModal);
+
+            if (matkulModal) {
+                matkulModal.addEventListener('click', (e) => {
+                    if (e.target === matkulModal) closeMatkulModal();
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && matkulModal && matkulModal.classList.contains('active')) {
+                    closeMatkulModal();
+                }
+            });
+
             function resetForm() {
                 form.reset();
                 form.action = storeUrl;
                 methodField.value = '';
                 document.getElementById('mkId').value = '';
                 submitLabel.textContent = 'Simpan Mata Kuliah';
-                cancelBtn.style.display = 'none';
                 formTitle.textContent = 'Form Tambah / Edit MK';
             }
 
-            cancelBtn.addEventListener('click', resetForm);
+            cancelBtn.addEventListener('click', () => {
+                resetForm();
+                closeMatkulModal();
+            });
 
             // Event Delegation untuk penanganan tombol Edit
             if (tableBody) {
@@ -313,18 +369,17 @@
                     methodField.value = 'PUT';
 
                     submitLabel.textContent = 'Update Mata Kuliah';
-                    cancelBtn.style.display = 'inline-block';
                     formTitle.textContent = 'Form Edit Mata Kuliah';
 
-                    document.getElementById('mkKode').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    openMatkulModal();
                 });
             }
 
             // Jika halaman ini adalah hasil redirect setelah validasi gagal saat mengedit
             @if ($isEditing)
                 submitLabel.textContent = 'Update Mata Kuliah';
-                cancelBtn.style.display = 'inline-block';
                 formTitle.textContent = 'Form Edit Mata Kuliah';
+                openMatkulModal();
             @endif
         });
     </script>
