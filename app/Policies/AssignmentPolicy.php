@@ -32,11 +32,16 @@ class AssignmentPolicy
     {
         $course = $assignment->course;
 
-        if ($this->isAdmin($user) || $this->teaches($user, $course)) {
-            return true; // termasuk tugas draft
+        // Jika course tidak ditemukan (misal: assignment dummy/orphan), tolak akses (403)
+        if (!$course) {
+            return false;
         }
 
-        // Mahasiswa: tugas draft tidak terlihat sama sekali (Q5).
+        if ($this->isAdmin($user) || $this->teaches($user, $course)) {
+            return true;
+        }
+
+        // Pastikan status tugas published dan user berhak melihat isi MK
         return $this->enumValue($assignment->status) === 'published'
             && $this->canSeeCourseContent($user, $course);
     }
@@ -49,6 +54,10 @@ class AssignmentPolicy
 
     public function update(User $user, Assignment $assignment): bool
     {
+        if (!$assignment->course) {
+            return false;
+        }
+
         return $this->canManageCourseContent($user, $assignment->course);
     }
 
@@ -59,7 +68,7 @@ class AssignmentPolicy
      */
     public function delete(User $user, Assignment $assignment): bool|Response
     {
-        if (! $this->canManageCourseContent($user, $assignment->course)) {
+        if (!$assignment->course || !$this->canManageCourseContent($user, $assignment->course)) {
             return false;
         }
 
