@@ -27,26 +27,8 @@
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
-                        <h1>Dashboard Admin</h1>
+                        <h1>Selamat Datang, Admin :)</h1>
                     </div>
-                </div>
-                <div class="topbar-right">
-                    <a href="{{ route('admin.pengguna') }}" class="btn-quick-action btn-outline">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <line x1="19" y1="8" x2="19" y2="14"></line>
-                            <line x1="22" y1="11" x2="16" y2="11"></line>
-                        </svg>
-                        Tambah Pengguna
-                    </a>
-                    <a href="{{ route('admin.matkul') }}" class="btn-quick-action btn-primary">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Tambah Mata Kuliah
-                    </a>
                 </div>
             </header>
 
@@ -186,7 +168,6 @@
                 <div class="card-box">
                     <div class="card-header-clean">
                         <h3>Aktivitas Sistem Terkini</h3>
-                        <span class="card-subtitle-tag">Real-time Log</span>
                     </div>
                     <div class="activity-list">
                         @forelse ($recentActivities as $act)
@@ -212,9 +193,6 @@
                     <div class="card-box sys-status-card">
                         <div class="card-header-clean">
                             <h3>Status Sistem & Akademik</h3>
-                            <span class="status-indicator-badge">
-                                <span class="status-pulse-dot"></span> Server Normal
-                            </span>
                         </div>
                         <div class="sys-status-list">
                             <div class="sys-item">
