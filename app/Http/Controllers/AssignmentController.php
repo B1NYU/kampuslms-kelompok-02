@@ -10,13 +10,22 @@ class AssignmentController extends Controller
 {
     public function show(Assignment $assignment): View
     {
+        $user = auth()->user();
+
         Gate::authorize('view', $assignment);
 
-        // Cari submission milik pengguna yang sedang login untuk tugas ini
-        $mySubmission = $assignment->submissions()
-            ->where('user_id', auth()->id())
-            ->first();
+        $assignment->load('course.lecturer');
 
-        return view('assignments.show', compact('assignment', 'mySubmission'));
+        if ($user->role === 'mahasiswa') {
+            // Mahasiswa: hanya melihat pengumpulan milik sendiri
+            $mySubmission = $assignment->submissions()->with('grade')->where('user_id', $user->id)->first();
+            $submissions = collect();
+        } else {
+            // Dosen & Admin: melihat semua berkas pengumpulan mahasiswa
+            $mySubmission = null;
+            $submissions = $assignment->submissions()->with(['student', 'grade'])->get();
+        }
+
+        return view('assignments.show', compact('assignment', 'mySubmission', 'submissions'));
     }
 }
