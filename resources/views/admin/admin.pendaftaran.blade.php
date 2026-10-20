@@ -138,14 +138,16 @@
                                         <td class="td-semester">{{ $tgl }}</td>
                                         <td>
                                             <div class="btn-actions">
-                                                <form method="POST" action="{{ route('admin.pendaftaran.destroy', [$mk, $mhs]) }}" style="margin:0; display:inline;"
-                                                      onsubmit="return confirm('Batalkan pendaftaran {{ e($mhs->name) }} dari {{ e($mk->code) }}?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn-icon btn-icon-danger btn-delete-enroll" title="Batalkan pendaftaran">
-                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                                                    </button>
-                                                </form>
+                                                @can('manageEnrollment', $mk)
+                                                    <form method="POST" action="{{ route('admin.pendaftaran.destroy', [$mk, $mhs]) }}" style="margin:0; display:inline;"
+                                                          onsubmit="return confirm('Batalkan pendaftaran {{ e($mhs->name) }} dari {{ e($mk->code) }}?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn-icon btn-icon-danger btn-delete-enroll" title="Batalkan pendaftaran">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                                        </button>
+                                                    </form>
+                                                @endcan
                                             </div>
                                         </td>
                                     </tr>

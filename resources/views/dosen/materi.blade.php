@@ -35,6 +35,8 @@
                 // $courses dikirim controller: hanya MK yang diampu dosen yang login.
                 $activeCourses  = $courses;
                 $allDbMaterials = $courses->flatMap->materials->sortByDesc('created_at');
+                // Policy membaca $material->course; isi relasinya dari $courses agar tidak N+1.
+                $allDbMaterials->each(fn ($m) => $m->setRelation('course', $courses->firstWhere('id', $m->course_id)));
             @endphp
 
             <!-- Topbar Header -->
@@ -70,6 +72,7 @@
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            @can('create', [\App\Models\Material::class, null])
                             <button type="button" class="btn-primary-action" id="btnOpenUploadMaterialModal" style="padding: 9px 18px; font-size: 13px;">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -77,6 +80,7 @@
                                 </svg>
                                 <span>+ Unggah Materi Baru</span>
                             </button>
+                            @endcan
                         </div>
                     </div>
 
@@ -108,11 +112,14 @@
                                     <div class="material-card-footer">
                                         <span class="material-meta-date">Diunggah: {{ $material->created_at ? $material->created_at->diffForHumans() : '-' }}</span>
                                         <div class="material-card-actions">
+                                            @can('view', $material)
                                             @if ($material->type === 'file')
                                                 <a href="{{ route('dosen.materi.download', $material) }}" class="btn-open-resource">Unduh File</a>
                                             @else
                                                 <a href="{{ $material->external_url }}" target="_blank" rel="noopener noreferrer" class="btn-open-resource">Buka Link</a>
                                             @endif
+                                            @endcan
+                                            @can('update', $material)
                                             <button type="button" class="btn-icon-edit btn-edit-material" title="Edit materi"
                                                     data-id="{{ $material->id }}"
                                                     data-type="{{ $material->type }}"
@@ -123,6 +130,8 @@
                                                     style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; border:1px solid rgba(3,159,250,0.25); background:rgba(3,159,250,0.08); color:#039FFA; cursor:pointer;">
                                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                             </button>
+                                            @endcan
+                                            @can('delete', $material)
                                             <form action="{{ route('dosen.materi.destroy', $material) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
@@ -130,6 +139,7 @@
                                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
                                                 </button>
                                             </form>
+                                            @endcan
                                         </div>
                                     </div>
                                 </div>
@@ -138,9 +148,11 @@
                                     <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
                                     <div style="font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Belum Ada Materi Perkuliahan</div>
                                     <p style="font-size: 12.5px; color: #64748B; margin-bottom: 14px;">Klik tombol di atas untuk mempublikasikan materi perkuliahan baru (PDF, PPTX, atau tautan referensi).</p>
+                                    @can('create', [\App\Models\Material::class, null])
                                     <button type="button" class="btn-primary-action" onclick="document.getElementById('btnOpenUploadMaterialModal').click()" style="margin: 0 auto; font-size: 12.5px;">
                                         + Unggah Materi Pertama
                                     </button>
+                                    @endcan
                                 </div>
                             @endforelse
                         </div>
