@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class Submission extends Model
 {
@@ -28,6 +30,36 @@ class Submission extends Model
             'submitted_at' => 'datetime',
             'is_late' => 'boolean',
         ];
+    }
+
+    /**
+     * Otomatis hapus berkas fisik submission dari storage saat record dihapus dari DB
+     */
+    protected static function booted(): void
+    {
+        static::deleted(function (Submission $submission) {
+            if ($submission->file_path && Storage::exists($submission->file_path)) {
+                Storage::delete($submission->file_path);
+            }
+        });
+    }
+
+    /**
+     * Accessor untuk format ukuran berkas agar mudah dibaca (misal: 1.25 MB)
+     */
+    protected function formattedFileSize(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $bytes = $this->file_size;
+                if (! $bytes) return '0 B';
+
+                $units = ['B', 'KB', 'MB', 'GB'];
+                $i = floor(log($bytes, 1024));
+
+                return round($bytes / pow(1024, $i), 2) . ' ' . $units[$i];
+            }
+        );
     }
 
     /** Aturan ada di SubmissionPolicy@view. Dipertahankan untuk pemanggil lama. */

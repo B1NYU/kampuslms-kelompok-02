@@ -79,13 +79,16 @@ class SubmissionPolicy
             return false;
         }
 
-        if (now()->greaterThan($assignment->due_at) && ! $assignment->allow_late) {
+        // Pastikan due_at dibandingkan dalam format Carbon yang presisi
+        $dueAt = \Illuminate\Support\Carbon::parse($assignment->due_at);
+
+        if (now()->greaterThan($dueAt) && ! (bool) $assignment->allow_late) {
             return Response::deny('Batas waktu pengumpulan sudah lewat.');
         }
 
         if ($assignment->submissions()->where('user_id', $user->id)->exists()) {
             return Response::deny('Anda sudah mengumpulkan tugas ini dan pengumpulan tidak dapat diubah.');
-        }
+        }   
 
         return true;
     }

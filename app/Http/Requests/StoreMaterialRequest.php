@@ -25,7 +25,7 @@ class StoreMaterialRequest extends FormRequest
                 'file',
                 'mimes:pdf,ppt,pptx',
                 'mimetypes:application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip',
-                'max:51200' // 50 MB
+                'max:20480'
             ],
             'external_url' => ['required_if:type,link', 'nullable', 'url:http,https', 'max:255'],
         ];
