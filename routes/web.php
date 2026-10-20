@@ -69,8 +69,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
             ->name('assignments.submissions.store');
 
-        // Unduh materi mata kuliah yang diikuti (hak akses dicek di MaterialController).
+        // Unduh materi mata kuliah yang diikuti (pake role:mahasiswa,dosen,admin agar dosen & admin bisa akses jika dipanggil)
         Route::get('/materi/{material}/unduh', [MaterialController::class, 'download'])
+            ->withoutMiddleware('role:mahasiswa')
+            ->middleware('role:mahasiswa,dosen,admin')
             ->name('materi.download');
     });
 
@@ -80,10 +82,12 @@ Route::middleware('auth')->group(function () {
         ->name('assignments.show');
 
     // ===== Semua peran login: pemilik / dosen pengampu / admin (dicek di controller) =====
-    Route::get('/submissions/{submission}', [SubmissionController::class, 'show'])
-        ->name('submissions.show');
-    Route::get('/submissions/{submission}/unduh', [SubmissionController::class, 'download'])
-        ->name('submissions.download');
+    Route::middleware('role:mahasiswa,dosen,admin')->group(function () {
+        Route::get('/submissions/{submission}', [SubmissionController::class, 'show'])
+            ->name('submissions.show');
+        Route::get('/submissions/{submission}/unduh', [SubmissionController::class, 'download'])
+            ->name('submissions.download');
+    });
 
     // ===== Dosen =====
     Route::middleware('role:dosen')->prefix('dosen')->name('dosen.')->group(function () {
