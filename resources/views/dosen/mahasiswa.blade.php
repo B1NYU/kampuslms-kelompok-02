@@ -35,6 +35,8 @@
             @php
                 $dosenCourses = $courses;
                 $firstCourse = $dosenCourses->firstWhere('code', $selectedCode);
+                // MK yang pesertanya boleh diubah (CoursePolicy::manageEnrollment: dosen pengampu, MK draft/active).
+                $enrollableCourses = $dosenCourses->filter(fn ($c) => auth()->user()->can('manageEnrollment', $c))->values();
             @endphp
 
             <!-- Topbar Header / Judul di Luar Container Utama -->
@@ -77,6 +79,7 @@
                             </svg>
                         </div>
 
+                        @if ($enrollableCourses->isNotEmpty())
                         <button type="button" class="btn-primary-action" id="btnOpenAddStudentModal">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -84,6 +87,7 @@
                             </svg>
                             <span>Daftarkan Mahasiswa</span>
                         </button>
+                        @endif
                     </div>
                 </div>
 
@@ -188,6 +192,7 @@
                                                         <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
                                                         <td><span class="badge-status badge-status-active">Aktif</span></td>
                                                         <td style="text-align: right;">
+                                                            @can('manageEnrollment', $course)
                                                             <form method="POST"
                                                                   action="{{ route('dosen.mahasiswa.destroy', [$course, $mhs]) }}"
                                                                   onsubmit="return confirm(@js('Keluarkan ' . $mhs->name . ' dari mata kuliah ini?'))"
@@ -201,6 +206,7 @@
                                                                     </svg>
                                                                 </button>
                                                             </form>
+                                                            @endcan
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -240,8 +246,8 @@
                     <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="form-group">
                             <label for="mhsMatkul">Mata Kuliah Target <span class="required">*</span></label>
-                            <select id="mhsMatkul" name="course_id" class="form-select" required {{ $dosenCourses->isEmpty() ? 'disabled' : '' }}>
-                                @forelse ($dosenCourses as $c)
+                            <select id="mhsMatkul" name="course_id" class="form-select" required {{ $enrollableCourses->isEmpty() ? 'disabled' : '' }}>
+                                @forelse ($enrollableCourses as $c)
                                     <option value="{{ $c->id }}" data-code="{{ $c->code }}" {{ (string) old('course_id') === (string) $c->id ? 'selected' : '' }}>{{ $c->code }} - {{ $c->name }}</option>
                                 @empty
                                     <option value="">Belum ada mata kuliah yang diampu</option>
@@ -325,7 +331,11 @@
                 const mhsMatkul = document.getElementById('mhsMatkul');
                 if (mhsMatkul) {
                     const opt = Array.from(mhsMatkul.options).find(o => o.dataset.code === selectCurrentCourse.value);
-                    if (opt) mhsMatkul.value = opt.value;
+                    if (!opt) {
+                        alert('Peserta mata kuliah ini tidak dapat diubah (mis. berstatus archived).');
+                        return;
+                    }
+                    mhsMatkul.value = opt.value;
                 }
                 if (studentModal) studentModal.classList.add('active');
             }
