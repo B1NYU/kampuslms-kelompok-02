@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Manajemen Materi Kuliah — KampusLMS Admin</title>
-    
-    <!-- Google Fonts Nunito -->
+
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
-    
+
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/css/admin/admin.materi.css', 'resources/css/dosen/dosen.materi.css', 'resources/js/app.js'])
     @else
@@ -24,13 +23,10 @@
 
     <div class="app-window">
 
-        <!-- Navbar Khusus Admin -->
         <x-navbar-admin />
 
-        <!-- Konten Utama Materi Admin -->
         <main class="admin-content">
 
-            <!-- Topbar Header -->
             <header class="dash-topbar">
                 <div class="topbar-left">
                     <div class="page-title">
@@ -38,13 +34,15 @@
                     </div>
                 </div>
                 <div class="topbar-right">
-                    <button type="button" class="btn-primary-action" id="btnOpenUploadMaterialModal" style="padding: 9px 18px; font-size: 13px;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Unggah Materi Baru</span>
-                    </button>
+                    @can('create', [\App\Models\Material::class, null])
+                        <button type="button" class="btn-primary-action" id="btnOpenUploadMaterialModal" style="padding: 9px 18px; font-size: 13px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            <span>Unggah Materi Baru</span>
+                        </button>
+                    @endcan
                 </div>
             </header>
 
@@ -137,7 +135,6 @@
                 </div>
 
                 <div class="toolbar-right-filters">
-                    <!-- Dropdown Custom Filter Mata Kuliah -->
                     <div class="custom-filter-dropdown" id="courseFilterDropdown">
                         <button type="button" class="filter-dropdown-btn" id="courseFilterBtn">
                             <span class="filter-dropdown-text" id="courseFilterText">Semua Mata Kuliah ({{ $coursesList->count() }} Terdaftar)</span>
@@ -159,7 +156,6 @@
                     </div>
                     <input type="hidden" id="selectFilterCourse" value="all">
 
-                    <!-- Filter Tipe -->
                     <div class="filter-select-wrapper filter-type-wrapper">
                         <select id="selectFilterType">
                             <option value="all">Semua Tipe Format</option>
@@ -204,9 +200,9 @@
                         $fileNameStr = $m->type === 'file' ? ($m->original_name ?? 'Berkas Dokumen') : $m->external_url;
                     @endphp
 
-                    <div class="material-card" 
-                          data-course-id="{{ $m->course_id }}" 
-                          data-type="{{ $m->type }}" 
+                    <div class="material-card"
+                          data-course-id="{{ $m->course_id }}"
+                          data-type="{{ $m->type }}"
                           data-title="{{ $m->title }}"
                           data-desc="{{ $m->description }}"
                           data-filename="{{ $fileNameStr }}"
@@ -221,22 +217,26 @@
                                     </span>
                                 </div>
                                 <div class="btn-actions" style="display:flex; gap:6px;">
-                                    <button type="button" class="btn-icon btn-icon-edit btn-edit-material" title="Edit Materi"
-                                            data-id="{{ $m->id }}"
-                                            data-type="{{ $m->type }}"
-                                            data-title="{{ $m->title }}"
-                                            data-description="{{ $m->description }}"
-                                            data-url="{{ $m->external_url }}"
-                                            data-filename="{{ $m->original_name }}">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                    </button>
-                                    <form action="{{ route('admin.materi.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')" style="margin:0; padding:0; display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-icon btn-icon-danger" title="Hapus Materi" style="border:none; cursor:pointer;">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                    @can('update', $m)
+                                        <button type="button" class="btn-icon btn-icon-edit btn-edit-material" title="Edit Materi"
+                                                data-id="{{ $m->id }}"
+                                                data-type="{{ $m->type }}"
+                                                data-title="{{ $m->title }}"
+                                                data-description="{{ $m->description }}"
+                                                data-url="{{ $m->external_url }}"
+                                                data-filename="{{ $m->original_name }}">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                         </button>
-                                    </form>
+                                    @endcan
+                                    @can('delete', $m)
+                                        <form action="{{ route('admin.materi.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')" style="margin:0; padding:0; display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-icon btn-icon-danger" title="Hapus Materi" style="border:none; cursor:pointer;">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </div>
                             </div>
 
@@ -261,23 +261,24 @@
                             </div>
 
                             <div class="material-card-actions">
-                                @if($m->type === 'file')
-                                    <a href="{{ route('admin.materi.download', $m->id) }}" class="btn-materi-view">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                        <span>Unduh</span>
-                                    </a>
-                                @else
-                                    <a href="{{ $m->external_url }}" target="_blank" rel="noopener noreferrer" class="btn-materi-view">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                        <span>Buka Link</span>
-                                    </a>
-                                @endif
+                                @can('view', $m)
+                                    @if($m->type === 'file')
+                                        <a href="{{ route('admin.materi.download', $m->id) }}" class="btn-materi-view">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                            <span>Unduh</span>
+                                        </a>
+                                    @else
+                                        <a href="{{ $m->external_url }}" target="_blank" rel="noopener noreferrer" class="btn-materi-view">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                            <span>Buka Link</span>
+                                        </a>
+                                    @endif
+                                @endcan
                             </div>
                         </div>
                     </div>
                 @endforeach
 
-                <!-- Empty State (Hidden by default) -->
                 <div class="materi-empty-state" id="materiEmptyState" style="display: none;">
                     <div class="materi-empty-icon">📂</div>
                     <div class="materi-empty-title">Tidak Ada Materi yang Cocok</div>
@@ -293,7 +294,7 @@
         <x-footer />
     </div>
 
-    <!-- MODAL FORM UNGGAH MATERI (Menyesuaikan Role Dosen) -->
+    <!-- MODAL FORM UNGGAH MATERI -->
     <div class="dosen-modal-overlay" id="materialModalOverlay">
         <div class="dosen-modal-card" style="max-width: 620px; width: 95%;">
             <div class="dosen-modal-header">
@@ -313,21 +314,11 @@
                 <button type="button" class="btn-close-modal" id="btnCloseMaterialModal" aria-label="Tutup modal">&times;</button>
             </div>
 
-            <!-- FORM TERHUBUNG DENGAN LARAVEL -->
             <form id="formUploadMaterial" action="{{ route('admin.materi.store') }}" method="POST" enctype="multipart/form-data" style="margin: 0; display: flex; flex-direction: column;">
                 @csrf
                 <input type="hidden" name="type" id="materialType" value="{{ old('type', 'file') }}">
 
                 <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
-
-                    @if ($errors->any() && !old('edit_id'))
-                        <div style="background:#FEF2F2; border:1px solid #FECACA; color:#B91C1C; border-radius:10px; padding:10px 12px; font-size:12.5px; font-weight:600; margin-bottom:12px;">
-                            @foreach ($errors->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                        </div>
-                    @endif
-
                     <div class="form-row-2">
                         <div class="form-group">
                             <label for="materialCourse">Mata Kuliah Aktif <span class="required">*</span></label>
@@ -342,7 +333,6 @@
                         </div>
                         <div class="form-group">
                             <label for="materialSession">Pertemuan Ke-</label>
-                            {{-- Tidak ber-name: tabel materials tidak punya kolom pertemuan, jadi nilainya tidak dikirim. --}}
                             <select id="materialSession" class="form-select">
                                 @for ($i = 1; $i <= 16; $i++)
                                     <option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Pertemuan {{ $i }}</option>
@@ -386,15 +376,10 @@
                             </svg>
                             <span class="file-dropzone-text" id="dropzoneText">Klik untuk memilih file PDF atau PPTX, atau seret berkas ke sini</span>
                             <span class="file-dropzone-sub">Maksimal ukuran file: 50MB (Format PDF, PPT, PPTX)</span>
-
-                            {{-- Input menutupi seluruh dropzone (transparan): klik & seret ditangani browser --}}
                             <input type="file" id="materialFileInput" name="file" accept=".pdf,.pptx,.ppt" title=" "
                                    style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: block;">
                         </div>
-
-                        {{-- Kotak status berkas: gaya inline agar tidak bergantung pada CSS lain --}}
-                        <div id="fileStatus" role="status" aria-live="polite"
-                             style="display: none; margin-top: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; word-break: break-all;"></div>
+                        <div id="fileStatus" role="status" aria-live="polite" style="display: none; margin-top: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; word-break: break-all;"></div>
                     </div>
 
                     <div id="linkInputContainer" class="form-group" style="display: none;">
@@ -439,15 +424,6 @@
                 <input type="hidden" name="edit_id" id="editMaterialId" value="{{ old('edit_id') }}">
 
                 <div class="dosen-modal-body" style="max-height: 70vh; overflow-y: auto;">
-
-                    @if ($errors->editMaterial->any())
-                        <div style="background:#FEF2F2; border:1px solid #FECACA; color:#B91C1C; border-radius:10px; padding:10px 12px; font-size:12.5px; font-weight:600; margin-bottom:12px;">
-                            @foreach ($errors->editMaterial->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                        </div>
-                    @endif
-
                     <div class="form-group">
                         <label for="editMaterialTitle">Judul Materi <span class="required">*</span></label>
                         <input type="text" id="editMaterialTitle" name="title" class="form-control" required>
@@ -582,12 +558,11 @@
                 applyFilters();
             };
 
-            // 2. MODAL UNGGAH MATERI (SESUAI ROLE DOSEN)
+            // 2. MODAL UNGGAH MATERI
             const materialModal = document.getElementById('materialModalOverlay');
             const btnOpenUpload = document.getElementById('btnOpenUploadMaterialModal');
             const btnCloseMaterialModal = document.getElementById('btnCloseMaterialModal');
             const btnCancelMaterialModal = document.getElementById('btnCancelMaterialModal');
-            const formUploadMaterial = document.getElementById('formUploadMaterial');
 
             const typePills = document.querySelectorAll('.type-pill');
             const fileUploadContainer = document.getElementById('fileUploadContainer');
@@ -640,19 +615,6 @@
             }
 
             if (materialDropzone && materialFileInput) {
-                ['dragenter', 'dragover'].forEach(evt => {
-                    materialDropzone.addEventListener(evt, () => {
-                        materialDropzone.style.borderColor = '#039FFA';
-                        materialDropzone.style.background = 'rgba(3, 159, 250, 0.06)';
-                    });
-                });
-                ['dragleave', 'drop'].forEach(evt => {
-                    materialDropzone.addEventListener(evt, () => {
-                        materialDropzone.style.borderColor = '';
-                        materialDropzone.style.background = '';
-                    });
-                });
-
                 materialFileInput.addEventListener('change', () => {
                     const file = materialFileInput.files[0];
                     if (!file) {
@@ -682,15 +644,11 @@
             }
 
             function openMaterialModal() {
-                if (materialModal) {
-                    materialModal.classList.add('active');
-                }
+                if (materialModal) materialModal.classList.add('active');
             }
 
             function closeMaterialModal() {
-                if (materialModal) {
-                    materialModal.classList.remove('active');
-                }
+                if (materialModal) materialModal.classList.remove('active');
             }
 
             if (btnOpenUpload) btnOpenUpload.addEventListener('click', openMaterialModal);
@@ -703,7 +661,7 @@
                 });
             }
 
-            // 3. MODAL EDIT MATERI (SESUAI ROLE DOSEN)
+            // 3. MODAL EDIT MATERI
             const editModal = document.getElementById('editMaterialModalOverlay');
             const formEdit = document.getElementById('formEditMaterial');
             const editId = document.getElementById('editMaterialId');
@@ -738,24 +696,22 @@
                     editCurrentFile.textContent = isLink ? '' : 'Berkas saat ini: ' + (btn.dataset.filename || '-');
                 }
 
-                if (editModal) {
-                    editModal.classList.add('active');
-                }
+                if (editModal) editModal.classList.add('active');
             }
 
             function closeEditModal() {
-                if (editModal) {
-                    editModal.classList.remove('active');
-                }
+                if (editModal) editModal.classList.remove('active');
             }
 
             document.querySelectorAll('.btn-edit-material').forEach(btn => {
                 btn.addEventListener('click', () => openEditModal(btn));
             });
+
             const btnCloseEditModal = document.getElementById('btnCloseEditModal');
             const btnCancelEditModal = document.getElementById('btnCancelEditModal');
             if (btnCloseEditModal) btnCloseEditModal.addEventListener('click', closeEditModal);
             if (btnCancelEditModal) btnCancelEditModal.addEventListener('click', closeEditModal);
+
             if (editModal) {
                 editModal.addEventListener('click', (e) => {
                     if (e.target === editModal) closeEditModal();
@@ -764,32 +720,10 @@
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    if (materialModal && materialModal.classList.contains('active')) {
-                        closeMaterialModal();
-                    }
-                    if (editModal && editModal.classList.contains('active')) {
-                        closeEditModal();
-                    }
+                    if (materialModal) materialModal.classList.remove('active');
+                    if (editModal) editModal.classList.remove('active');
                 }
             });
-
-            @if ($errors->editMaterial->any() && old('edit_id'))
-                (function () {
-                    const btn = document.querySelector('.btn-edit-material[data-id="{{ old('edit_id') }}"]');
-                    if (!btn) return;
-                    openEditModal(btn);
-                    if (editTitle) editTitle.value = @json(old('title', ''));
-                    if (editDesc) editDesc.value = @json(old('description', ''));
-                    if (editUrl && !editUrl.disabled) editUrl.value = @json(old('external_url', ''));
-                })();
-            @endif
-
-            @if ($errors->any() && !old('edit_id'))
-                openMaterialModal();
-                if (@json(old('type')) === 'link') {
-                    setType('link');
-                }
-            @endif
         });
     </script>
 </body>

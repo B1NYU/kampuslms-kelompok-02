@@ -28,8 +28,13 @@ class MaterialPolicy
     }
 
     /** Gate::authorize('create', [Material::class, $course]) */
-    public function create(User $user, Course $course): bool
+    public function create(User $user, ?Course $course = null): bool
     {
+        // Jika diakses dari halaman global admin/dosen tanpa spesifik course
+        if (!$course) {
+            return in_array($user->role, ['admin', 'dosen']);
+        }
+
         return $this->canManageCourseContent($user, $course);
     }
 

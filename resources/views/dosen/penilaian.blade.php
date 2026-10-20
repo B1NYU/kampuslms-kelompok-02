@@ -240,10 +240,12 @@
                                             </div>
                                         </td>
                                         <td>
+                                            @can('view', $sub)
                                             <a href="#" onclick="alert('Membuka / mengunduh berkas: {{ addslashes($filename) }}\nUkuran: {{ $fileSizeKb }}'); return false;" class="btn-open-resource" style="font-size:11px; max-width: 170px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="{{ $filename }} ({{ $fileSizeKb }})">
                                                 <span>{{ $icon }}</span>
                                                 <span>{{ $filename }}</span>
                                             </a>
+                                            @endcan
                                             @if($sub->note)
                                                 <div style="font-size:10px; color:#64748B; font-style:italic; margin-top:2px;" title="{{ $sub->note }}">
                                                     Catatan: {{ Str::limit($sub->note, 25) }}
@@ -269,6 +271,7 @@
                                             @endif
                                         </td>
                                         <td style="text-align: right;">
+                                            @can('grade', $sub)
                                             @if ($isGraded)
                                                 <button class="btn-primary-action btn-grade-action"
                                                     data-id="{{ $sub->id }}"
@@ -290,6 +293,9 @@
                                                     Beri Nilai
                                                 </button>
                                             @endif
+                                            @else
+                                                <span style="font-size:11px; color:#94A3B8; font-weight:600;">Tidak dapat dinilai</span>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @empty

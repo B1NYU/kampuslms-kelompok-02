@@ -39,6 +39,8 @@
     @php
         $isEdit = $assignment->exists;
         $dueDefault = $assignment->due_at ?? now()->addWeek()->setTime(23, 59);
+        // Policy membaca $assignment->course; isi relasinya dari $course agar tidak N+1.
+        $assignments->each(fn ($a) => $a->setRelation('course', $course));
     @endphp
 
     <div class="app-window">
@@ -84,6 +86,7 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <span class="section-header-badge">{{ $assignments->count() }} Tugas Terdaftar</span>
+                            @can('create', [\App\Models\Assignment::class, $course])
                             <button type="button" class="btn-primary-action" id="btnOpenCreateAssignmentModal" style="padding: 9px 18px; font-size: 13px;">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -91,6 +94,7 @@
                                 </svg>
                                 <span>+ Buat Tugas Baru</span>
                             </button>
+                            @endcan
                         </div>
                     </div>
 
@@ -158,16 +162,22 @@
                                         <span class="badge-status {{ $badgeClass }}">{{ $badgeText }}</span>
 
                                         <div class="card-actions">
+                                            @can('view', $a)
                                             <a href="{{ route('assignments.show', $a) }}" class="btn-secondary-action" style="font-size: 11px;">Lihat Pengumpulan &rarr;</a>
+                                            @endcan
+                                            @can('update', $a)
                                             <a href="{{ route('dosen.assignments.edit', $a) }}" class="btn-secondary-action" style="font-size: 11px;">Ubah</a>
+                                            @endcan
 
                                             @if ($a->submissions_count === 0)
+                                                @can('delete', $a)
                                                 <form action="{{ route('dosen.assignments.destroy', $a) }}" method="POST"
                                                       onsubmit="return confirm('Hapus tugas ini? Tindakan ini tidak dapat dibatalkan.')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn-danger-action">Hapus</button>
                                                 </form>
+                                                @endcan
                                             @endif
                                         </div>
                                     </div>
@@ -177,9 +187,11 @@
                                     <div style="font-size: 36px; margin-bottom: 8px;">📝</div>
                                     <div style="font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Belum Ada Tugas untuk Mata Kuliah Ini</div>
                                     <p style="font-size: 12.5px; color: #64748B; margin-bottom: 16px;">Mata kuliah ini belum memiliki penugasan aktif. Klik tombol di bawah untuk membuat tugas pertama.</p>
+                                    @can('create', [\App\Models\Assignment::class, $course])
                                     <button type="button" class="btn-primary-action" onclick="document.getElementById('btnOpenCreateAssignmentModal').click()" style="margin: 0 auto; font-size: 12.5px;">
                                         + Buat Tugas Pertama
                                     </button>
+                                    @endcan
                                 </div>
                             @endforelse
                         </div>
