@@ -72,4 +72,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Grade::class, 'graded_by');
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function createdAttendanceSessions()
+    {
+        return $this->hasMany(AttendanceSession::class, 'created_by');
+    }
 }
