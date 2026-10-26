@@ -11,9 +11,11 @@ use App\Http\Controllers\AkunKataSandiController;
 use App\Http\Controllers\Auth\LupaKataSandiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dosen\AssignmentController as DosenAssignmentController;
+use App\Http\Controllers\Dosen\AttendanceController as DosenAttendanceController;
 use App\Http\Controllers\Dosen\GradingController;
 use App\Http\Controllers\Dosen\MaterialController as DosenMaterialController;
 use App\Http\Controllers\Dosen\StudentController as DosenStudentController;
+use App\Http\Controllers\Mahasiswa\AttendanceController as MahasiswaAttendanceController;
 use App\Http\Controllers\Mahasiswa\MahasiswaCourseController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SubmissionController;
@@ -64,10 +66,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [MahasiswaCourseController::class, 'index'])->name('index');
             // Kepemilikan (terdaftar atau tidak) dicek di controller.
             Route::get('/{mata_kuliah}', [MahasiswaCourseController::class, 'show'])->name('show');
+            // Presensi hanya dapat dilakukan pada halaman mata kuliah yang bersangkutan
+            Route::post('/{mata_kuliah}/presensi', [MahasiswaAttendanceController::class, 'storeForCourse'])->name('presensi.store');
         });
 
         Route::post('/assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
             ->name('assignments.submissions.store');
+
+        // Presensi Kelas Mahasiswa diarahkan ke mata kuliah
+        Route::get('/presensi', fn () => redirect()->route('mahasiswa.mata-kuliah.index')->with('info', 'Presensi dilakukan langsung pada halaman mata kuliah yang Anda ikuti.'))->name('presensi.index');
+        Route::post('/presensi', [MahasiswaAttendanceController::class, 'store'])->name('presensi.store');
 
         // Unduh materi mata kuliah yang diikuti (pake role:mahasiswa,dosen,admin agar dosen & admin bisa akses jika dipanggil)
         Route::get('/materi/{material}/unduh', [MaterialController::class, 'download'])
@@ -98,6 +106,15 @@ Route::middleware('auth')->group(function () {
             }
             return view('dosen.dashboard');
         })->name('dashboard');
+
+        // Presensi Kelas Dosen (berbasis kode unik dengan masa berlaku)
+        Route::get('/presensi', [DosenAttendanceController::class, 'index'])->name('presensi.index');
+        Route::post('/presensi', [DosenAttendanceController::class, 'store'])->name('presensi.store');
+        Route::get('/presensi/{session}', [DosenAttendanceController::class, 'show'])->name('presensi.show');
+        Route::post('/presensi/{session}/toggle', [DosenAttendanceController::class, 'toggleStatus'])->name('presensi.toggle');
+        Route::post('/presensi/{session}/extend', [DosenAttendanceController::class, 'extend'])->name('presensi.extend');
+        Route::post('/presensi/{session}/manual', [DosenAttendanceController::class, 'updateStudentAttendance'])->name('presensi.manual');
+        Route::delete('/presensi/{session}', [DosenAttendanceController::class, 'destroy'])->name('presensi.destroy');
 
         // Kelola mahasiswa: daftar / keluarkan mahasiswa dari mata kuliah yang diampu.
         Route::get('/mahasiswa', [DosenStudentController::class, 'index'])->name('mahasiswa');

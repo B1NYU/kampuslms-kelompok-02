@@ -69,9 +69,30 @@ class MahasiswaCourseController extends Controller
         $mataKuliah = $this->formatCourseMetadata($course);
         $nilaiData = $this->calculateGradesAndTasks($course, $student);
 
+        // Data presensi khusus untuk mata kuliah yang dibuka ini
+        $activeSessions = $course->attendanceSessions()
+            ->where('is_active', true)
+            ->where('expires_at', '>=', now())
+            ->where('start_time', '<=', now())
+            ->orderBy('expires_at')
+            ->get();
+
+        $courseSessionIds = $course->attendanceSessions()->pluck('id');
+
+        $attendedSessionIds = \App\Models\Attendance::where('user_id', $student->id)
+            ->whereIn('attendance_session_id', $courseSessionIds)
+            ->pluck('attendance_session_id')
+            ->toArray();
+
+        $attendanceHistory = \App\Models\Attendance::where('user_id', $student->id)
+            ->whereIn('attendance_session_id', $courseSessionIds)
+            ->with('session')
+            ->orderByDesc('attended_at')
+            ->get();
+
         return view()->file(
             resource_path('views/courses/show.blade.php'),
-            compact('course', 'mataKuliah', 'nilaiData', 'student')
+            compact('course', 'mataKuliah', 'nilaiData', 'student', 'activeSessions', 'attendedSessionIds', 'attendanceHistory')
         );
     }
 

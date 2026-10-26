@@ -1,5 +1,9 @@
 @php
     $courseDb = $course;
+    $activeTab = request('tab');
+    if (!$activeTab) {
+        $activeTab = ($errors->has('code') || session('tab') === 'presensi') ? 'presensi' : 'detail';
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -34,16 +38,26 @@
                         <span class="crumb-course-name">{{ $mataKuliah['nama'] }}</span>
                     </div>
 
-                    <!-- TABS: DETAIL & NILAI -->
+                    <!-- TABS: DETAIL, PRESENSI & NILAI -->
                     <div class="course-subnav-tabs">
-                        <button class="subnav-tab-btn {{ request('tab') !== 'nilai' ? 'active' : '' }}" id="tabBtnDetail" onclick="switchCourseTab('detail')">
+                        <button class="subnav-tab-btn {{ $activeTab === 'detail' ? 'active' : '' }}" id="tabBtnDetail" onclick="switchCourseTab('detail')">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                             </svg>
                             <span>Detail</span>
                         </button>
-                        <button class="subnav-tab-btn {{ request('tab') === 'nilai' ? 'active' : '' }}" id="tabBtnNilai" onclick="switchCourseTab('nilai')">
+                        <button class="subnav-tab-btn {{ $activeTab === 'presensi' ? 'active' : '' }}" id="tabBtnPresensi" onclick="switchCourseTab('presensi')">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 11l3 3L22 4"></path>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                            <span>Presensi</span>
+                            @if (isset($activeSessions) && $activeSessions->isNotEmpty())
+                                <span class="tab-badge-pill" style="background: #10B981; color: #FFF;">{{ $activeSessions->count() }} Aktif</span>
+                            @endif
+                        </button>
+                        <button class="subnav-tab-btn {{ $activeTab === 'nilai' ? 'active' : '' }}" id="tabBtnNilai" onclick="switchCourseTab('nilai')">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -61,7 +75,7 @@
         <main class="course-main-content">
 
             <!-- VIEW 1: DETAIL (Alur 16 Sesi & Info Matkul) -->
-            <div id="panelCourseDetail" style="{{ request('tab') === 'nilai' ? 'display: none;' : '' }}">
+            <div id="panelCourseDetail" style="{{ $activeTab !== 'detail' ? 'display: none;' : '' }}">
                 <div class="split-layout">
                     <!-- ==============================================
                          KOLOM KIRI: TIMELINE PERTEMUAN (DENGAN SCROLL INTERNAL)
@@ -320,7 +334,7 @@
             </div>
 
             <!-- VIEW 2: NILAI (Rekapitulasi Nilai Tugas Mahasiswa) -->
-            <div id="panelCourseNilai" style="{{ request('tab') === 'nilai' ? '' : 'display: none;' }}">
+            <div id="panelCourseNilai" style="{{ $activeTab === 'nilai' ? '' : 'display: none;' }}">
                 <!-- Stat Cards Ringkasan Nilai -->
                 <div class="grades-stat-grid">
                     <div class="grade-summary-card">
@@ -484,6 +498,190 @@
                 </div>
             </div>
 
+            <!-- VIEW 3: PRESENSI KELAS KHUSUS MATA KULIAH INI -->
+            <div id="panelCoursePresensi" style="{{ $activeTab === 'presensi' ? '' : 'display: none;' }}; padding-top: 10px;">
+                @if (session('success'))
+                    <div style="background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; border-radius: 14px; padding: 16px 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; border-radius: 14px; padding: 16px 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div>
+                            @foreach ($errors->all() as $err)
+                                <div>{{ $err }}</div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Hero Input Card Khusus Mata Kuliah Ini -->
+                <div style="background: linear-gradient(135deg, #0284C7 0%, #039FFA 50%, #38BDF8 100%); border-radius: 20px; padding: 32px; color: #FFF; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(3, 159, 250, 0.22); position: relative; overflow: hidden;">
+                    <div style="max-width: 650px;">
+                        <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.95;">
+                            Presensi Kehadiran Kelas
+                        </span>
+                        <h2 style="font-size: 26px; font-weight: 900; margin: 4px 0 8px 0; color: #FFF;">
+                            {{ $mataKuliah['kode'] }} &bull; {{ $mataKuliah['nama'] }}
+                        </h2>
+                        <p style="font-size: 14px; opacity: 0.92; line-height: 1.5; margin: 0;">
+                            Presensi kehadiran pada halaman ini hanya berlaku untuk mata kuliah ini. Masukkan kode unik yang diberikan oleh dosen pengampu di kelas.
+                        </p>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px); border: 2px dashed rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 20px 24px; margin-top: 20px; max-width: 580px;">
+                        <form method="POST" action="{{ route('mahasiswa.mata-kuliah.presensi.store', $course) }}">
+                            @csrf
+                            <label for="inputPresensiCode" style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #FFF; margin-bottom: 8px; text-align: center;">
+                                Masukkan Kode Presensi:
+                            </label>
+
+                            <input type="text" name="code" id="inputPresensiCode" placeholder="CONTOH: 8K9P2X" maxlength="16" autocomplete="off" required value="{{ old('code') }}" style="width: 100%; font-family: 'Consolas', monospace; font-size: 24px; font-weight: 900; letter-spacing: 5px; text-align: center; text-transform: uppercase; padding: 12px 18px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.8); background: #FFF; color: #0F172A; outline: none; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);">
+
+                            <button type="submit" style="width: 100%; margin-top: 10px; background: #F9B804; color: #78350F; border: none; font-size: 15px; font-weight: 900; padding: 12px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(249, 184, 4, 0.4); transition: transform 0.15s;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M9 11l3 3L22 4"></path>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                </svg>
+                                Kirim Presensi Kelas
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Sesi Presensi Aktif di Mata Kuliah Ini -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+                        Sesi Presensi yang Sedang Berlangsung di Mata Kuliah Ini
+                    </h3>
+
+                    @if (isset($activeSessions) && $activeSessions->isNotEmpty())
+                        @foreach ($activeSessions as $active)
+                            @php
+                                $alreadyAttended = in_array($active->id, $attendedSessionIds ?? []);
+                            @endphp
+                            <div style="background: #FFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);">
+                                <div>
+                                    <div style="font-size: 15px; font-weight: 800; color: #0F172A;">
+                                        {{ $active->title }}
+                                    </div>
+                                    <div style="font-size: 12.5px; color: #64748B; margin-top: 3px;">
+                                        Masa berlaku sampai <strong>{{ $active->expires_at->format('H:i') }} WIB</strong> ({{ $active->remainingTimeForHumans() }})
+                                    </div>
+                                </div>
+
+                                <div>
+                                    @if ($alreadyAttended)
+                                        <span style="font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 20px; background: #DCFCE7; color: #166534; display: inline-flex; align-items: center; gap: 6px;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            Anda Sudah Hadir
+                                        </span>
+                                    @else
+                                        <span style="font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 20px; background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; display: inline-flex; align-items: center; gap: 6px;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                            </svg>
+                                            Belum Hadir &bull; Minta Kode ke Dosen
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div style="background: #FFF; border: 1px dashed #CBD5E1; border-radius: 14px; padding: 20px; text-align: center; color: #64748B; font-size: 13.5px; font-weight: 600;">
+                            Tidak ada sesi presensi yang sedang berlangsung untuk mata kuliah ini saat ini.
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Riwayat Kehadiran Mahasiswa di Mata Kuliah Ini -->
+                <div style="background: #FFF; border-radius: 18px; border: 1px solid rgba(3, 159, 250, 0.18); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); overflow: hidden;">
+                    <div style="padding: 18px 24px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between;">
+                        <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#039FFA" stroke-width="2.3">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Riwayat Kehadiran di Mata Kuliah Ini
+                        </h3>
+                        <span style="font-size: 12.5px; font-weight: 700; color: #64748B;">
+                            Total: {{ isset($attendanceHistory) ? $attendanceHistory->count() : 0 }} Pertemuan
+                        </span>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                            <thead>
+                                <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; color: #475569; font-size: 12px; font-weight: 800; text-transform: uppercase;">
+                                    <th style="padding: 12px 20px;">Pertemuan / Sesi</th>
+                                    <th style="padding: 12px 16px;">Waktu Presensi</th>
+                                    <th style="padding: 12px 16px;">Status</th>
+                                    <th style="padding: 12px 20px;">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($attendanceHistory ?? [] as $att)
+                                    @php
+                                        $badgeBg = match($att->status) {
+                                            'hadir' => '#DCFCE7',
+                                            'izin' => '#E0F2FE',
+                                            'sakit' => '#FEF3C7',
+                                            default => '#FEE2E2',
+                                        };
+                                        $badgeColor = match($att->status) {
+                                            'hadir' => '#166534',
+                                            'izin' => '#0369A1',
+                                            'sakit' => '#92400E',
+                                            default => '#991B1B',
+                                        };
+                                    @endphp
+                                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                                        <td style="padding: 14px 20px; font-weight: 800; color: #0F172A;">
+                                            {{ $att->session?->title ?? '-' }}
+                                        </td>
+                                        <td style="padding: 14px 16px; color: #475569; font-weight: 600;">
+                                            {{ $att->attended_at ? $att->attended_at->format('d/m/Y H:i') . ' WIB' : '-' }}
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; background: {{ $badgeBg }}; color: {{ $badgeColor }};">
+                                                {{ strtoupper($att->status) }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 20px; font-size: 12.5px; color: #64748B;">
+                                            {{ $att->notes ?: 'Tercatat di sistem' }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="padding: 36px 20px; text-align: center; color: #94A3B8;">
+                                            <div style="font-weight: 700; font-size: 14px; color: #475569;">Belum ada riwayat kehadiran pada mata kuliah ini.</div>
+                                            <div style="font-size: 12.5px; margin-top: 4px;">Masukkan kode presensi dari dosen pada formulir di atas.</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <!-- FOOTER GLOBAL -->
@@ -492,31 +690,45 @@
 
     <!-- JAVASCRIPT SWITCHER -->
     <script>
-        // Switcher Tab Detail & Nilai
+        // Switcher Tab Detail, Presensi & Nilai
         function switchCourseTab(tab) {
-            const btnDetail   = document.getElementById('tabBtnDetail');
-            const btnNilai    = document.getElementById('tabBtnNilai');
-            const panelDetail = document.getElementById('panelCourseDetail');
-            const panelNilai  = document.getElementById('panelCourseNilai');
+            const btnDetail    = document.getElementById('tabBtnDetail');
+            const btnNilai     = document.getElementById('tabBtnNilai');
+            const btnPresensi  = document.getElementById('tabBtnPresensi');
+            const panelDetail  = document.getElementById('panelCourseDetail');
+            const panelNilai   = document.getElementById('panelCourseNilai');
+            const panelPresensi = document.getElementById('panelCoursePresensi');
 
-            if (tab === 'detail') {
-                btnDetail.classList.add('active');
-                btnNilai.classList.remove('active');
-                panelDetail.style.display = 'block';
-                panelNilai.style.display  = 'none';
-                if (window.history.replaceState) {
-                    const url = new URL(window.location);
-                    url.searchParams.delete('tab');
-                    window.history.replaceState({}, '', url);
-                }
-            } else {
-                btnNilai.classList.add('active');
-                btnDetail.classList.remove('active');
-                panelNilai.style.display  = 'block';
-                panelDetail.style.display = 'none';
+            if (btnDetail) btnDetail.classList.remove('active');
+            if (btnNilai) btnNilai.classList.remove('active');
+            if (btnPresensi) btnPresensi.classList.remove('active');
+
+            if (panelDetail) panelDetail.style.display   = 'none';
+            if (panelNilai) panelNilai.style.display    = 'none';
+            if (panelPresensi) panelPresensi.style.display = 'none';
+
+            if (tab === 'nilai') {
+                if (btnNilai) btnNilai.classList.add('active');
+                if (panelNilai) panelNilai.style.display = 'block';
                 if (window.history.replaceState) {
                     const url = new URL(window.location);
                     url.searchParams.set('tab', 'nilai');
+                    window.history.replaceState({}, '', url);
+                }
+            } else if (tab === 'presensi') {
+                if (btnPresensi) btnPresensi.classList.add('active');
+                if (panelPresensi) panelPresensi.style.display = 'block';
+                if (window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', 'presensi');
+                    window.history.replaceState({}, '', url);
+                }
+            } else {
+                if (btnDetail) btnDetail.classList.add('active');
+                if (panelDetail) panelDetail.style.display = 'block';
+                if (window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('tab');
                     window.history.replaceState({}, '', url);
                 }
             }
