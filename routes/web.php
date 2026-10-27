@@ -10,6 +10,7 @@ use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AkunKataSandiController;
 use App\Http\Controllers\Auth\LupaKataSandiController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Dosen\AssignmentController as DosenAssignmentController;
 use App\Http\Controllers\Dosen\AttendanceController as DosenAttendanceController;
 use App\Http\Controllers\Dosen\GradingController;
@@ -46,6 +47,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+    // Ringkasan notifikasi untuk lonceng di navbar (di-polling browser). Milik pengguna sendiri saja.
+    Route::get('/notifikasi/ringkas', [NotificationController::class, 'ringkas'])
+        ->middleware('throttle:60,1')->name('notifikasi.ringkas');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

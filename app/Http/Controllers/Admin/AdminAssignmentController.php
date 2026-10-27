@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\AssignmentPublished;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\Course;
@@ -50,6 +51,8 @@ class AdminAssignmentController extends Controller
         $assignment->created_by = $request->user()->id;   // id admin yang sedang login (keputusan B3)
         $assignment->save();
 
+        AssignmentPublished::dispatchIfNewlyPublished($assignment);
+
         return redirect()->route('admin.tugas')
             ->with('success', "Tugas \"{$assignment->title}\" berhasil ditambahkan.");
     }
@@ -62,7 +65,10 @@ class AdminAssignmentController extends Controller
 
         // course_id sengaja dibuang: tugas tidak boleh dipindah antar mata kuliah,
         // karena submission dan enrollment-nya terikat ke mata kuliah asal.
+        $statusSebelumnya = $assignment->status;
         $assignment->update(Arr::except($data, ['course_id']));
+
+        AssignmentPublished::dispatchIfNewlyPublished($assignment, $statusSebelumnya);
 
         return redirect()->route('admin.tugas')
             ->with('success', "Tugas \"{$assignment->title}\" berhasil diperbarui.");

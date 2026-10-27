@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dosen;
 
+use App\Events\AssignmentPublished;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\Course;
@@ -55,6 +56,8 @@ class AssignmentController extends Controller
         $assignment->created_by = $request->user()->id;
         $assignment->save();
 
+        AssignmentPublished::dispatchIfNewlyPublished($assignment);
+
         return redirect()->route('dosen.courses.assignments.index', $course)
             ->with('success', 'Tugas berhasil dibuat.');
     }
@@ -70,7 +73,10 @@ class AssignmentController extends Controller
     {
         Gate::authorize('update', $assignment);
 
+        $statusSebelumnya = $assignment->status;
         $assignment->update($this->validated($request));
+
+        AssignmentPublished::dispatchIfNewlyPublished($assignment, $statusSebelumnya);
 
         return redirect()->route('dosen.courses.assignments.index', $assignment->course_id)
             ->with('success', 'Tugas berhasil diperbarui.');
