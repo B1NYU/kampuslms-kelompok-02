@@ -66,7 +66,7 @@
                             </div>
                             <div class="section-header-text">
                                 <h2>Penilaian &amp; Umpan Balik (Feedback) Pengumpulan Mahasiswa</h2>
-                                <p>Evaluasi tugas mahasiswa, berikan skor angka (0-100), dan cantumkan catatan konstruktif yang tersimpan langsung ke database.</p>
+                                <p>Evaluasi tugas mahasiswa, berikan skor angka (sesuai nilai maksimal tugas), dan cantumkan catatan konstruktif yang tersimpan langsung ke database.</p>
                             </div>
                         </div>
                         <span class="section-header-badge">Evaluasi &amp; Grading</span>
@@ -172,10 +172,14 @@
                                 @forelse ($allSubmissions as $sub)
                                     @php
                                         $student = $sub->student;
+                                        $maxScore = (int) ($sub->assignment?->max_score ?? 100);
                                         $assignment = $sub->assignment;
                                         $course = $assignment?->course;
                                         $grade = $sub->grade;
                                         $isGraded = !is_null($grade);
+                                        // 87.5 harus tetap "87.5" (bukan dibulatkan ke 88): angka ini diisikan kembali
+                                        // ke form "Edit Nilai", dan menyimpannya akan mengubah nilai mahasiswa.
+                                        $scoreText = $isGraded ? rtrim(rtrim(number_format((float) $grade->score, 2, '.', ''), '0'), '.') : '';
 
                                         $name = $student?->name ?? ('Mahasiswa #' . $sub->user_id);
                                         $words = explode(' ', trim($name));
@@ -241,7 +245,7 @@
                                         </td>
                                         <td>
                                             @can('view', $sub)
-                                            <a href="#" onclick="alert('Membuka / mengunduh berkas: {{ addslashes($filename) }}\nUkuran: {{ $fileSizeKb }}'); return false;" class="btn-open-resource" style="font-size:11px; max-width: 170px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="{{ $filename }} ({{ $fileSizeKb }})">
+                                            <a href="{{ route('submissions.download', $sub) }}" class="btn-open-resource" style="font-size:11px; max-width: 170px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="{{ $filename }} ({{ $fileSizeKb }})">
                                                 <span>{{ $icon }}</span>
                                                 <span>{{ $filename }}</span>
                                             </a>
@@ -254,7 +258,7 @@
                                         </td>
                                         <td>
                                             @if ($isGraded)
-                                                <span class="score-badge score-badge-graded item-score">{{ round($grade->score) }} / 100</span>
+                                                <span class="score-badge score-badge-graded item-score">{{ $scoreText }} / {{ $maxScore }}</span>
                                             @else
                                                 <span class="score-badge score-badge-pending item-score">Belum Dinilai</span>
                                             @endif
@@ -277,7 +281,8 @@
                                                     data-id="{{ $sub->id }}"
                                                     data-student="{{ $name }} ({{ $nim }})"
                                                     data-title="{{ $assignment?->title ?? 'Tugas' }}"
-                                                    data-score="{{ round($grade->score) }}"
+                                                    data-max="{{ $maxScore }}"
+                                                    data-score="{{ $scoreText }}"
                                                     data-feedback="{{ $grade->feedback }}"
                                                     style="padding: 6px 14px; font-size: 11px;">
                                                     Edit Nilai
@@ -287,6 +292,7 @@
                                                     data-id="{{ $sub->id }}"
                                                     data-student="{{ $name }} ({{ $nim }})"
                                                     data-title="{{ $assignment?->title ?? 'Tugas' }}"
+                                                    data-max="{{ $maxScore }}"
                                                     data-score=""
                                                     data-feedback=""
                                                     style="padding: 6px 14px; font-size: 11px; background:#1B8A5A;">
@@ -329,14 +335,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="inputScore">Nilai Akhir (Skala 0 - 100) <span class="required">*</span></label>
-                    <input type="number" id="inputScore" class="form-control" placeholder="Masukkan nilai 0-100..." min="0" max="100" required>
+                    <label for="inputScore">Nilai Akhir (Skala 0 - <span id="modalMaxLabel">100</span>) <span class="required">*</span></label>
+                    <input type="number" id="inputScore" class="form-control" placeholder="Masukkan nilai..." min="0" max="100" step="any" required>
                     <div class="score-quick-buttons">
                         <span style="font-size: 11px; color: #64748B; align-self: center;">Pintasan Nilai:</span>
-                        <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 95">95 (A)</button>
-                        <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 88">88 (A-)</button>
-                        <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 82">82 (B+)</button>
-                        <button type="button" class="btn-score-quick" onclick="document.getElementById('inputScore').value = 75">75 (B)</button>
+                        <button type="button" class="btn-score-quick" data-pct="95">95% (A)</button>
+                        <button type="button" class="btn-score-quick" data-pct="88">88% (A-)</button>
+                        <button type="button" class="btn-score-quick" data-pct="82">82% (B+)</button>
+                        <button type="button" class="btn-score-quick" data-pct="75">75% (B)</button>
                     </div>
                 </div>
 
@@ -392,7 +398,16 @@
             const inputScore = document.getElementById('inputScore');
             const inputFeedback = document.getElementById('inputFeedback');
 
+            const modalMaxLabel = document.getElementById('modalMaxLabel');
             let activeSubmissionId = null;
+            let activeMax = 100;   // nilai maksimal tugas yang sedang dinilai (dari data-max)
+
+            // Pintasan nilai = persentase dari nilai maksimal tugas, bukan angka tetap.
+            document.querySelectorAll('.btn-score-quick').forEach(b => {
+                b.addEventListener('click', () => {
+                    inputScore.value = Math.round(activeMax * Number(b.dataset.pct) / 100);
+                });
+            });
 
             function attachGradingButtons() {
                 const gradeBtns = document.querySelectorAll('.btn-grade-action');
@@ -403,7 +418,10 @@
                         const title = btn.getAttribute('data-title');
                         const score = btn.getAttribute('data-score') || '';
                         const feedback = btn.getAttribute('data-feedback') || '';
+                        activeMax = Number(btn.getAttribute('data-max')) || 100;
 
+                        modalMaxLabel.textContent = activeMax;
+                        inputScore.max = activeMax;
                         modalAssignmentTitle.textContent = title;
                         modalStudentName.textContent = `Mahasiswa: ${student}`;
                         inputScore.value = score;
@@ -432,8 +450,8 @@
                 const score = parseFloat(inputScore.value);
                 const feedback = inputFeedback.value.trim();
 
-                if (isNaN(score) || score < 0 || score > 100) {
-                    alert('Harap masukkan nilai valid antara 0 hingga 100!');
+                if (isNaN(score) || score < 0 || score > activeMax) {
+                    alert('Harap masukkan nilai valid antara 0 hingga ' + activeMax + '!');
                     return;
                 }
 
@@ -470,7 +488,7 @@
                             const scoreElem = targetRow.querySelector('.item-score');
                             if (scoreElem) {
                                 scoreElem.className = 'score-badge score-badge-graded item-score';
-                                scoreElem.textContent = `${Math.round(score)} / 100`;
+                                scoreElem.textContent = `${score} / ${activeMax}`;
                             }
 
                             const feedbackElem = targetRow.querySelector('.item-feedback');
@@ -485,14 +503,14 @@
                             if (actionBtn) {
                                 actionBtn.style.background = 'linear-gradient(135deg, #039FFA 0%, #0284C7 100%)';
                                 actionBtn.textContent = 'Edit Nilai';
-                                actionBtn.setAttribute('data-score', Math.round(score));
+                                actionBtn.setAttribute('data-score', score);
                                 actionBtn.setAttribute('data-feedback', feedback);
                             }
                         }
 
                         applyFilters();
                         closeModal();
-                        showToast(`Nilai (${Math.round(score)}) & Feedback berhasil disimpan ke database!`);
+                        showToast(`Nilai (${score}) & Feedback berhasil disimpan.`);
                     } else {
                         const firstError = data.errors ? Object.values(data.errors).flat()[0] : null;
                         alert(firstError || data.message || 'Gagal menyimpan nilai ke database. Silakan coba lagi.');

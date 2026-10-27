@@ -18,10 +18,16 @@
     .notif-item a:hover { background: #F0F9FF; }
     .notif-msg { display: block; font-size: 13px; font-weight: 700; line-height: 1.4; }
     .notif-time { display: block; margin-top: 3px; font-size: 11.5px; font-weight: 600; color: #64748B; }
+    .notif-footer { display: block; padding: 11px 16px; text-align: center; font-size: 12.5px; font-weight: 800; color: #0369A1; text-decoration: none; background: #F8FAFC; border-top: 1px solid #E2E8F0; }
+    .notif-footer:hover { background: #F0F9FF; }
+    .notif-item a { cursor: pointer; }
     .notif-empty { padding: 22px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #64748B; }
 </style>
 
-<div class="notif-wrapper" id="notifWrapper" data-url="{{ route('notifikasi.ringkas') }}">
+<div class="notif-wrapper" id="notifWrapper"
+     data-url="{{ route('notifikasi.ringkas') }}"
+     data-baca="{{ route('notifikasi.baca', ['id' => '__ID__']) }}"
+     data-csrf="{{ csrf_token() }}">
     <button type="button" class="notif-bell" id="notifBell" aria-haspopup="true" aria-expanded="false"
             aria-controls="notifPanel" aria-label="Notifikasi, {{ $jumlahAwal }} belum dibaca" title="Notifikasi">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -36,6 +42,7 @@
         <ul class="notif-list" id="notifList">
             <li class="notif-empty">Memuat...</li>
         </ul>
+        <a class="notif-footer" href="{{ route('notifikasi.index') }}">Lihat semua notifikasi</a>
     </div>
 </div>
 
@@ -45,6 +52,8 @@
         if (!wrap) return;
 
         const url = wrap.dataset.url;
+        const bacaTemplate = wrap.dataset.baca;
+        const csrf = wrap.dataset.csrf;
         const bell = document.getElementById('notifBell');
         const badge = document.getElementById('notifBadge');
         const panel = document.getElementById('notifPanel');
@@ -73,9 +82,25 @@
             data.items.forEach(function (it) {
                 const li = document.createElement('li');
                 li.className = 'notif-item';
-                const aman = typeof it.url === 'string' && it.url.startsWith('/') && !it.url.startsWith('//');
+                const aman = typeof it.url === 'string' && /^\/(?![\/\\])[^\\\x00-\x1F\x7F]*$/.test(it.url);
                 const isi = document.createElement(aman ? 'a' : 'div');
-                if (aman) { isi.href = it.url; } else { isi.className = 'notif-noLink'; }
+                if (aman) {
+                    isi.href = it.url;
+                    // Klik = tandai dibaca (POST) lalu server mengarahkan ke tujuan. Kalau JS gagal,
+                    // href biasa tetap membuka halamannya (hanya belum ditandai dibaca).
+                    isi.addEventListener('click', function (e) {
+                        if (!it.id || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+                        e.preventDefault();
+                        const f = document.createElement('form');
+                        f.method = 'POST';
+                        f.action = bacaTemplate.replace('__ID__', encodeURIComponent(it.id));
+                        const t = document.createElement('input');
+                        t.type = 'hidden'; t.name = '_token'; t.value = csrf;
+                        f.appendChild(t);
+                        document.body.appendChild(f);
+                        f.submit();
+                    });
+                } else { isi.className = 'notif-noLink'; }
                 const msg = document.createElement('span');
                 msg.className = 'notif-msg';
                 msg.textContent = it.message;

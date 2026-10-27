@@ -15,9 +15,11 @@ use App\Http\Controllers\Dosen\AssignmentController as DosenAssignmentController
 use App\Http\Controllers\Dosen\AttendanceController as DosenAttendanceController;
 use App\Http\Controllers\Dosen\GradingController;
 use App\Http\Controllers\Dosen\MaterialController as DosenMaterialController;
+use App\Http\Controllers\Dosen\RekapNilaiController as DosenRekapNilaiController;
 use App\Http\Controllers\Dosen\StudentController as DosenStudentController;
 use App\Http\Controllers\Mahasiswa\AttendanceController as MahasiswaAttendanceController;
 use App\Http\Controllers\Mahasiswa\MahasiswaCourseController;
+use App\Http\Controllers\Mahasiswa\RekapNilaiController as MahasiswaRekapNilaiController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +54,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifikasi/ringkas', [NotificationController::class, 'ringkas'])
         ->middleware('throttle:60,1')->name('notifikasi.ringkas');
 
+    // Halaman daftar notifikasi + tandai dibaca. Semua bekerja lewat relasi notifications() milik
+    // pengguna login, jadi ID notifikasi orang lain berujung 404 (bukan 403).
+    Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi/baca-semua', [NotificationController::class, 'bacaSemua'])
+        ->middleware('throttle:30,1')->name('notifikasi.baca-semua');
+    Route::post('/notifikasi/{id}/baca', [NotificationController::class, 'baca'])
+        ->middleware('throttle:60,1')->name('notifikasi.baca');
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Ubah kata sandi (sudah login): dosen & mahasiswa.
@@ -74,6 +84,9 @@ Route::middleware('auth')->group(function () {
             // Presensi hanya dapat dilakukan pada halaman mata kuliah yang bersangkutan
             Route::post('/{mata_kuliah}/presensi', [MahasiswaAttendanceController::class, 'storeForCourse'])->name('presensi.store');
         });
+
+        // Rekap nilai milik sendiri, lintas mata kuliah (disaring per mahasiswa di controller).
+        Route::get('/nilai', [MahasiswaRekapNilaiController::class, 'index'])->name('nilai');
 
         Route::post('/assignments/{assignment}/submissions', [SubmissionController::class, 'store'])
             ->name('assignments.submissions.store');
@@ -140,6 +153,10 @@ Route::middleware('auth')->group(function () {
         // Penilaian & Feedback Dosen
         Route::get('/penilaian', [GradingController::class, 'index'])->name('penilaian');
         Route::put('/penilaian/{submission}', [GradingController::class, 'update'])->name('penilaian.update');
+
+        // Rekap nilai per mata kuliah (mahasiswa × tugas). Otorisasi: CoursePolicy@viewGradeRecap.
+        Route::get('/rekap-nilai', [DosenRekapNilaiController::class, 'landing'])->name('rekap');
+        Route::get('/rekap-nilai/{course}', [DosenRekapNilaiController::class, 'show'])->name('rekap.show');
 
         // /dosen/courses/{course}/assignments (index, create, store)
         // /dosen/assignments/{assignment}     (edit, update, destroy)
