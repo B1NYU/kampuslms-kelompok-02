@@ -77,6 +77,16 @@
                     Penilaian & Feedback
                 </a>
             </li>
+            <li class="{{ request()->is('dosen/rekap-nilai*') ? 'active' : '' }}">
+                <a href="{{ route('dosen.rekap') }}" class="nav-link-dosen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    Rekap Nilai
+                </a>
+            </li>
         </ul>
     </div>
 

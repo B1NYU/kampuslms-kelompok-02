@@ -9,22 +9,21 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Unduh materi. Dipakai bersama oleh mahasiswa, dosen, dan admin.
- *
- * Route model binding hanya membuktikan materi itu ADA; hak akses dicek
- * MaterialPolicy@view (admin, dosen pengampu, atau mahasiswa terdaftar di MK
- * yang bukan draft). Tanpa pengecekan ini, mengganti ID di URL membuka
- * materi mata kuliah lain (IDOR).
- */
 class MaterialController extends Controller
 {
     public function download(Request $request, Material $material): StreamedResponse|RedirectResponse
     {
+        // Dosen tidak boleh menggunakan route unduh versi mahasiswa
+        if ($request->routeIs('mahasiswa.materi.download') && (
+            $request->user()->role === 'dosen' ||
+            (method_exists($request->user(), 'hasRole') && $request->user()->hasRole('dosen')) ||
+            (isset($request->user()->is_dosen) && $request->user()->is_dosen)
+        )) {
+            abort(403);
+        }
+
         Gate::authorize('view', $material);
 
-        // Materi berupa tautan: arahkan ke URL-nya, tetapi hanya http/https
-        // (mencegah javascript:, data:, dan skema berbahaya lain).
         if ($material->isLink()) {
             $scheme = strtolower((string) parse_url((string) $material->external_url, PHP_URL_SCHEME));
             abort_unless(in_array($scheme, ['http', 'https'], true), 404);
@@ -38,7 +37,6 @@ class MaterialController extends Controller
             'Berkas materi tidak ditemukan di server. Hubungi dosen pengampu.'
         );
 
-        // download() = Content-Disposition: attachment, jadi berkas tidak dieksekusi di browser.
         return Storage::disk('local')->download($material->file_path, $material->original_name);
     }
 }
