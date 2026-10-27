@@ -11,7 +11,7 @@
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.tugas.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.tugas.css', 'resources/js/app.js', 'resources/js/dosen/dosen.tugas.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/dosen/dosen.tugas.css') }}">
     @endif
@@ -331,83 +331,7 @@
     <!-- Toast Notification Container -->
     <div class="dosen-toast-container" id="toastContainer"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // Modal Controls
-            const assignmentModal = document.getElementById('assignmentModalOverlay');
-            const btnOpenCreate = document.getElementById('btnOpenCreateAssignmentModal');
-            const btnCloseModal = document.getElementById('btnCloseAssignmentModal');
-            const btnCancelModal = document.getElementById('btnCancelAssignmentModal');
-
-            function openModal() {
-                if (assignmentModal) {
-                    assignmentModal.classList.add('active');
-                }
-            }
-
-            function closeModal() {
-                if (assignmentModal) {
-                    assignmentModal.classList.remove('active');
-                    @if ($isEdit)
-                        window.location.href = @json(route('dosen.courses.assignments.index', $course));
-                    @endif
-                }
-            }
-
-            if (btnOpenCreate) {
-                btnOpenCreate.addEventListener('click', openModal);
-            }
-            if (btnCloseModal) {
-                btnCloseModal.addEventListener('click', closeModal);
-            }
-            if (btnCancelModal) {
-                btnCancelModal.addEventListener('click', closeModal);
-            }
-            if (assignmentModal) {
-                assignmentModal.addEventListener('click', (e) => {
-                    if (e.target === assignmentModal) closeModal();
-                });
-            }
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && assignmentModal && assignmentModal.classList.contains('active')) {
-                    closeModal();
-                }
-            });
-
-            function showToast(message, isSuccess = true) {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'dosen-toast';
-                if (!isSuccess) toast.style.borderLeftColor = '#EF4444';
-
-                const icon = `
-                    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? '#10B981' : '#EF4444'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>`;
-                toast.innerHTML = icon;
-
-                // textContent, bukan innerHTML, supaya pesan tidak bisa menyisipkan HTML.
-                const text = document.createElement('span');
-                text.textContent = message;
-                toast.appendChild(text);
-
-                container.appendChild(toast);
-                setTimeout(() => toast.classList.add('show'), 50);
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 350);
-                }, 3500);
-            }
-
-            @if (session('success'))
-                showToast(@json(session('success')), true);
-            @endif
-            @if (session('error'))
-                showToast(@json(session('error')), false);
-            @endif
-        });
-    </script>
+    <div id="dosenTugasConfig" style="display:none;" data-is-edit="{{ $isEdit ? '1' : '0' }}" data-redirect-url="{{ $isEdit ? route('dosen.courses.assignments.index', $course) : '' }}" data-toast-success="{{ session('success') }}" data-toast-error="{{ session('error') }}"></div>
 </body>
 
 </html>

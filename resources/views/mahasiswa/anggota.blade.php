@@ -10,7 +10,7 @@
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/mahasiswa/anggota.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/mahasiswa/anggota.css', 'resources/js/app.js', 'resources/js/mahasiswa/anggota.js'])
     @endif
 </head>
 <body class="poster-page">
@@ -152,29 +152,6 @@
             <p id="modalNim" class="modal-nim"></p>
         </div>
     </div>
-    
-    <script>
-        function showDetail(nama, nim, peran, foto, color) {
-            document.getElementById('modalImg').src = foto;
-            document.getElementById('modalNama').textContent = nama;
-            document.getElementById('modalNim').textContent = 'NIM: ' + nim;
-            const peranEl = document.getElementById('modalPeran');
-            peranEl.textContent = peran;
-            if (color) {
-                peranEl.style.background = color;
-            }
-            const modal = document.getElementById('memberModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-        function closeModal() {
-            const modal = document.getElementById('memberModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeModal();
-        });
-    </script>
+
 </body>
 </html>
