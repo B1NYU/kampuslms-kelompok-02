@@ -8,30 +8,38 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.pengguna.css', 'resources/js/app.js', 'resources/js/admin/admin.pengguna.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin/admin.pengguna.js'])
     @endif
+    <style>
+        #userModalOverlay { display: none; }
+        #userModalOverlay.active { display: flex; }
+    </style>
 </head>
-<body>
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <div class="app-window">
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed top-[-80px] right-[-80px] w-96 h-96 bg-sky-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-[-80px] left-[-80px] w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
+
+        <!-- Navbar Admin -->
         <x-navbar-admin />
 
-        <main class="admin-content">
+        <!-- Konten Utama Manajemen Pengguna -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
-            <!-- Topbar -->
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <h1>Manajemen Pengguna</h1>
+            <!-- Topbar Header -->
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Manajemen Pengguna</h1>
                     </div>
                 </div>
-                <div class="topbar-right">
-                    <button type="button" class="btn-primary-action" id="btnOpenAddUserModal" style="padding: 9px 18px; font-size: 13px; width: auto; height: auto;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <div>
+                    <button type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer" id="btnOpenAddUserModal">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
@@ -40,108 +48,165 @@
                 </div>
             </header>
 
-            <!-- Fitur: CRUD Pengguna -->
-            <section>
-                @php
-                    $userList = \App\Models\User::withTrashed()
-                        ->orderByRaw("CASE WHEN role = 'admin' THEN 1 WHEN role = 'dosen' THEN 2 ELSE 3 END, id ASC")
-                        ->get();
-                    $countAdmin = $userList->where('role', 'admin')->count();
-                    $countDosen = $userList->where('role', 'dosen')->count();
-                    $countMahasiswa = $userList->where('role', 'mahasiswa')->count();
-                    $countTotal = $userList->count();
-                @endphp
-                <div class="section-card">
-                    <div id="userPageAlert" style="display:none;margin-bottom:14px;font-size:13px;font-weight:700;padding:10px 14px;border-radius:10px;"></div>
+            <!-- Alert Box Halaman -->
+            <div id="userPageAlert" style="display:none;" class="text-xs sm:text-sm font-bold px-4 py-3 rounded-xl shadow-sm transition-all"></div>
 
-                    <!-- Tabel Daftar Pengguna (Full Width) -->
-                    <div class="table-container">
-                        <div class="table-header-tools">
-                            <span class="table-summary-info">Total <strong id="userTableCount">{{ $countTotal }}</strong> Pengguna Terdaftar</span>
-                            <div class="search-input-box">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                </svg>
-                                <input type="text" id="searchUserInput" placeholder="Cari nama / ID...">
-                            </div>
+            @php
+                $userList = \App\Models\User::withTrashed()
+                    ->orderByRaw("CASE WHEN role = 'admin' THEN 1 WHEN role = 'dosen' THEN 2 ELSE 3 END, id ASC")
+                    ->get();
+                $countAdmin = $userList->where('role', 'admin')->count();
+                $countDosen = $userList->where('role', 'dosen')->count();
+                $countMahasiswa = $userList->where('role', 'mahasiswa')->count();
+                $countTotal = $userList->count();
+            @endphp
+
+            <!-- Card Utama: Tabel Pengguna -->
+            <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+
+                <!-- Toolbar: Filter Tabs & Pencarian -->
+                <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <!-- Role Filter Group Buttons -->
+                    <div class="role-filter-group flex flex-wrap items-center gap-2">
+                        <button type="button" class="role-filter-btn active inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#039FFA] text-white shadow-sm border border-transparent transition-all cursor-pointer" data-filter="all">
+                            <span>Semua</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-white/20" id="filterCountAll">{{ $countTotal }}</span>
+                        </button>
+                        <button type="button" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-filter="admin">
+                            <span>👑 Admin</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600" id="filterCountAdmin">{{ $countAdmin }}</span>
+                        </button>
+                        <button type="button" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-filter="dosen">
+                            <span>🎓 Dosen</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600" id="filterCountDosen">{{ $countDosen }}</span>
+                        </button>
+                        <button type="button" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-filter="mahasiswa">
+                            <span>👥 Mahasiswa</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600" id="filterCountMhs">{{ $countMahasiswa }}</span>
+                        </button>
+                    </div>
+
+                    <!-- Search Input Box -->
+                    <div class="relative w-full md:w-80">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
                         </div>
+                        <input type="text" id="searchUserInput" placeholder="Cari nama, NIM/NIP, atau email..."
+                               class="w-full pl-10 pr-4 py-2 bg-slate-50/80 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all shadow-xs">
+                    </div>
+                </div>
 
-                        <!-- Filter Role Buttons -->
-                        <div class="role-filter-group" style="display:flex;gap:6px;flex-wrap:wrap;">
-                            <button type="button" class="role-filter-btn active" data-filter="all" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid var(--admin-primary);background:var(--admin-primary);color:#fff;cursor:pointer;transition:all 0.2s;">
-                                Semua (<span id="filterCountAll">{{ $countTotal }}</span>)
-                            </button>
-                            <button type="button" class="role-filter-btn" data-filter="admin" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid var(--admin-border);background:var(--admin-white);color:var(--admin-text);cursor:pointer;transition:all 0.2s;">
-                                👑 Admin (<span id="filterCountAdmin">{{ $countAdmin }}</span>)
-                            </button>
-                            <button type="button" class="role-filter-btn" data-filter="dosen" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid var(--admin-border);background:var(--admin-white);color:var(--admin-text);cursor:pointer;transition:all 0.2s;">
-                                🎓 Dosen (<span id="filterCountDosen">{{ $countDosen }}</span>)
-                            </button>
-                            <button type="button" class="role-filter-btn" data-filter="mahasiswa" style="padding:6px 14px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid var(--admin-border);background:var(--admin-white);color:var(--admin-text);cursor:pointer;transition:all 0.2s;">
-                                👥 Mahasiswa (<span id="filterCountMhs">{{ $countMahasiswa }}</span>)
-                            </button>
-                        </div>
-
-                        <div class="table-responsive" style="max-height:560px;overflow-y:auto;position:relative;">
-                            <table class="custom-admin-table" id="userTable">
-                                <thead>
-                                    <tr style="position:sticky;top:0;z-index:10;background:var(--admin-light);box-shadow:0 1px 2px rgba(0,0,0,0.06);">
-                                        <th>Pengguna</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th style="text-align:right;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="userTableBody">
-                                    @forelse ($userList as $u)
-                                    @php
-                                        $initials = collect(explode(' ', $u->name))->map(fn($w) => mb_substr($w, 0, 1))->join('');
-                                        $initials = strtoupper(mb_substr($initials, 0, 2));
-                                        $roleColors = [
-                                            'admin' => ['rgba(249, 99, 5, 0.12)', '#F96305'],
-                                            'dosen' => ['rgba(249, 184, 4, 0.14)', '#D97706'],
-                                            'mahasiswa' => ['rgba(3, 159, 250, 0.12)', '#039FFA'],
-                                        ];
-                                        [$bg, $c] = $roleColors[$u->role] ?? ['#F1F5F9', '#64748B'];
-                                        $isNonAktif = $u->trashed();
-                                    @endphp
-                                    <tr data-id="{{ $u->id }}"
-                                        data-name="{{ $u->name }}"
-                                        data-nim-nip="{{ $u->nim_nip }}"
-                                        data-email="{{ $u->email }}"
-                                        data-role="{{ $u->role }}"
-                                        data-status="{{ $isNonAktif ? 'nonaktif' : 'aktif' }}">
-                                        <td>
-                                            <div class="user-cell">
-                                                <div class="user-avatar" style="background:{{ $bg }};color:{{ $c }};">{{ $initials }}</div>
-                                                <div class="user-meta">
-                                                    <span class="user-name">{{ $u->name }}</span>
-                                                    <span class="user-id">{{ $u->nim_nip }}</span>
-                                                </div>
+                <!-- Tabel Daftar Pengguna -->
+                <div class="overflow-x-auto" style="max-height: 580px; overflow-y: auto;">
+                    <table class="w-full text-left border-collapse" id="userTable">
+                        <thead>
+                            <tr class="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-xs border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                                <th class="py-3.5 px-5">Pengguna</th>
+                                <th class="py-3.5 px-5">Role</th>
+                                <th class="py-3.5 px-5">Status</th>
+                                <th class="py-3.5 px-5 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm font-semibold">
+                            @forelse ($userList as $u)
+                            @php
+                                $initials = collect(explode(' ', $u->name))->map(fn($w) => mb_substr($w, 0, 1))->join('');
+                                $initials = strtoupper(mb_substr($initials, 0, 2));
+                                $isNonAktif = $u->trashed();
+                                $avatarBg = 'bg-sky-50 text-[#039FFA] border-sky-100';
+                                if ($u->role === 'admin') $avatarBg = 'bg-orange-50 text-orange-600 border-orange-100';
+                                elseif ($u->role === 'dosen') $avatarBg = 'bg-amber-50 text-amber-600 border-amber-100';
+                            @endphp
+                            <tr data-id="{{ $u->id }}"
+                                data-name="{{ $u->name }}"
+                                data-nim-nip="{{ $u->nim_nip }}"
+                                data-email="{{ $u->email }}"
+                                data-role="{{ $u->role }}"
+                                data-status="{{ $isNonAktif ? 'nonaktif' : 'aktif' }}"
+                                class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-3.5 px-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border {{ $avatarBg }}">
+                                            {{ $initials }}
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="font-bold text-slate-900 text-sm leading-snug">{{ $u->name }}</span>
+                                            <div class="flex items-center gap-2 text-[11px] font-semibold text-slate-500">
+                                                <span>{{ $u->nim_nip ?? '-' }}</span>
+                                                @if ($u->email)
+                                                    <span class="text-slate-300">•</span>
+                                                    <span class="truncate max-w-[200px] text-slate-400">{{ $u->email }}</span>
+                                                @endif
                                             </div>
-                                        </td>
-                                        <td><span class="badge-role badge-role-{{ $u->role }}">{{ ucfirst($u->role) }}</span></td>
-                                        <td><span class="badge-status badge-status-{{ $isNonAktif ? 'inactive' : 'active' }}">{{ $isNonAktif ? 'Non-aktif' : 'Aktif' }}</span></td>
-                                        <td>
-                                            <div class="btn-actions">
-                                                <button type="button" class="btn-icon btn-icon-edit btn-edit-user" title="Edit pengguna">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                                </button>
-                                                <button type="button" class="btn-icon btn-icon-danger btn-delete-user" title="Hapus pengguna">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr id="userEmptyRow">
-                                        <td colspan="4" style="text-align:center;padding:20px;color:#94A3B8;">Belum ada pengguna terdaftar.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-5">
+                                    @if ($u->role === 'admin')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-orange-50 text-orange-600 border border-orange-200/70">👑 Admin</span>
+                                    @elseif ($u->role === 'dosen')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200/70">🎓 Dosen</span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-sky-50 text-[#039FFA] border border-sky-200/70">👥 Mahasiswa</span>
+                                    @endif
+                                </td>
+                                <td class="py-3.5 px-5">
+                                    @if ($isNonAktif)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-500 border border-slate-200/70">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Non-aktif
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-600 border border-emerald-200/70">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Aktif
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-3.5 px-5 text-right">
+                                    <div class="inline-flex items-center justify-end gap-1.5">
+                                        <button type="button" class="btn-edit-user p-2 rounded-xl border border-slate-200/80 bg-white text-slate-600 hover:text-[#039FFA] hover:border-sky-300 hover:bg-sky-50/60 shadow-xs transition-all cursor-pointer" title="Edit pengguna">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="btn-delete-user p-2 rounded-xl border border-slate-200/80 bg-white text-slate-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/60 shadow-xs transition-all cursor-pointer" title="Hapus pengguna">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr id="userEmptyRow">
+                                <td colspan="4" class="text-center py-12 text-slate-400 font-semibold">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <svg class="w-8 h-8 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                                        </svg>
+                                        <span>Belum ada pengguna terdaftar.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Ringkasan Kartu -->
+                <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                    <div>
+                        Menampilkan seluruh akun terdaftar pada sistem
+                    </div>
+                    <div class="flex items-center gap-1.5 font-bold text-slate-700">
+                        <span>Total:</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black" id="userTableCount">{{ $countTotal }}</span>
+                        <span>pengguna</span>
                     </div>
                 </div>
             </section>
@@ -149,12 +214,13 @@
         </main>
 
         <!-- MODAL FORM TAMBAH / EDIT PENGGUNA -->
-        <div class="admin-modal-overlay" id="userModalOverlay">
-            <div class="admin-modal-card">
-                <div class="admin-modal-header">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="section-header-icon" style="width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(3, 159, 250, 0.1); color: #039FFA;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 transition-all duration-200" id="userModalOverlay">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <!-- Modal Header -->
+                <div class="px-6 py-4.5 bg-gradient-to-r from-sky-50 via-white to-amber-50/40 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-sky-100/80 text-[#039FFA] shrink-0 border border-sky-200/60">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -162,33 +228,39 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 id="formUserTitle" style="font-size: 15px; font-weight: 800; color: #0F172A; margin: 0; display:flex; align-items:center; gap:8px;">
-                                <span>Tambah / Edit Pengguna</span>
+                            <h3 id="formUserTitle" class="text-base font-black text-slate-900 m-0">
+                                <span>Tambah Pengguna Baru</span>
                             </h3>
-                            <span id="formUserSubtitle" style="font-size: 11px; color: #64748B; font-weight: 600;">Kelola akun mahasiswa, dosen, atau admin</span>
                         </div>
                     </div>
-                    <button type="button" class="btn-close-modal" id="btnCloseUserModal" aria-label="Tutup modal">&times;</button>
+                    <button type="button" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer" id="btnCloseUserModal" aria-label="Tutup modal">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                <div class="admin-modal-body">
-                    <form id="formAddUser" style="display: flex; flex-direction: column; gap: 14px; margin: 0;">
+
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <form id="formAddUser" class="flex flex-col gap-4 m-0">
                         <input type="hidden" id="userDbId" value="">
 
-                        <div id="userFormAlert" style="display:none;margin-bottom:6px;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:8px;"></div>
+                        <div id="userFormAlert" style="display:none;" class="text-xs font-bold px-3.5 py-2.5 rounded-xl"></div>
 
-                        <div class="form-group">
-                            <label for="userNama">Nama Lengkap <span class="required">*</span></label>
-                            <input type="text" id="userNama" class="form-control" placeholder="Nama lengkap pengguna..." required>
+                        <div>
+                            <label for="userNama" class="block text-xs font-bold text-slate-700 mb-1.5">Nama Lengkap <span class="text-rose-500">*</span></label>
+                            <input type="text" id="userNama" class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all" placeholder="Contoh: Budi Santoso" required>
                         </div>
 
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label for="userId">NIM / NIP / ID <span class="required">*</span></label>
-                                <input type="text" id="userId" class="form-control" placeholder="Contoh: 10241014" required>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label for="userId" class="block text-xs font-bold text-slate-700 mb-1.5">NIM / NIP / ID <span class="text-rose-500">*</span></label>
+                                <input type="text" id="userId" class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all" placeholder="Contoh: 10241014" required>
                             </div>
-                            <div class="form-group">
-                                <label for="userRole">Role <span class="required">*</span></label>
-                                <select id="userRole" class="form-select" required>
+                            <div>
+                                <label for="userRole" class="block text-xs font-bold text-slate-700 mb-1.5">Role <span class="text-rose-500">*</span></label>
+                                <select id="userRole" class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all cursor-pointer" required>
                                     <option value="mahasiswa">Mahasiswa</option>
                                     <option value="dosen">Dosen</option>
                                     <option value="admin">Admin</option>
@@ -196,33 +268,33 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="userEmail">Email</label>
-                            <input type="email" id="userEmail" class="form-control" placeholder="email@kampus.ac.id">
+                        <div>
+                            <label for="userEmail" class="block text-xs font-bold text-slate-700 mb-1.5">Alamat Email</label>
+                            <input type="email" id="userEmail" class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all" placeholder="email@kampus.ac.id">
                         </div>
 
-                        <div class="form-group">
-                            <label for="userPassword">Password <span class="required" id="passwordRequiredMark">*</span></label>
-                            <input type="password" id="userPassword" class="form-control" placeholder="Minimal 6 karakter" autocomplete="new-password">
-                            <small id="passwordHint" style="display:none;color:#64748B;">Kosongkan jika tidak ingin mengubah password.</small>
+                        <div>
+                            <label for="userPassword" class="block text-xs font-bold text-slate-700 mb-1.5">Password <span class="text-rose-500" id="passwordRequiredMark">*</span></label>
+                            <input type="password" id="userPassword" class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all" placeholder="Minimal 6 karakter" autocomplete="new-password">
+                            <small id="passwordHint" style="display:none;" class="block mt-1 text-[11px] font-semibold text-slate-500">Kosongkan jika tidak ingin mengubah password.</small>
                         </div>
 
-                        <div class="form-group">
-                            <label for="userStatus">Status Akun</label>
-                            <select id="userStatus" class="form-select">
+                        <div>
+                            <label for="userStatus" class="block text-xs font-bold text-slate-700 mb-1.5">Status Akun</label>
+                            <select id="userStatus" class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all cursor-pointer">
                                 <option value="aktif">Aktif</option>
                                 <option value="nonaktif">Non-aktif</option>
                             </select>
                         </div>
 
-                        <div style="display:flex; gap:10px; margin-top:8px;">
-                            <button type="submit" class="btn-primary-action" id="btnSubmitUser" style="flex:1;">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="flex gap-2.5 mt-2 pt-4 border-t border-slate-100">
+                            <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-sm cursor-pointer transition-all" id="btnSubmitUser">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                                 <span>Simpan Pengguna</span>
                             </button>
-                            <button type="button" id="userCancelEditBtn" class="btn-icon" style="padding:0 18px; width:auto; border-radius:12px; background:#FFFFFF; border:1.5px solid #CBD5E1; color:var(--admin-muted); font-weight:800; font-size:13px; height:42px;">Batal</button>
+                            <button type="button" id="userCancelEditBtn" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-all cursor-pointer">Batal</button>
                         </div>
                     </form>
                 </div>

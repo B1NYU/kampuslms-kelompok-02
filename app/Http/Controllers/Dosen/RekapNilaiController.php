@@ -65,6 +65,7 @@ class RekapNilaiController extends Controller
         $rows = $students->map(function ($student) use ($assignments, $submissions, &$gradedCells, &$waitingCells, &$sumPercentAll) {
             $cells = [];
             $graded = 0;
+            $submitted = 0;
             $sumPercent = 0.0;
 
             foreach ($assignments as $assignment) {
@@ -74,6 +75,8 @@ class RekapNilaiController extends Controller
                     $cells[] = ['state' => 'none'];
                     continue;
                 }
+
+                $submitted++;
 
                 if (! $sub->grade) {
                     $waitingCells++;
@@ -98,10 +101,11 @@ class RekapNilaiController extends Controller
             }
 
             return [
-                'student'  => $student,
-                'cells'    => $cells,
-                'graded'   => $graded,
-                'average'  => $graded > 0 ? round($sumPercent / $graded, 1) : null,
+                'student'   => $student,
+                'cells'     => $cells,
+                'submitted' => $submitted,
+                'graded'    => $graded,
+                'average'   => $graded > 0 ? round($sumPercent / $graded, 1) : null,
             ];
         });
 

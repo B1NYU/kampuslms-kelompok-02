@@ -8,6 +8,7 @@ use App\Http\Requests\GradeSubmissionRequest;
 use App\Models\Grade;
 use App\Models\Submission;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -51,7 +52,7 @@ class GradingController extends Controller
      * Simpan (baru / ubah) nilai & feedback. Otorisasi 'grade' dan validasi
      * dijalankan GradeSubmissionRequest sebelum method ini dipanggil.
      */
-    public function update(GradeSubmissionRequest $request, Submission $submission): JsonResponse
+    public function update(GradeSubmissionRequest $request, Submission $submission): JsonResponse|RedirectResponse
     {
         $data = $request->validated();
 
@@ -71,13 +72,17 @@ class GradingController extends Controller
             SubmissionGraded::dispatch($grade, regraded: ! $grade->wasRecentlyCreated);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Nilai dan feedback berhasil disimpan.',
-            'grade'   => [
-                'score'    => (float) $grade->score,
-                'feedback' => $grade->feedback,
-            ],
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Nilai dan feedback berhasil disimpan.',
+                'grade'   => [
+                    'score'    => (float) $grade->score,
+                    'feedback' => $grade->feedback,
+                ],
+            ]);
+        }
+
+        return back()->with('success', 'Nilai dan umpan balik berhasil disimpan.');
     }
 }

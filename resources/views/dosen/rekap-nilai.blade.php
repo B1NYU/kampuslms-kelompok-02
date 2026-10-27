@@ -118,6 +118,7 @@
                                                 <small>maks {{ $a->max_score }}</small>
                                             </th>
                                         @endforeach
+                                        <th class="col-submitted" style="text-align:center; min-width: 120px;">Tugas Terkumpul</th>
                                         <th class="col-avg" style="text-align:center;">Rata-rata</th>
                                     </tr>
                                 </thead>
@@ -134,7 +135,7 @@
                                                 <td class="cell">
                                                     @if ($cell['state'] === 'graded')
                                                         <span class="cell-graded">
-                                                            <a href="{{ route('submissions.show', $cell['submission_id']) }}">{{ $fmt($cell['score']) }}</a>
+                                                             <a href="{{ route('submissions.show', $cell['submission_id']) }}">{{ $fmt($cell['score']) }}</a>
                                                             @if ($cell['late'])<span class="tag-late">T</span>@endif
                                                         </span>
                                                     @elseif ($cell['state'] === 'waiting')
@@ -147,6 +148,12 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            @php
+                                                $submittedCount = $row['submitted'] ?? collect($row['cells'])->filter(fn($c) => in_array($c['state'], ['graded', 'waiting']))->count();
+                                            @endphp
+                                            <td style="text-align: center; font-size: 13px; font-weight: 800; color: #0F172A; white-space: nowrap;">
+                                                {{ $submittedCount }}/{{ $assignments->count() }}
+                                            </td>
                                             <td class="col-avg">
                                                 {{ $row['average'] !== null ? $fmt($row['average']) . '%' : '-' }}
                                                 <div style="font-size:10.5px; font-weight:700; color:#64748B;">{{ $row['graded'] }}/{{ $assignments->count() }} dinilai</div>
