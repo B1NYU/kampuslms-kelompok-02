@@ -128,7 +128,6 @@
                                             <th>Mahasiswa</th>
                                             <th>NIM</th>
                                             <th>Program Studi</th>
-                                            <th>Kelas</th>
                                             <th>Status</th>
                                             <th style="text-align: right;">Aksi</th>
                                         </tr>
@@ -140,7 +139,7 @@
                                         @endphp
                                         @if ($dosenCourses->isEmpty())
                                             <tr>
-                                                <td colspan="6" style="text-align:center;padding:36px 20px;color:#64748B;">
+                                                <td colspan="5" style="text-align:center;padding:36px 20px;color:#64748B;">
                                                     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                                             <circle cx="12" cy="12" r="10"></circle>
@@ -154,8 +153,8 @@
                                             </tr>
                                         @else
                                             <tr id="emptyCourseRow" style="{{ $hasStudentsInFirstCourse ? 'display:none;' : '' }}">
-                                                <td colspan="6" style="text-align:center;padding:32px 20px;color:#94A3B8;">
-                                                    Belum ada mahasiswa yang terdaftar di kelas mata kuliah ini.
+                                                <td colspan="5" style="text-align:center;padding:32px 20px;color:#94A3B8;">
+                                                    Belum ada mahasiswa yang terdaftar di mata kuliah ini.
                                                 </td>
                                             </tr>
                                             @php $orderIdx = 0; @endphp
@@ -189,7 +188,6 @@
                                                             <span class="student-nim">{{ $mhs->nim_nip }}</span>
                                                         </td>
                                                         <td>Sistem Informasi</td>
-                                                        <td><span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px;">SI-A</span></td>
                                                         <td><span class="badge-status badge-status-active">Aktif</span></td>
                                                         <td style="text-align: right;">
                                                             @can('manageEnrollment', $course)
@@ -199,7 +197,7 @@
                                                                   style="display:inline; margin:0;">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn-icon-danger btn-delete-student" title="Keluarkan dari kelas">
+                                                                <button type="submit" class="btn-icon-danger btn-delete-student" title="Keluarkan dari mata kuliah">
                                                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                                                         <polyline points="3 6 5 6 21 6"></polyline>
                                                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -235,7 +233,7 @@
                         </div>
                         <div>
                             <h3>Pendaftaran Mahasiswa Baru</h3>
-                            <span style="font-size: 11px; color: #64748B; font-weight: 600;">Daftarkan peserta ke kelas mata kuliah</span>
+                            <span style="font-size: 11px; color: #64748B; font-weight: 600;">Daftarkan peserta ke mata kuliah</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close-modal" id="btnCloseStudentModal" aria-label="Tutup modal">&times;</button>

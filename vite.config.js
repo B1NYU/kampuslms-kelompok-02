@@ -20,15 +20,6 @@ export default defineConfig({
                 'resources/css/dosen/dosen.materi.css',
                 'resources/css/dosen/dosen.tugas.css',
                 'resources/css/dosen/dosen.penilaian.css',
-                // Mode Admin
-                'resources/css/admin/admin.common.css',
-                'resources/css/admin/admin.dashboard.css',
-                'resources/css/admin/admin.pengguna.css',
-                'resources/css/admin/admin.matkul.css',
-                'resources/css/admin/admin.pendaftaran.css',
-                'resources/css/admin/admin.materi.css',
-                'resources/css/admin/admin.tugas.css',
-                'resources/css/admin/admin.nilai.css',
                 // Fallbacks & JS
                 'resources/css/welcome.css',
                 'resources/css/index.css',

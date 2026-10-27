@@ -85,16 +85,59 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function rowHtml(u) {
-        const [bg, c] = roleColors[u.role] || ['#F1F5F9', '#64748B'];
+        const initials = initialsOf(u.name);
         const isNonAktif = u.status === 'nonaktif';
+        
+        let roleBadge = '';
+        if (u.role === 'admin') {
+            roleBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-orange-50 text-orange-600 border border-orange-200/70">👑 Admin</span>`;
+        } else if (u.role === 'dosen') {
+            roleBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200/70">🎓 Dosen</span>`;
+        } else {
+            roleBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-sky-50 text-[#039FFA] border border-sky-200/70">👥 Mahasiswa</span>`;
+        }
+
+        const statusBadge = isNonAktif
+            ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-500 border border-slate-200/70"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Non-aktif</span>`
+            : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-600 border border-emerald-200/70"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Aktif</span>`;
+
+        let avatarBg = 'bg-sky-50 text-[#039FFA] border-sky-100';
+        if (u.role === 'admin') avatarBg = 'bg-orange-50 text-orange-600 border-orange-100';
+        else if (u.role === 'dosen') avatarBg = 'bg-amber-50 text-amber-600 border-amber-100';
+
         return `
-            <td><div class="user-cell"><div class="user-avatar" style="background:${bg};color:${c};">${initialsOf(u.name)}</div><div class="user-meta"><span class="user-name">${u.name}</span><span class="user-id">${u.nim_nip}</span></div></div></td>
-            <td><span class="badge-role badge-role-${u.role}">${u.role.charAt(0).toUpperCase()+u.role.slice(1)}</span></td>
-            <td><span class="badge-status badge-status-${isNonAktif ? 'inactive' : 'active'}">${isNonAktif ? 'Non-aktif' : 'Aktif'}</span></td>
-            <td><div class="btn-actions">
-                <button type="button" class="btn-icon btn-icon-edit btn-edit-user"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                <button type="button" class="btn-icon btn-icon-danger btn-delete-user"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></button>
-            </div></td>`;
+            <td class="py-3.5 px-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border ${avatarBg}">
+                        ${initials}
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                        <span class="font-bold text-slate-900 text-sm leading-snug">${u.name}</span>
+                        <div class="flex items-center gap-2 text-[11px] font-semibold text-slate-500">
+                            <span>${u.nim_nip || '-'}</span>
+                            ${u.email ? `<span class="text-slate-300">•</span><span class="truncate max-w-[200px] text-slate-400">${u.email}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="py-3.5 px-5">${roleBadge}</td>
+            <td class="py-3.5 px-5">${statusBadge}</td>
+            <td class="py-3.5 px-5 text-right">
+                <div class="inline-flex items-center justify-end gap-1.5">
+                    <button type="button" class="btn-edit-user p-2 rounded-xl border border-slate-200/80 bg-white text-slate-600 hover:text-[#039FFA] hover:border-sky-300 hover:bg-sky-50/60 shadow-xs transition-all cursor-pointer" title="Edit pengguna">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-delete-user p-2 rounded-xl border border-slate-200/80 bg-white text-slate-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/60 shadow-xs transition-all cursor-pointer" title="Hapus pengguna">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </td>`;
     }
 
     function upsertRow(u) {
@@ -105,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!tr) {
             tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50/80 transition-colors';
             tbody.prepend(tr);
         }
         tr.dataset.id = u.id;
@@ -331,15 +375,21 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.role-filter-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             document.querySelectorAll('.role-filter-btn').forEach(b => {
-                b.classList.remove('active');
-                b.style.background = 'var(--admin-white)';
-                b.style.color = 'var(--admin-text)';
-                b.style.borderColor = 'var(--admin-border)';
+                b.classList.remove('active', 'bg-[#039FFA]', 'text-white', 'shadow-sm', 'border-transparent');
+                b.classList.add('bg-white', 'text-slate-600', 'border-slate-200/80', 'hover:bg-slate-50', 'hover:text-slate-900');
+                const badge = b.querySelector('span[id^="filterCount"]');
+                if (badge) {
+                    badge.classList.remove('bg-white/20');
+                    badge.classList.add('bg-slate-100', 'text-slate-600');
+                }
             });
-            this.classList.add('active');
-            this.style.background = 'var(--admin-primary)';
-            this.style.color = '#fff';
-            this.style.borderColor = 'var(--admin-primary)';
+            this.classList.remove('bg-white', 'text-slate-600', 'border-slate-200/80', 'hover:bg-slate-50', 'hover:text-slate-900');
+            this.classList.add('active', 'bg-[#039FFA]', 'text-white', 'shadow-sm', 'border-transparent');
+            const activeBadge = this.querySelector('span[id^="filterCount"]');
+            if (activeBadge) {
+                activeBadge.classList.remove('bg-slate-100', 'text-slate-600');
+                activeBadge.classList.add('bg-white/20');
+            }
 
             currentRoleFilter = this.dataset.filter;
             applyFilters();

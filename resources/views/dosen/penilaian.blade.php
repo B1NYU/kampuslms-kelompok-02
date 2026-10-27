@@ -224,7 +224,13 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <strong>{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</strong>
+                                            @can('view', $sub)
+                                                <a href="{{ route('submissions.show', $sub) }}" style="color: inherit; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                                    <strong>{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</strong>
+                                                </a>
+                                            @else
+                                                <strong>{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</strong>
+                                            @endcan
                                             <div style="font-size:11px; color:#64748B; font-weight:600; margin-top:2px;">
                                                 {{ $course?->code }} &bull; {{ $course?->name }}
                                             </div>
@@ -245,10 +251,19 @@
                                         </td>
                                         <td>
                                             @can('view', $sub)
-                                            <a href="{{ route('submissions.download', $sub) }}" class="btn-open-resource" style="font-size:11px; max-width: 170px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="{{ $filename }} ({{ $fileSizeKb }})">
-                                                <span>{{ $icon }}</span>
-                                                <span>{{ $filename }}</span>
-                                            </a>
+                                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                                <a href="{{ route('submissions.show', $sub) }}" class="btn-open-resource" style="font-size:11px; max-width: 160px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="Buka Detail Pengumpulan: {{ $filename }} ({{ $fileSizeKb }})">
+                                                    <span>{{ $icon }}</span>
+                                                    <span>{{ $filename }}</span>
+                                                </a>
+                                                <a href="{{ route('submissions.download', $sub) }}" style="color: #64748B; display: inline-flex; align-items: center; padding: 5px; border-radius: 6px; transition: all 0.2s; background: #F1F5F9; border: 1px solid #E2E8F0;" title="Unduh berkas langsung" download>
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                                    </svg>
+                                                </a>
+                                            </div>
                                             @endcan
                                             @if($sub->note)
                                                 <div style="font-size:10px; color:#64748B; font-style:italic; margin-top:2px;" title="{{ $sub->note }}">
@@ -274,34 +289,41 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td style="text-align: right;">
-                                            @can('grade', $sub)
-                                            @if ($isGraded)
-                                                <button class="btn-primary-action btn-grade-action"
-                                                    data-id="{{ $sub->id }}"
-                                                    data-student="{{ $name }} ({{ $nim }})"
-                                                    data-title="{{ $assignment?->title ?? 'Tugas' }}"
-                                                    data-max="{{ $maxScore }}"
-                                                    data-score="{{ $scoreText }}"
-                                                    data-feedback="{{ $grade->feedback }}"
-                                                    style="padding: 6px 14px; font-size: 11px;">
-                                                    Edit Nilai
-                                                </button>
-                                            @else
-                                                <button class="btn-primary-action btn-grade-action"
-                                                    data-id="{{ $sub->id }}"
-                                                    data-student="{{ $name }} ({{ $nim }})"
-                                                    data-title="{{ $assignment?->title ?? 'Tugas' }}"
-                                                    data-max="{{ $maxScore }}"
-                                                    data-score=""
-                                                    data-feedback=""
-                                                    style="padding: 6px 14px; font-size: 11px; background:#1B8A5A;">
-                                                    Beri Nilai
-                                                </button>
-                                            @endif
-                                            @else
-                                                <span style="font-size:11px; color:#94A3B8; font-weight:600;">Tidak dapat dinilai</span>
-                                            @endcan
+                                        <td style="text-align: right; white-space: nowrap;">
+                                            <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                                                @can('view', $sub)
+                                                <a href="{{ route('submissions.show', $sub) }}" class="btn-secondary-action" style="padding: 6px 10px; font-size: 11px; text-decoration: none;" title="Buka detail pengumpulan">
+                                                    Detail &rarr;
+                                                </a>
+                                                @endcan
+                                                @can('grade', $sub)
+                                                @if ($isGraded)
+                                                    <button class="btn-primary-action btn-grade-action"
+                                                        data-id="{{ $sub->id }}"
+                                                        data-student="{{ $name }} ({{ $nim }})"
+                                                        data-title="{{ $assignment?->title ?? 'Tugas' }}"
+                                                        data-max="{{ $maxScore }}"
+                                                        data-score="{{ $scoreText }}"
+                                                        data-feedback="{{ $grade->feedback }}"
+                                                        style="padding: 6px 14px; font-size: 11px;">
+                                                        Edit Nilai
+                                                    </button>
+                                                @else
+                                                    <button class="btn-primary-action btn-grade-action"
+                                                        data-id="{{ $sub->id }}"
+                                                        data-student="{{ $name }} ({{ $nim }})"
+                                                        data-title="{{ $assignment?->title ?? 'Tugas' }}"
+                                                        data-max="{{ $maxScore }}"
+                                                        data-score=""
+                                                        data-feedback=""
+                                                        style="padding: 6px 14px; font-size: 11px; background:#1B8A5A;">
+                                                        Beri Nilai
+                                                    </button>
+                                                @endif
+                                                @else
+                                                    <span style="font-size:11px; color:#94A3B8; font-weight:600;">Tidak dapat dinilai</span>
+                                                @endcan
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

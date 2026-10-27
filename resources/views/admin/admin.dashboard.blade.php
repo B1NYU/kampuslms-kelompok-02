@@ -30,12 +30,7 @@
                 <div>
                     <div class="flex items-center gap-3">
                         <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Selamat Datang, Admin :)</h1>
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-sky-50 text-[#039FFA] border border-sky-200/80 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-[#039FFA] animate-pulse"></span>
-                            Portal Aktif
-                        </span>
                     </div>
-                    <p class="text-xs sm:text-sm font-semibold text-slate-500 mt-1">Ringkasan aktivitas terkini dan metrik operasional KampusLMS</p>
                 </div>
                 <div class="inline-flex items-center gap-2.5 text-xs font-extrabold text-slate-600 bg-white px-4 py-2.5 rounded-xl border border-sky-100 shadow-sm w-fit self-start sm:self-auto">
                     <svg class="w-4 h-4 text-[#039FFA]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -281,53 +276,8 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Kotak 2: Aksi Cepat Admin (Mengisi Ruang agar Seimbang) -->
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
-                        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
-                            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Pusat Aksi Cepat</h3>
-                            <span class="text-xs text-slate-400 font-semibold">Pintasan Fitur</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <a href="{{ route('admin.pengguna') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-sky-300 hover:bg-sky-50/50 hover:-translate-y-0.5 transition duration-150 flex flex-col items-center justify-center text-center gap-1.5 group">
-                                <div class="w-8 h-8 rounded-lg bg-sky-100/70 text-[#039FFA] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
-                                    </svg>
-                                </div>
-                                <span class="text-xs font-bold text-slate-700 group-hover:text-[#039FFA]">Kelola Pengguna</span>
-                            </a>
-                            <a href="{{ route('admin.matkul') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-emerald-300 hover:bg-emerald-50/50 hover:-translate-y-0.5 transition duration-150 flex flex-col items-center justify-center text-center gap-1.5 group">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                    </svg>
-                                </div>
-                                <span class="text-xs font-bold text-slate-700 group-hover:text-emerald-600">Mata Kuliah</span>
-                            </a>
-                            <a href="{{ route('admin.materi') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-amber-300 hover:bg-amber-50/50 hover:-translate-y-0.5 transition duration-150 flex flex-col items-center justify-center text-center gap-1.5 group">
-                                <div class="w-8 h-8 rounded-lg bg-amber-100/70 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                                    </svg>
-                                </div>
-                                <span class="text-xs font-bold text-slate-700 group-hover:text-amber-600">Unggah Materi</span>
-                            </a>
-                            <a href="{{ route('admin.tugas') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-orange-300 hover:bg-orange-50/50 hover:-translate-y-0.5 transition duration-150 flex flex-col items-center justify-center text-center gap-1.5 group">
-                                <div class="w-8 h-8 rounded-lg bg-orange-100/70 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line>
-                                    </svg>
-                                </div>
-                                <span class="text-xs font-bold text-slate-700 group-hover:text-orange-600">Tugas Kuliah</span>
-                            </a>
-                        </div>
-                    </div>
-
                 </div>
-
             </section>
-
         </main>
 
         <!-- Footer Global -->
