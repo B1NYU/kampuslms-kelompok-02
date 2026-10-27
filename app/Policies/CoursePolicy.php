@@ -76,4 +76,16 @@ class CoursePolicy
         return $this->teaches($user, $course)
             && in_array($this->courseStatus($course), ['draft', 'active'], true);
     }
+
+    /**
+     * Rekap nilai seluruh mahasiswa satu MK (tabel mahasiswa × tugas).
+     * Hanya dosen pengampu, di SEMUA status MK (arsip tetap bisa direkap).
+     * Mahasiswa sengaja ditolak: CoursePolicy@view meloloskan mahasiswa terdaftar, dan rekap ini
+     * memuat nilai teman sekelasnya. Admin punya halaman rekap sendiri (admin.nilai).
+     * Pemakaian: Gate::authorize('viewGradeRecap', $course).
+     */
+    public function viewGradeRecap(User $user, Course $course): bool
+    {
+        return $this->teaches($user, $course);
+    }
 }
