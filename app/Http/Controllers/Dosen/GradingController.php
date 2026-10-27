@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dosen;
 
+use App\Events\SubmissionGraded;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GradeSubmissionRequest;
 use App\Models\Grade;
@@ -63,6 +64,12 @@ class GradingController extends Controller
                 'graded_at' => now(),
             ]
         );
+
+        // Beri tahu mahasiswa hanya bila ada nilai baru atau skor/feedback benar-benar berubah
+        // (menyimpan ulang tanpa perubahan tidak boleh mengirim notifikasi berulang).
+        if ($grade->wasRecentlyCreated || $grade->wasChanged(['score', 'feedback'])) {
+            SubmissionGraded::dispatch($grade, regraded: ! $grade->wasRecentlyCreated);
+        }
 
         return response()->json([
             'success' => true,
