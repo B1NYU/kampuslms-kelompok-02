@@ -43,6 +43,8 @@
 
     <!-- Kanan: Profil Mahasiswa & Dropdown Menu -->
     <div class="navbar-right-group">
+        <x-notification-bell />
+
         @php
             $mhsAuth = auth()->user();
             $mhsParts = preg_split('/\s+/', trim($mhsAuth?->name ?? 'Mahasiswa'));

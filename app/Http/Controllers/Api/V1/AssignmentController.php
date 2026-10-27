@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\AssignmentPublished;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AssignmentCollection;
 use App\Http\Resources\AssignmentResource;
@@ -61,7 +62,7 @@ class AssignmentController extends Controller
         // 2. Cek kepemilikan Course TERLEBIH DAHULU jika course_id dikirimkan
         if ($courseId = $request->input('course_id')) {
             $course = Course::find($courseId);
-            
+
             // Jika course ditemukan tetapi tidak diampu oleh dosen yang login -> AUTO 403!
             if ($course) {
                 abort_unless($course->isTaughtBy($request->user()), 403);
@@ -91,6 +92,8 @@ class AssignmentController extends Controller
             'status'       => $data['status'] ?? 'draft',
         ] + Arr::only($data, ['max_score', 'allow_late']));
 
+        AssignmentPublished::dispatchIfNewlyPublished($assignment);
+
         return (new AssignmentResource($assignment->refresh()))
             ->response()
             ->setStatusCode(201);
@@ -117,7 +120,10 @@ class AssignmentController extends Controller
             'status'       => [...$presence, Rule::in(['draft', 'published'])],
         ]);
 
+        $statusSebelumnya = $assignment->status;
         $assignment->update($data);
+
+        AssignmentPublished::dispatchIfNewlyPublished($assignment, $statusSebelumnya);
 
         return new AssignmentResource($assignment->refresh());
     }
