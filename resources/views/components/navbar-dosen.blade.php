@@ -157,28 +157,6 @@
     </div>
 @endif
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const profileTrigger = document.getElementById('dosenProfileTrigger');
-        const profileDropdown = document.getElementById('dosenProfileDropdown');
-        const profileChevron = profileTrigger ? profileTrigger.querySelector('.dosen-profile-chevron') : null;
-
-        if (profileTrigger && profileDropdown) {
-            profileTrigger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const isOpen = profileDropdown.style.display === 'block';
-                profileDropdown.style.display = isOpen ? 'none' : 'block';
-                if (profileChevron) {
-                    profileChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-                }
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
-                    profileDropdown.style.display = 'none';
-                    if (profileChevron) profileChevron.style.transform = 'rotate(0deg)';
-                }
-            });
-        }
-    });
-</script>
+@if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+    @vite(['resources/js/dosen/dosen.navbar.js'])
+@endif

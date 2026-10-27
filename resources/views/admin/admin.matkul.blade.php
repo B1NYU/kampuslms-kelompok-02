@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.matkul.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/admin/admin.matkul.css', 'resources/js/app.js', 'resources/js/admin/admin.matkul.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/admin/admin.matkul.css') }}">
     @endif
@@ -294,100 +294,6 @@
         <x-footer />
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const storeUrl          = "{{ route('admin.matkul.store') }}";
-            const updateUrlTemplate = "{{ route('admin.matkul.update', ['matkul' => '__ID__']) }}";
-
-            const form         = document.getElementById('formAddMatkul');
-            const methodField  = document.getElementById('mkMethodField');
-            const submitBtn    = document.getElementById('mkSubmitBtn');
-            const cancelBtn    = document.getElementById('mkCancelEditBtn');
-            const formTitle    = document.getElementById('formMkTitle').querySelector('span');
-            const submitLabel  = submitBtn.querySelector('span');
-            const tableBody    = document.getElementById('mkTableBody');
-
-            const matkulModal        = document.getElementById('matkulModalOverlay');
-            const btnOpenAddMatkul   = document.getElementById('btnOpenAddMatkulModal');
-            const btnCloseMatkulModal= document.getElementById('btnCloseMatkulModal');
-
-            function openMatkulModal() {
-                if (matkulModal) matkulModal.classList.add('active');
-            }
-
-            function closeMatkulModal() {
-                if (matkulModal) matkulModal.classList.remove('active');
-            }
-
-            if (btnOpenAddMatkul) {
-                btnOpenAddMatkul.addEventListener('click', () => {
-                    resetForm();
-                    openMatkulModal();
-                });
-            }
-
-            if (btnCloseMatkulModal) btnCloseMatkulModal.addEventListener('click', closeMatkulModal);
-
-            if (matkulModal) {
-                matkulModal.addEventListener('click', (e) => {
-                    if (e.target === matkulModal) closeMatkulModal();
-                });
-            }
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && matkulModal && matkulModal.classList.contains('active')) {
-                    closeMatkulModal();
-                }
-            });
-
-            function resetForm() {
-                form.reset();
-                form.action = storeUrl;
-                methodField.value = '';
-                document.getElementById('mkId').value = '';
-                submitLabel.textContent = 'Simpan Mata Kuliah';
-                formTitle.textContent = 'Form Tambah / Edit MK';
-            }
-
-            cancelBtn.addEventListener('click', () => {
-                resetForm();
-                closeMatkulModal();
-            });
-
-            // Event Delegation untuk penanganan tombol Edit
-            if (tableBody) {
-                tableBody.addEventListener('click', function (e) {
-                    const editBtn = e.target.closest('.btn-edit-mk');
-                    if (!editBtn) return;
-
-                    const tr = editBtn.closest('tr');
-                    if (!tr) return;
-
-                    document.getElementById('mkId').value = tr.dataset.id || '';
-                    document.getElementById('mkKode').value = tr.dataset.kode || '';
-                    document.getElementById('mkNama').value = tr.dataset.nama || '';
-                    document.getElementById('mkSks').value = tr.dataset.sks || 3;
-                    document.getElementById('mkDosen').value = tr.dataset.lecturerId || '';
-                    document.getElementById('mkStatus').value = tr.dataset.status || 'active';
-                    document.getElementById('mkDeskripsi').value = tr.dataset.deskripsi || '';
-
-                    form.action = updateUrlTemplate.replace('__ID__', tr.dataset.id);
-                    methodField.value = 'PUT';
-
-                    submitLabel.textContent = 'Update Mata Kuliah';
-                    formTitle.textContent = 'Form Edit Mata Kuliah';
-
-                    openMatkulModal();
-                });
-            }
-
-            // Jika halaman ini adalah hasil redirect setelah validasi gagal saat mengedit
-            @if ($isEditing)
-                submitLabel.textContent = 'Update Mata Kuliah';
-                formTitle.textContent = 'Form Edit Mata Kuliah';
-                openMatkulModal();
-            @endif
-        });
-    </script>
+    <div id="matkulRoutes" style="display:none;" data-store-url="{{ route('admin.matkul.store') }}" data-update-url-template="{{ route('admin.matkul.update', ['matkul' => '__ID__']) }}" data-is-editing="{{ $isEditing ? '1' : '0' }}"></div>
 </body>
 </html>

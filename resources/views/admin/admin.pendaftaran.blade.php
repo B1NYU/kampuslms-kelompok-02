@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/admin/admin.pendaftaran.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/css/admin/admin.pendaftaran.css', 'resources/js/app.js', 'resources/js/admin/admin.pendaftaran.js'])
     @else
         <link rel="stylesheet" href="{{ asset('css/admin/admin.pendaftaran.css') }}">
     @endif
@@ -232,70 +232,6 @@
         <x-footer />
     </div>
 
-    <script>
-        // Modal Daftarkan Mahasiswa
-        const enrollModal = document.getElementById('enrollModalOverlay');
-        const btnOpenEnroll = document.getElementById('btnOpenEnrollModal');
-        const btnCloseEnrollModal = document.getElementById('btnCloseEnrollModal');
-        const btnCancelEnrollModal = document.getElementById('btnCancelEnrollModal');
-
-        function openEnrollModal() {
-            if (enrollModal) enrollModal.classList.add('active');
-        }
-
-        function closeEnrollModal() {
-            if (enrollModal) enrollModal.classList.remove('active');
-        }
-
-        if (btnOpenEnroll) btnOpenEnroll.addEventListener('click', openEnrollModal);
-        if (btnCloseEnrollModal) btnCloseEnrollModal.addEventListener('click', closeEnrollModal);
-        if (btnCancelEnrollModal) btnCancelEnrollModal.addEventListener('click', closeEnrollModal);
-
-        if (enrollModal) {
-            enrollModal.addEventListener('click', (e) => {
-                if (e.target === enrollModal) closeEnrollModal();
-            });
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && enrollModal && enrollModal.classList.contains('active')) {
-                closeEnrollModal();
-            }
-        });
-
-        // Filter MK awal berasal dari server (?mk=KODE), default 'all'
-        let currentMkFilter = @json($selectedCode);
-
-        function applyEnrollFilters() {
-            const q = (document.getElementById('searchEnrollInput')?.value || '').toLowerCase().trim();
-            let visible = 0;
-
-            document.querySelectorAll('#enrollTableBody tr[data-mk]').forEach(row => {
-                const matchMk = (currentMkFilter === 'all' || row.dataset.mk === currentMkFilter);
-                const matchSearch = !q || row.textContent.toLowerCase().includes(q);
-                const show = matchMk && matchSearch;
-
-                row.style.display = show ? '' : 'none';
-                if (show) visible++;
-            });
-
-            document.getElementById('enrollCount').textContent = visible;
-        }
-
-        document.querySelectorAll('.btn-filter-mk').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.btn-filter-mk').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                currentMkFilter = this.dataset.mk;
-                applyEnrollFilters();
-            });
-        });
-
-        document.getElementById('searchEnrollInput').addEventListener('input', applyEnrollFilters);
-
-        // Terapkan filter awal saat halaman dimuat
-        applyEnrollFilters();
-    </script>
+    <div id="enrollConfig" style="display:none;" data-selected-code="{{ $selectedCode }}"></div>
 </body>
 </html>
