@@ -69,26 +69,25 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('submissions', function (Blueprint $table) {
-            // Lepas Foreign Key terlebih dahulu agar MySQL mengizinkan penghapusan indeks
             $table->dropForeign(['user_id']);
-
             $table->dropIndex('idx_submissions_user_id');
             $table->dropIndex('idx_submissions_submitted_at');
-
-            // Pasang kembali Foreign Key bawaan
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
 
         Schema::table('assignments', function (Blueprint $table) {
+            $table->dropForeign(['course_id']);
             $table->dropIndex('idx_assignments_course_status_due');
+            $table->foreign('course_id')->references('id')->on('courses')->cascadeOnDelete();
         });
 
         Schema::table('courses', function (Blueprint $table) {
+            $table->dropForeign(['lecturer_id']);
             $table->dropIndex('idx_courses_lecturer_status');
+            $table->foreign('lecturer_id')->references('id')->on('users')->restrictOnDelete();
         });
 
         Schema::table('course_user', function (Blueprint $table) {
-            // Terapkan penanganan serupa untuk foreign key user_id di course_user
             $table->dropForeign(['user_id']);
             $table->dropIndex('idx_course_user_user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
