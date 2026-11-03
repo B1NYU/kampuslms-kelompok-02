@@ -10,33 +10,36 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
-    <!-- Memuat CSS via Vite sesuai lokasi resources/css/mahasiswa/mahasiswa.dashboard.css -->
+    <!-- Memuat CSS & JS via Vite (Hanya Tailwind app.css murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.dashboard.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
 
-<body>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <!-- Background Decorative Glow (selaras dengan halaman Daftar Anggota) -->
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
     <!-- Main Window Canvas -->
-    <div class="app-window">
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
 
-        <!-- 1. Panggil Komponen Sidebar -->
+        <!-- 1. Panggil Komponen Navbar/Sidebar Mahasiswa -->
         <x-layout />
 
         <!-- 2. Konten Utama Dashboard -->
-        <main class="dashboard-content">
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
-            <!-- Topbar -->
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <h1>Selamat Datang</h1>
+            <!-- Topbar Header -->
+            <header class="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col gap-1">
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                            <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                            Selamat Datang
+                        </h1>
                     </div>
                 </div>
             </header>
@@ -77,152 +80,173 @@
             @endphp
 
             <!-- Row 1: 3 Stat Cards terhubung ke Database -->
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-label">Mata Kuliah Aktif</span>
-                    <span class="stat-value stat-color-2">{{ $totalCourseCount }} MK</span>
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div class="relative bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-sky-300 transition-all duration-200 flex flex-col items-center text-center gap-1.5 overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span class="text-xs font-black tracking-wider uppercase text-slate-500">Mata Kuliah Aktif</span>
+                    <span class="text-3xl font-black text-sky-500 tracking-tight">{{ $totalCourseCount }} MK</span>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-label">Total Beban SKS</span>
-                    <span class="stat-value stat-color-3">{{ $totalSks }} SKS</span>
+                <div class="relative bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-orange-300 transition-all duration-200 flex flex-col items-center text-center gap-1.5 overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span class="text-xs font-black tracking-wider uppercase text-slate-500">Total Beban SKS</span>
+                    <span class="text-3xl font-black text-orange-500 tracking-tight">{{ $totalSks }} SKS</span>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-label">Tugas Belum Dikumpulkan</span>
-                    <span class="stat-value stat-color-4">{{ $tugasPending }}</span>
+                <div class="relative bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-amber-300 transition-all duration-200 flex flex-col items-center text-center gap-1.5 overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span class="text-xs font-black tracking-wider uppercase text-slate-500">Tugas Belum Dikumpulkan</span>
+                    <span class="text-3xl font-black text-amber-500 tracking-tight">{{ $tugasPending }}</span>
                 </div>
             </section>
 
             <!-- Row 2: Middle Section (List Mata Kuliah Diambil & Aktivitas Mingguan) -->
-            <section class="middle-grid">
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- Kiri: List Mata Kuliah yang Diambil dari Database -->
-                <div class="card-box">
-                    <div class="card-header-clean">
+                <div class="lg:col-span-2 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                         <div>
-                            <h3 style="margin:0;">Mata Kuliah yang Diambil</h3>
-                            <small style="color:#64748B;font-size:12px;">Data langsung dari database LMS</small>
+                            <h3 class="text-base sm:text-lg font-black text-sky-600">Mata Kuliah yang Diambil</h3>
+                            <small class="text-xs font-semibold text-slate-500">Data langsung dari database LMS</small>
                         </div>
-                        <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="card-subtitle-tag" style="text-decoration:none;">Lihat Semua &rarr;</a>
+                        <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="text-xs font-extrabold text-sky-600 bg-[#FFFDF8] hover:bg-sky-50 px-3 py-1.5 rounded-full border border-sky-400/30 transition-colors">
+                            Lihat Semua &rarr;
+                        </a>
                     </div>
 
-                    <div class="mk-list">
+                    <div class="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-1">
                         @forelse ($dbCourses as $mk)
-                            <a href="{{ route('mahasiswa.mata-kuliah.show', $mk->id) }}" class="mk-row" style="text-decoration:none;color:inherit;transition:background 0.2s;">
-                                <span class="mk-code">{{ $mk->code }}</span>
-                                <div class="mk-info">
-                                    <span class="mk-name">{{ $mk->name }}</span>
-                                    <span class="mk-dosen">{{ $mk->lecturer?->name ?? 'Dosen Pengampu' }}</span>
+                            <a href="{{ route('mahasiswa.mata-kuliah.show', $mk->id) }}" class="flex items-center gap-3.5 p-3 rounded-xl bg-[#FFFDF8] hover:bg-white border border-sky-400/20 border-l-[3px] border-l-sky-500 hover:border-l-orange-500 hover:border-sky-400/40 hover:translate-x-0.5 transition-all duration-200 group">
+                                <span class="shrink-0 text-xs font-extrabold text-sky-600 bg-white border border-sky-400/30 px-2 py-1 rounded-lg w-16 text-center">
+                                    {{ $mk->code }}
+                                </span>
+                                <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+                                    <span class="text-sm font-extrabold text-slate-900 truncate group-hover:text-sky-600 transition-colors">
+                                        {{ $mk->name }}
+                                    </span>
+                                    <span class="text-xs font-semibold text-slate-500 truncate">
+                                        {{ $mk->lecturer?->name ?? 'Dosen Pengampu' }}
+                                    </span>
                                 </div>
-                                <span class="mk-sks">{{ $mk->sks }} SKS</span>
-                                <span class="mk-status mk-status-aktif">{{ ucfirst($mk->status ?? 'Aktif') }}</span>
+                                <span class="shrink-0 text-xs font-extrabold text-slate-700">
+                                    {{ $mk->sks }} SKS
+                                </span>
+                                <span class="shrink-0 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full text-sky-600 bg-sky-500/10 border border-sky-400/30">
+                                    {{ ucfirst($mk->status ?? 'Aktif') }}
+                                </span>
                             </a>
                         @empty
-                            <div style="padding:20px;text-align:center;color:#94A3B8;">Belum ada mata kuliah yang diambil.</div>
+                            <div class="py-8 text-center text-sm font-semibold text-slate-400">
+                                Belum ada mata kuliah yang diambil.
+                            </div>
                         @endforelse
                     </div>
                 </div>
 
-                <!-- Kanan: Aktivitas Mingguan (Mata Kuliah Terpopuler dihapus) -->
-                <div class="right-column-stack">
-                    <div class="card-box">
-                        <div class="card-header-clean">
-                            <h3>Aktivitas Mingguan</h3>
-                            <span class="card-subtitle-tag">+18%</span>
-                        </div>
-                        <div class="bars-container">
-                            <div class="bar-pill" style="height: 35%;"></div>
-                            <div class="bar-pill" style="height: 60%;"></div>
-                            <div class="bar-pill" style="height: 45%;"></div>
-                            <div class="bar-pill" style="height: 80%;"></div>
-                            <div class="bar-pill" style="height: 55%;"></div>
-                            <div class="bar-pill" style="height: 90%;"></div>
-                            <div class="bar-pill" style="height: 65%;"></div>
-                            <div class="bar-pill" style="height: 40%;"></div>
-                            <div class="bar-pill" style="height: 75%;"></div>
-                            <div class="bar-pill" style="height: 95%;"></div>
-                            <div class="bar-pill" style="height: 50%;"></div>
-                            <div class="bar-pill" style="height: 70%;"></div>
-                        </div>
+                <!-- Kanan: Aktivitas Mingguan -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                        <h3 class="text-base sm:text-lg font-black text-sky-600">Aktivitas Mingguan</h3>
+                        <span class="text-xs font-extrabold text-sky-600 bg-[#FFFDF8] px-2.5 py-1 rounded-full border border-sky-400/30">+18%</span>
+                    </div>
+                    <div class="flex items-end justify-between gap-1.5 h-36 pt-2 px-1">
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 35%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 60%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 45%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 80%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 55%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 90%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 65%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 40%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 75%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 95%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 50%;"></div>
+                        <div class="flex-1 rounded-t-md bg-gradient-to-b from-sky-400 to-orange-500 hover:brightness-110 transition-all duration-200" style="height: 70%;"></div>
                     </div>
                 </div>
 
             </section>
 
             <!-- Row 3: Bottom Section (Progres Bulat & Pengumuman) -->
-            <section class="bottom-grid">
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 <!-- Kiri: Donut Progress Gauges -->
-                <div class="card-box">
-                    <div class="card-header-clean">
-                        <h3>Progres Akademik Mahasiswa</h3>
+                <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                        <h3 class="text-base sm:text-lg font-black text-sky-600">Progres Akademik Mahasiswa</h3>
                     </div>
-                    <div class="progress-gauges">
+                    <div class="flex items-center justify-around py-3">
 
-                        <div class="gauge-item">
-                            <div class="gauge-circle-wrap">
-                                <svg class="gauge-svg" viewBox="0 0 36 36">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="relative w-20 h-20 flex items-center justify-center">
+                                <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="#039FFA" stroke-width="3.2" stroke-dasharray="85, 100" stroke-linecap="round" />
                                 </svg>
-                                <span class="gauge-text">85%</span>
+                                <span class="absolute text-sm font-black text-sky-600">85%</span>
                             </div>
-                            <span class="gauge-label">Presensi</span>
+                            <span class="text-xs font-bold text-slate-500">Presensi</span>
                         </div>
 
-                        <div class="gauge-item">
-                            <div class="gauge-circle-wrap">
-                                <svg class="gauge-svg" viewBox="0 0 36 36">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="relative w-20 h-20 flex items-center justify-center">
+                                <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="#F96305" stroke-width="3.2" stroke-dasharray="{{ $persenTugasSelesai }}, 100" stroke-linecap="round" />
                                 </svg>
-                                <span class="gauge-text">{{ $persenTugasSelesai }}%</span>
+                                <span class="absolute text-sm font-black text-orange-500">{{ $persenTugasSelesai }}%</span>
                             </div>
-                            <span class="gauge-label">Tugas Selesai</span>
+                            <span class="text-xs font-bold text-slate-500">Tugas Selesai</span>
                         </div>
 
-                        <div class="gauge-item">
-                            <div class="gauge-circle-wrap">
-                                <svg class="gauge-svg" viewBox="0 0 36 36">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="relative w-20 h-20 flex items-center justify-center">
+                                <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="rgba(3, 159, 250, 0.12)" stroke-width="3.2" />
                                     <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                           fill="none" stroke="#F9B804" stroke-width="3.2" stroke-dasharray="92, 100" stroke-linecap="round" />
                                 </svg>
-                                <span class="gauge-text">92%</span>
+                                <span class="absolute text-sm font-black text-amber-500">92%</span>
                             </div>
-                            <span class="gauge-label">Target SKS</span>
+                            <span class="text-xs font-bold text-slate-500">Target SKS</span>
                         </div>
 
                     </div>
                 </div>
 
-                <!-- Kanan: Pesan & Pengumuman Terbaru -->
-                <div class="card-box">
-                    <div class="card-header-clean">
-                        <h3>Tugas & Pengumuman Terkini</h3>
-                        <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="link-see-all">Semua MK</a>
+                <!-- Kanan: Tugas & Pengumuman Terkini -->
+                <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                        <h3 class="text-base sm:text-lg font-black text-sky-600">Tugas &amp; Pengumuman Terkini</h3>
+                        <a href="{{ route('mahasiswa.mata-kuliah.index') }}" class="text-xs font-extrabold text-orange-500 hover:text-sky-600 transition-colors">
+                            Semua MK
+                        </a>
                     </div>
-                    <div class="message-list">
+                    <div class="flex flex-col gap-3">
                         @forelse ($tugasTerkini->take(3) as $assign)
                             @php
                                 $isDuePast = $assign->due_at->isPast();
                             @endphp
-                            <a href="{{ route('assignments.show', $assign) }}" class="message-item" style="text-decoration:none;color:inherit;">
-                                <span class="msg-sender">{{ $assign->course?->code ?? 'MK' }}</span>
-                                <span class="msg-badge" style="background:#FFFDF8; color:{{ $isDuePast ? '#F96305' : '#039FFA' }}; border:1px solid {{ $isDuePast ? 'rgba(249, 99, 5, 0.35)' : 'rgba(3, 159, 250, 0.35)' }};">
+                            <a href="{{ route('assignments.show', $assign) }}" class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5 pb-3 border-b border-dashed border-sky-400/20 last:border-b-0 last:pb-0 hover:bg-slate-50/60 p-2 rounded-xl transition-colors group">
+                                <span class="shrink-0 text-xs font-black text-sky-600 min-w-20">
+                                    {{ $assign->course?->code ?? 'MK' }}
+                                </span>
+                                <span class="shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded-md border w-fit {{ $isDuePast ? 'bg-[#FFFDF8] text-orange-500 border-orange-500/40' : 'bg-[#FFFDF8] text-sky-600 border-sky-400/40' }}">
                                     {{ $isDuePast ? 'Lewat Deadline' : 'Belum Dikumpulkan' }}
                                 </span>
-                                <span class="msg-body"><strong>{{ $assign->title }}</strong> &bull; Batas: {{ $assign->due_at->translatedFormat('d M Y, H:i') }}</span>
+                                <span class="text-xs font-medium text-slate-600 flex-1 leading-relaxed">
+                                    <strong class="font-extrabold text-slate-800 group-hover:text-sky-600 transition-colors">{{ $assign->title }}</strong> &bull; Batas: {{ $assign->due_at->translatedFormat('d M Y, H:i') }}
+                                </span>
                             </a>
                         @empty
-                            <div class="message-item">
-                                <span class="msg-sender">Sistem</span>
-                                <span class="msg-badge">Info</span>
-                                <span class="msg-body">Tidak ada tugas yang menunggu. Semua tugas sudah dikumpulkan.</span>
+                            <div class="flex items-start gap-3 p-2">
+                                <span class="text-xs font-black text-sky-600 min-w-20">Sistem</span>
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-50 text-sky-600 border border-sky-200">Info</span>
+                                <span class="text-xs text-slate-600 font-medium">Tidak ada tugas yang menunggu. Semua tugas sudah dikumpulkan.</span>
                             </div>
                         @endforelse
                     </div>
@@ -234,4 +258,5 @@
         <x-footer />
     </div>
 </body>
+
 </html>

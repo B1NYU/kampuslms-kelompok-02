@@ -10,8 +10,6 @@ export default defineConfig({
                 'resources/css/footer.css',
                 'resources/css/sidebar.css',
                 // Mode Mahasiswa
-                'resources/css/mahasiswa/mahasiswa.dashboard.css',
-                'resources/css/mahasiswa/mahasiswa.matkul.css',
                 'resources/css/mahasiswa/anggota.css',
                 // Mode Dosen
                 'resources/css/dosen/dosen.common.css',
