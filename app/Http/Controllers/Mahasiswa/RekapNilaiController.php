@@ -38,7 +38,8 @@ class RekapNilaiController extends Controller
             $sumPercent = 0.0;
 
             foreach ($course->assignments as $assignment) {
-                $sub = $assignment->submissions->firstWhere('user_id', $student->id);
+                
+                $sub = $assignment->submissions->first();
                 $grade = $sub?->grade;
 
                 $state = $sub ? ($grade ? 'graded' : 'waiting') : ($assignment->due_at->isPast() ? 'missed' : 'open');
