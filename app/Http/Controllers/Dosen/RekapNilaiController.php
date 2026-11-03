@@ -49,7 +49,8 @@ class RekapNilaiController extends Controller
         $students = $course->students()
             ->where('users.role', 'mahasiswa')
             ->orderBy('users.name')
-            ->get(['users.id', 'users.name', 'users.nim_nip']);
+            ->paginate(10)
+            ->withQueryString();
 
         // Pengumpulan + nilai, hanya milik mahasiswa yang TERDAFTAR dan tugas yang ditampilkan.
         $submissions = Submission::query()
@@ -63,7 +64,7 @@ class RekapNilaiController extends Controller
         $waitingCells = 0;
         $sumPercentAll = 0.0;
 
-        $rows = $students->map(function ($student) use ($assignments, $submissions, &$gradedCells, &$waitingCells, &$sumPercentAll) {
+        $rows = $students->through(function ($student) use ($assignments, $submissions, &$gradedCells, &$waitingCells, &$sumPercentAll) {
             $cells = [];
             $graded = 0;
             $submitted = 0;
@@ -111,7 +112,7 @@ class RekapNilaiController extends Controller
         });
 
         $stats = [
-            'students'    => $students->count(),
+            'students'    => $students->total(),
             'assignments' => $assignments->count(),
             'graded'      => $gradedCells,
             'waiting'     => $waitingCells,

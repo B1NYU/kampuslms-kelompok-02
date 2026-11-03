@@ -133,6 +133,9 @@ document.addEventListener('DOMContentLoaded', function() {
         applyFilters();
     };
 
+    // Inisialisasi setelah DOM siap
+    applyFilters();
+
     // MODAL CONTROLS (CREATE & EDIT)
     function openModal(isEdit = false, card = null) {
         if (!modalOverlay || !formTugas) return;

@@ -22,12 +22,13 @@ class AdminAssignmentController extends Controller
         $assignments = Assignment::with(['course.lecturer', 'creator'])
             ->withCount('submissions')
             ->orderBy('due_at')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        $totalAssignments = $assignments->count();
-        $totalPublished   = $assignments->where('status', 'published')->count();
-        $totalDraft       = $assignments->where('status', 'draft')->count();
-        $totalSubmissions = $assignments->sum('submissions_count');
+        $totalAssignments = Assignment::count();
+        $totalPublished   = Assignment::where('status', 'published')->count();
+        $totalDraft       = Assignment::where('status', 'draft')->count();
+        $totalSubmissions = \App\Models\Submission::count();
 
         return view()->file(resource_path('views/admin/admin.tugas.blade.php'), [
             'coursesList'      => $coursesList,

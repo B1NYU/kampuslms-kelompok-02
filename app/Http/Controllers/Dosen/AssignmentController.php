@@ -102,7 +102,8 @@ class AssignmentController extends Controller
         $assignments = $course->assignments()
             ->withCount('submissions')
             ->orderBy('due_at')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         $studentCount = $course->students()->count();
 

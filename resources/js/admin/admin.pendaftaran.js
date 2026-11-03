@@ -54,11 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('.btn-filter-mk').forEach(btn => {
         btn.addEventListener('click', function () {
-            document.querySelectorAll('.btn-filter-mk').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-
-            currentMkFilter = this.dataset.mk;
-            applyEnrollFilters();
+            const mk = this.dataset.mk;
+            window.location.href = `?mk=${encodeURIComponent(mk)}`;
         });
     });
 

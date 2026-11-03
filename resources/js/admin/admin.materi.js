@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSearchQuery  = '';
 
     // 1. FILTERING & SEARCH KARTU MATERI
+
     function applyFilters() {
         const cards = document.querySelectorAll('.material-card');
         let visibleCount = 0;
@@ -102,6 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSearchQuery = '';
         applyFilters();
     };
+
+    // Inisialisasi setelah DOM siap
+    applyFilters();
 
     // 2. MODAL UNGGAH MATERI
     const materialModal = document.getElementById('materialModalOverlay');

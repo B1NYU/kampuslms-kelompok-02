@@ -133,6 +133,7 @@
                                                             </span>
                                                         @endif
 
+<<<<<<< HEAD
                                                         @if ($it['late'])
                                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">
                                                                 Terlambat
@@ -165,6 +166,13 @@
                         Anda belum terdaftar di mata kuliah aktif mana pun.
                     </div>
                 @endforelse
+
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($rekap->hasPages())
+                    <div class="mt-4">
+                        {{ $rekap->links() }}
+                    </div>
+                @endif
 
                 <p class="text-xs font-semibold text-slate-500 mt-2">
                     Rata-rata dihitung dari persentase (nilai &divide; nilai maksimal tugas) pada tugas yang sudah dinilai. Klik nilai untuk melihat umpan balik dosen.

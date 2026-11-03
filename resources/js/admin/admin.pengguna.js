@@ -1,6 +1,7 @@
 /**
  * Script untuk Manajemen Akun Pengguna oleh Admin
  */
+
 document.addEventListener('DOMContentLoaded', function () {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const routesEl = document.getElementById('penggunaRoutes');
@@ -316,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('#userTableBody tr[data-id]').forEach(bindRowButtons);
 
-    let currentRoleFilter = 'all';
+    // ──────────────────────────────────────────────────────────────────────
 
     function updateCount() {
         if (!tbody) return;
@@ -335,66 +336,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const countElem = document.getElementById('userTableCount');
         if (countElem) countElem.textContent = total;
-
-        const bTotal = document.getElementById('badgeCountTotal');
-        if (bTotal) bTotal.textContent = total;
-        const bAdmin = document.getElementById('badgeCountAdmin');
-        if (bAdmin) bAdmin.textContent = adminCount;
-        const bDosen = document.getElementById('badgeCountDosen');
-        if (bDosen) bDosen.textContent = dosenCount;
-        const bMhs = document.getElementById('badgeCountMhs');
-        if (bMhs) bMhs.textContent = mhsCount;
-
-        const fAll = document.getElementById('filterCountAll');
-        if (fAll) fAll.textContent = total;
-        const fAdmin = document.getElementById('filterCountAdmin');
-        if (fAdmin) fAdmin.textContent = adminCount;
-        const fDosen = document.getElementById('filterCountDosen');
-        if (fDosen) fDosen.textContent = dosenCount;
-        const fMhs = document.getElementById('filterCountMhs');
-        if (fMhs) fMhs.textContent = mhsCount;
-
-        applyFilters();
     }
-
-    function applyFilters() {
-        if (!tbody) return;
-        const q = (document.getElementById('searchUserInput')?.value || '').toLowerCase().trim();
-        const allRows = tbody.querySelectorAll('tr[data-id]');
-
-        allRows.forEach(row => {
-            const role = row.dataset.role;
-            const matchRole = (currentRoleFilter === 'all' || role === currentRoleFilter);
-            const text = row.textContent.toLowerCase();
-            const matchSearch = !q || text.includes(q);
-
-            row.style.display = (matchRole && matchSearch) ? '' : 'none';
-        });
-    }
-
-    document.querySelectorAll('.role-filter-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.role-filter-btn').forEach(b => {
-                b.classList.remove('active', 'bg-[#039FFA]', 'text-white', 'shadow-sm', 'border-transparent');
-                b.classList.add('bg-white', 'text-slate-600', 'border-slate-200/80', 'hover:bg-slate-50', 'hover:text-slate-900');
-                const badge = b.querySelector('span[id^="filterCount"]');
-                if (badge) {
-                    badge.classList.remove('bg-white/20');
-                    badge.classList.add('bg-slate-100', 'text-slate-600');
-                }
-            });
-            this.classList.remove('bg-white', 'text-slate-600', 'border-slate-200/80', 'hover:bg-slate-50', 'hover:text-slate-900');
-            this.classList.add('active', 'bg-[#039FFA]', 'text-white', 'shadow-sm', 'border-transparent');
-            const activeBadge = this.querySelector('span[id^="filterCount"]');
-            if (activeBadge) {
-                activeBadge.classList.remove('bg-slate-100', 'text-slate-600');
-                activeBadge.classList.add('bg-white/20');
-            }
-
-            currentRoleFilter = this.dataset.filter;
-            applyFilters();
-        });
-    });
-
-    document.getElementById('searchUserInput')?.addEventListener('input', applyFilters);
 });

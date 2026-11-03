@@ -76,14 +76,6 @@
             @endif
 
             @php
-                // $courses, $mahasiswaList, $selectedCode dikirim AdminEnrollmentController.
-                $allEnrollments = collect();
-                foreach ($courses as $course) {
-                    foreach ($course->students as $student) {
-                        $allEnrollments->push(['course' => $course, 'student' => $student]);
-                    }
-                }
-
                 // Hanya MK aktif yang bisa dipilih untuk pendaftaran baru.
                 $activeCourses = $courses->where('status', 'active');
             @endphp
@@ -208,11 +200,18 @@
                     </table>
                 </div>
 
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($allEnrollments->hasPages())
+                    <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between">
+                        {{ $allEnrollments->links() }}
+                    </div>
+                @endif
+
                 <!-- Footer Ringkasan Kartu -->
                 <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
                     <div class="flex items-center gap-1.5 font-bold text-slate-700">
                         <span>Total:</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black">{{ $allEnrollments->count() }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black">{{ $allEnrollments->total() }}</span>
                         <span>mahasiswa terdaftar</span>
                     </div>
                 </div>

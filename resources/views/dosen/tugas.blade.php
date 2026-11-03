@@ -195,6 +195,13 @@
                                 </div>
                             @endforelse
                         </div>
+
+                        {{-- Navigasi Pagination Laravel --}}
+                        @if ($assignments->hasPages())
+                            <div style="margin-top: 16px;">
+                                {{ $assignments->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </section>

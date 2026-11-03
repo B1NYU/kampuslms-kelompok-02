@@ -354,6 +354,13 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($gradeItems->hasPages())
+                    <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between">
+                        {{ $gradeItems->links() }}
+                    </div>
+                @endif
             </section>
         </main>
 

@@ -152,67 +152,74 @@
                                                 </td>
                                             </tr>
                                         @else
-                                            <tr id="emptyCourseRow" style="{{ $hasStudentsInFirstCourse ? 'display:none;' : '' }}">
-                                                <td colspan="5" style="text-align:center;padding:32px 20px;color:#94A3B8;">
-                                                    Belum ada mahasiswa yang terdaftar di mata kuliah ini.
-                                                </td>
-                                            </tr>
-                                            @php $orderIdx = 0; @endphp
-                                            @foreach ($dosenCourses as $course)
-                                                @foreach ($course->students as $mhs)
-                                                    @php
-                                                        $orderIdx++;
-                                                        $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
-                                                        $initials = strtoupper(mb_substr($initials, 0, 2));
-                                                        $colors = [
-                                                            ['rgba(3, 159, 250, 0.12)', '#039FFA'],
-                                                            ['rgba(50, 179, 241, 0.14)', '#0284C7'],
-                                                            ['rgba(16, 185, 129, 0.14)', '#10B981'],
-                                                            ['rgba(249, 184, 4, 0.14)', '#D97706'],
-                                                            ['rgba(249, 99, 5, 0.12)', '#F96305']
-                                                        ];
-                                                        [$bg, $c] = $colors[$mhs->id % count($colors)];
-                                                    @endphp
-                                                    <tr data-mk="{{ $course->code }}"
-                                                        data-name="{{ strtolower($mhs->name) }}"
-                                                        data-nim="{{ $mhs->nim_nip }}"
-                                                        data-order="{{ $orderIdx }}"
-                                                        style="{{ $course->code === $selectedCourseCode ? '' : 'display:none;' }}">
-                                                        <td>
-                                                            <div class="student-cell">
-                                                                <div class="student-avatar" style="background:{{ $bg }}; color:{{ $c }};">{{ $initials }}</div>
-                                                                <span class="student-name">{{ $mhs->name }}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span class="student-nim">{{ $mhs->nim_nip }}</span>
-                                                        </td>
-                                                        <td>Sistem Informasi</td>
-                                                        <td><span class="badge-status badge-status-active">Aktif</span></td>
-                                                        <td style="text-align: right;">
-                                                            @can('manageEnrollment', $course)
-                                                            <form method="POST"
-                                                                  action="{{ route('dosen.mahasiswa.destroy', [$course, $mhs]) }}"
-                                                                  onsubmit="return confirm(@js('Keluarkan ' . $mhs->name . ' dari mata kuliah ini?'))"
-                                                                  style="display:inline; margin:0;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn-icon-danger btn-delete-student" title="Keluarkan dari mata kuliah">
-                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                                    </svg>
-                                                                </button>
-                                                            </form>
-                                                            @endcan
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @endforeach
+                                            @php $orderIdx = ($students->currentPage() - 1) * $students->perPage(); @endphp
+                                            @forelse ($students as $mhs)
+                                                @php
+                                                    $orderIdx++;
+                                                    $initials = collect(explode(' ', $mhs->name))->map(fn($w)=>mb_substr($w,0,1))->join('');
+                                                    $initials = strtoupper(mb_substr($initials, 0, 2));
+                                                    $colors = [
+                                                        ['rgba(3, 159, 250, 0.12)', '#039FFA'],
+                                                        ['rgba(50, 179, 241, 0.14)', '#0284C7'],
+                                                        ['rgba(16, 185, 129, 0.14)', '#10B981'],
+                                                        ['rgba(249, 184, 4, 0.14)', '#D97706'],
+                                                        ['rgba(249, 99, 5, 0.12)', '#F96305']
+                                                    ];
+                                                    [$bg, $c] = $colors[$mhs->id % count($colors)];
+                                                @endphp
+                                                <tr data-mk="{{ $firstCourse?->code ?? '' }}"
+                                                    data-name="{{ strtolower($mhs->name) }}"
+                                                    data-nim="{{ $mhs->nim_nip }}"
+                                                    data-order="{{ $orderIdx }}">
+                                                    <td>
+                                                        <div class="student-cell">
+                                                            <div class="student-avatar" style="background:{{ $bg }}; color:{{ $c }};">{{ $initials }}</div>
+                                                            <span class="student-name">{{ $mhs->name }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="student-nim">{{ $mhs->nim_nip }}</span>
+                                                    </td>
+                                                    <td>Sistem Informasi</td>
+                                                    <td><span class="badge-status badge-status-active">Aktif</span></td>
+                                                    <td style="text-align: right;">
+                                                        @if ($firstCourse)
+                                                        @can('manageEnrollment', $firstCourse)
+                                                        <form method="POST"
+                                                              action="{{ route('dosen.mahasiswa.destroy', [$firstCourse, $mhs]) }}"
+                                                              onsubmit="return confirm(@js('Keluarkan ' . $mhs->name . ' dari mata kuliah ini?'))"
+                                                              style="display:inline; margin:0;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn-icon-danger btn-delete-student" title="Keluarkan dari mata kuliah">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                        @endcan
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" style="text-align:center;padding:32px 20px;color:#94A3B8;">
+                                                        Belum ada mahasiswa yang terdaftar di mata kuliah ini.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         @endif
                                     </tbody>
                                 </table>
                             </div>
+
+                            {{-- Navigasi Pagination Laravel --}}
+                            @if ($students->hasPages())
+                                <div class="px-5 py-3 border-t border-slate-100 bg-white flex items-center justify-between">
+                                    {{ $students->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
             </section>

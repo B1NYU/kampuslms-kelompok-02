@@ -109,6 +109,13 @@
                     </div>
                 @endforelse
 
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($courses->hasPages())
+                    <div class="col-span-full mt-4">
+                        {{ $courses->links() }}
+                    </div>
+                @endif
+
             </section>
 
         </main>

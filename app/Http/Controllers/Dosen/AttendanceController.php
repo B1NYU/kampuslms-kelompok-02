@@ -42,7 +42,7 @@ class AttendanceController extends Controller
             $sessionsQuery->where('course_id', $selectedCourseId);
         }
 
-        $sessions = $sessionsQuery->get();
+        $sessions = $sessionsQuery->paginate(10)->withQueryString();
 
         // Kode default yang di-generate untuk form pembukaan presensi
         $generatedCode = AttendanceSession::generateUniqueCode();

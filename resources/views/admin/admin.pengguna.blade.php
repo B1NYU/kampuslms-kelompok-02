@@ -51,16 +51,6 @@
             <!-- Alert Box Halaman -->
             <div id="userPageAlert" style="display:none;" class="text-xs sm:text-sm font-bold px-4 py-3 rounded-xl shadow-sm transition-all"></div>
 
-            @php
-                $userList = \App\Models\User::withTrashed()
-                    ->orderByRaw("CASE WHEN role = 'admin' THEN 1 WHEN role = 'dosen' THEN 2 ELSE 3 END, id ASC")
-                    ->get();
-                $countAdmin = $userList->where('role', 'admin')->count();
-                $countDosen = $userList->where('role', 'dosen')->count();
-                $countMahasiswa = $userList->where('role', 'mahasiswa')->count();
-                $countTotal = $userList->count();
-            @endphp
-
             <!-- Card Utama: Tabel Pengguna -->
             <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
@@ -68,35 +58,38 @@
                 <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <!-- Role Filter Group Buttons -->
                     <div class="role-filter-group flex flex-wrap items-center gap-2">
-                        <button type="button" class="role-filter-btn active inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#039FFA] text-white shadow-sm border border-transparent transition-all cursor-pointer" data-filter="all">
+                        <a href="{{ request()->fullUrlWithQuery(['role' => null, 'page' => 1]) }}" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs {{ empty($role) || $role === 'all' ? 'font-extrabold bg-[#039FFA] text-white shadow-sm border border-transparent' : 'font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900' }} transition-all cursor-pointer">
                             <span>Semua</span>
-                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-white/20" id="filterCountAll">{{ $countTotal }}</span>
-                        </button>
-                        <button type="button" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-filter="admin">
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] {{ empty($role) || $role === 'all' ? 'bg-white/20' : 'bg-slate-100 text-slate-600' }}" id="filterCountAll">{{ $countTotal }}</span>
+                        </a>
+                        <a href="{{ request()->fullUrlWithQuery(['role' => 'admin', 'page' => 1]) }}" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs {{ $role === 'admin' ? 'font-extrabold bg-[#039FFA] text-white shadow-sm border border-transparent' : 'font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900' }} transition-all cursor-pointer">
                             <span>👑 Admin</span>
-                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600" id="filterCountAdmin">{{ $countAdmin }}</span>
-                        </button>
-                        <button type="button" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-filter="dosen">
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] {{ $role === 'admin' ? 'bg-white/20' : 'bg-slate-100 text-slate-600' }}" id="filterCountAdmin">{{ $countAdmin }}</span>
+                        </a>
+                        <a href="{{ request()->fullUrlWithQuery(['role' => 'dosen', 'page' => 1]) }}" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs {{ $role === 'dosen' ? 'font-extrabold bg-[#039FFA] text-white shadow-sm border border-transparent' : 'font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900' }} transition-all cursor-pointer">
                             <span>🎓 Dosen</span>
-                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600" id="filterCountDosen">{{ $countDosen }}</span>
-                        </button>
-                        <button type="button" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-filter="mahasiswa">
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] {{ $role === 'dosen' ? 'bg-white/20' : 'bg-slate-100 text-slate-600' }}" id="filterCountDosen">{{ $countDosen }}</span>
+                        </a>
+                        <a href="{{ request()->fullUrlWithQuery(['role' => 'mahasiswa', 'page' => 1]) }}" class="role-filter-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs {{ $role === 'mahasiswa' ? 'font-extrabold bg-[#039FFA] text-white shadow-sm border border-transparent' : 'font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900' }} transition-all cursor-pointer">
                             <span>👥 Mahasiswa</span>
-                            <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600" id="filterCountMhs">{{ $countMahasiswa }}</span>
-                        </button>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] {{ $role === 'mahasiswa' ? 'bg-white/20' : 'bg-slate-100 text-slate-600' }}" id="filterCountMhs">{{ $countMahasiswa }}</span>
+                        </a>
                     </div>
 
                     <!-- Search Input Box -->
-                    <div class="relative w-full md:w-80">
+                    <form method="GET" action="{{ route('admin.pengguna') }}" class="relative w-full md:w-80">
+                        @if (!empty($role))
+                            <input type="hidden" name="role" value="{{ $role }}">
+                        @endif
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
                         </div>
-                        <input type="text" id="searchUserInput" placeholder="Cari nama, NIM/NIP, atau email..."
+                        <input type="text" name="q" value="{{ $search ?? '' }}" id="searchUserInput" placeholder="Cari nama, NIM/NIP, atau email..."
                                class="w-full pl-10 pr-4 py-2 bg-slate-50/80 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-[#039FFA] focus:bg-white transition-all shadow-xs">
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Tabel Daftar Pengguna -->
@@ -198,14 +191,25 @@
                     </table>
                 </div>
 
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($userList->hasPages())
+                    <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between">
+                        {{ $userList->links() }}
+                    </div>
+                @endif
+
                 <!-- Footer Ringkasan Kartu -->
                 <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
-                    <div>
-                        Menampilkan seluruh akun terdaftar pada sistem
+                    <div class="text-slate-500">
+                        @if ($userList->total() > 0)
+                            Menampilkan {{ $userList->firstItem() }}–{{ $userList->lastItem() }} dari {{ $userList->total() }} akun terdaftar
+                        @else
+                            Tidak ada akun terdaftar
+                        @endif
                     </div>
                     <div class="flex items-center gap-1.5 font-bold text-slate-700">
                         <span>Total:</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black" id="userTableCount">{{ $countTotal }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black" id="userTableCount">{{ $userList->total() }}</span>
                         <span>pengguna</span>
                     </div>
                 </div>

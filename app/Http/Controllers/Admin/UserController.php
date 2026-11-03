@@ -13,13 +13,33 @@ class UserController extends Controller
 {
     private const ROLES = ['admin', 'dosen', 'mahasiswa'];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $userList = User::withTrashed()->orderByDesc('created_at')->get();
+        $role = $request->query('role');
+        $search = trim((string) $request->query('q', ''));
+
+        $userList = User::withTrashed()
+            ->when(in_array($role, self::ROLES, true), fn ($q) => $q->where('role', $role))
+            ->when($search !== '', function ($q) use ($search) {
+                $like = '%' . $search . '%';
+                $q->where(function ($sq) use ($like) {
+                    $sq->where('name', 'like', $like)
+                       ->orWhere('nim_nip', 'like', $like)
+                       ->orWhere('email', 'like', $like);
+                });
+            })
+            ->orderByRaw("CASE WHEN role = 'admin' THEN 1 WHEN role = 'dosen' THEN 2 ELSE 3 END, id ASC")
+            ->paginate(10)
+            ->withQueryString();
+
+        $countAdmin = User::withTrashed()->where('role', 'admin')->count();
+        $countDosen = User::withTrashed()->where('role', 'dosen')->count();
+        $countMahasiswa = User::withTrashed()->where('role', 'mahasiswa')->count();
+        $countTotal = User::withTrashed()->count();
 
         return view()->file(
             resource_path('views/admin/admin.pengguna.blade.php'),
-            compact('userList')
+            compact('userList', 'role', 'search', 'countAdmin', 'countDosen', 'countMahasiswa', 'countTotal')
         );
     }
 

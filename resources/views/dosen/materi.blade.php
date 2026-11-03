@@ -32,11 +32,9 @@
         <main class="dosen-content">
 
             @php
-                // $courses dikirim controller: hanya MK yang diampu dosen yang login.
+                // $courses dan $materials dikirim controller
                 $activeCourses  = $courses;
-                $allDbMaterials = $courses->flatMap->materials->sortByDesc('created_at');
-                // Policy membaca $material->course; isi relasinya dari $courses agar tidak N+1.
-                $allDbMaterials->each(fn ($m) => $m->setRelation('course', $courses->firstWhere('id', $m->course_id)));
+                $allDbMaterials = $materials;
             @endphp
 
             <!-- Topbar Header -->
@@ -156,6 +154,13 @@
                                 </div>
                             @endforelse
                         </div>
+
+                        {{-- Navigasi Pagination Laravel --}}
+                        @if ($materials->hasPages())
+                            <div style="margin-top: 16px;">
+                                {{ $materials->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </section>

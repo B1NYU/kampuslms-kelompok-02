@@ -17,11 +17,20 @@ class MaterialController extends Controller
         // Hanya mata kuliah yang diampu dosen yang sedang login.
         $courses = $request->user()
             ->taughtCourses()
-            ->with('materials')   // eager load agar tidak N+1
             ->orderBy('code')
             ->get();
 
-        return view('dosen.materi', compact('courses'));
+        $selectedCourseId = $request->query('course_id');
+        $courseIds = $courses->pluck('id');
+
+        $materials = Material::with('course')
+            ->whereIn('course_id', $courseIds)
+            ->when($selectedCourseId, fn ($q) => $q->where('course_id', $selectedCourseId))
+            ->latest()
+            ->paginate(9)
+            ->withQueryString();
+
+        return view('dosen.materi', compact('courses', 'materials', 'selectedCourseId'));
     }
 
     public function store(StoreMaterialRequest $request)
