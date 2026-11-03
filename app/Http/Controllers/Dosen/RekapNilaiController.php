@@ -22,7 +22,8 @@ class RekapNilaiController extends Controller
     /** /dosen/rekap-nilai — diarahkan ke mata kuliah pertama yang diampu. */
     public function landing(Request $request): RedirectResponse
     {
-        $course = $request->user()->taughtCourses()->orderBy('code')->first();
+        // Optimasi: Ambil hanya kolom courses.id dan code
+        $course = $request->user()->taughtCourses()->orderBy('code')->first(['courses.id', 'code']);
 
         if (! $course) {
             return redirect()->route('dosen.dashboard')
@@ -37,7 +38,7 @@ class RekapNilaiController extends Controller
         // Policy: hanya dosen pengampu MK ini. Dosen lain / mahasiswa / admin → 403.
         Gate::authorize('viewGradeRecap', $course);
 
-        $courses = $request->user()->taughtCourses()->orderBy('code')->get(['id', 'code', 'name', 'sks']);
+        $courses = $request->user()->taughtCourses()->orderBy('code')->get(['courses.id', 'code', 'name', 'sks']);
 
         // Hanya tugas published: draft belum terlihat mahasiswa, jadi belum layak direkap.
         $assignments = $course->assignments()
