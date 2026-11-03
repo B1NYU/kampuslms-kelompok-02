@@ -11,137 +11,169 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
+    <!-- Memuat CSS & JS via Vite (Hanya Tailwind app.css murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.tugas.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.tugas.css') }}">
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
-
-    <style>
-        .rekap-course { margin-bottom: 22px; }
-        .rekap-course-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-        .rekap-course-head h3 { margin: 0; font-size: 15px; font-weight: 900; color: #0F172A; }
-        .rekap-course-head small { display: block; font-size: 12px; font-weight: 700; color: #64748B; }
-        .rekap-avg { font-size: 12px; font-weight: 800; color: #0369A1; background: #EFF6FF; border: 1px solid rgba(3,159,250,.25); padding: 5px 12px; border-radius: 12px; }
-        .tag-late { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 8px; font-size: 10px; font-weight: 800; background: #FEF3C7; color: #B45309; }
-        .rekap-kpi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
-        .rekap-kpi-card { background: #FFFFFF; border: 1.5px solid rgba(3, 159, 250, 0.22); border-radius: 16px; padding: 14px 18px; }
-        .rekap-kpi-card .lbl { display: block; font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: .06em; }
-        .rekap-kpi-card .val { display: block; margin-top: 2px; font-size: 24px; font-weight: 900; color: #0F172A; line-height: 1.15; }
-        @media (max-width: 700px) { .rekap-kpi { grid-template-columns: 1fr; } }
-    </style>
 </head>
 
-<body>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
     @php
         $fmt = fn ($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
         $totalTugas = $rekap->sum('total');
     @endphp
 
-    <div class="app-window">
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
 
+        <!-- 1. Navbar Utama Mahasiswa -->
         <x-layout />
 
-        <main class="dosen-content">
+        <!-- 2. Konten Utama Rekap Nilai -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
+            <!-- Topbar Header -->
+            <header class="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="inline-flex items-center gap-1.5 w-fit text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border border-sky-400/30 bg-white text-sky-600">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                             PORTAL MAHASISWA &bull; REKAP NILAI
                         </span>
-                        <h1>Nilai Saya</h1>
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                            <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                            Nilai Saya
+                        </h1>
                     </div>
                 </div>
             </header>
 
-            <div class="rekap-kpi">
-                <div class="rekap-kpi-card"><span class="lbl">Mata Kuliah</span><span class="val">{{ $rekap->count() }}</span></div>
-                <div class="rekap-kpi-card"><span class="lbl">Tugas Dinilai</span><span class="val">{{ $totalGraded }} / {{ $totalTugas }}</span></div>
-                <div class="rekap-kpi-card"><span class="lbl">Rata-rata Keseluruhan</span><span class="val">{{ $overallAverage !== null ? $fmt($overallAverage) . '%' : '-' }}</span></div>
+            <!-- Stat Cards KPI Ringkasan Nilai -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md hover:border-sky-300 transition-all flex flex-col justify-between">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-500">Mata Kuliah</span>
+                    <span class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{{ $rekap->count() }}</span>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md hover:border-sky-300 transition-all flex flex-col justify-between">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-500">Tugas Dinilai</span>
+                    <span class="text-2xl sm:text-3xl font-black text-sky-600 mt-2">
+                        {{ $totalGraded }} <span class="text-sm font-bold text-slate-400">/ {{ $totalTugas }}</span>
+                    </span>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md hover:border-sky-300 transition-all flex flex-col justify-between">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-500">Rata-rata Keseluruhan</span>
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-600 mt-2">
+                        {{ $overallAverage !== null ? $fmt($overallAverage) . '%' : '-' }}
+                    </span>
+                </div>
             </div>
 
-            <section class="feature-section">
-                <div class="section-card">
+            <!-- Card Utama Daftar Nilai Per Mata Kuliah -->
+            <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col gap-6">
 
-                    @forelse ($rekap as $r)
-                        <div class="rekap-course">
-                            <div class="rekap-course-head">
-                                <div>
-                                    <h3>{{ $r['course']->code }} &bull; {{ $r['course']->name }}</h3>
-                                    <small>{{ $r['graded'] }} dari {{ $r['total'] }} tugas sudah dinilai</small>
-                                </div>
-                                <span class="rekap-avg">Rata-rata: {{ $r['average'] !== null ? $fmt($r['average']) . '%' : '-' }}</span>
+                @forelse ($rekap as $r)
+                    <div class="pb-6 border-b border-slate-100 last:border-b-0 last:pb-0 flex flex-col gap-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                                    <span class="px-2 py-0.5 text-xs font-black rounded-md bg-sky-100 text-sky-700 border border-sky-200">{{ $r['course']->code }}</span>
+                                    <span>{{ $r['course']->name }}</span>
+                                </h3>
+                                <small class="text-xs font-semibold text-slate-500 mt-0.5 block">{{ $r['graded'] }} dari {{ $r['total'] }} tugas sudah dinilai</small>
                             </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-sky-50 text-sky-700 border border-sky-200 w-fit">
+                                Rata-rata: {{ $r['average'] !== null ? $fmt($r['average']) . '%' : '-' }}
+                            </span>
+                        </div>
 
-                            @if ($r['total'] === 0)
-                                <p style="font-size:13px; font-weight:700; color:#64748B;">Belum ada tugas yang dipublikasikan.</p>
-                            @else
-                                <div class="table-responsive">
-                                    <table class="custom-dosen-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tugas</th>
-                                                <th>Batas Waktu</th>
-                                                <th>Status</th>
-                                                <th style="text-align:right;">Nilai</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($r['items'] as $it)
-                                                <tr>
-                                                    <td><strong>{{ $it['assignment']->title }}</strong></td>
-                                                    <td style="font-size:12px; color:#64748B; font-weight:600;">{{ $it['assignment']->due_at->translatedFormat('d M Y, H:i') }} WITA</td>
-                                                    <td>
+                        @if ($r['total'] === 0)
+                            <p class="text-xs sm:text-sm font-bold text-slate-400 py-3">Belum ada tugas yang dipublikasikan.</p>
+                        @else
+                            <div class="overflow-x-auto rounded-xl border border-slate-200/80">
+                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-50/80 text-slate-600 uppercase font-black tracking-wider text-[11px] border-b border-slate-200">
+                                            <th class="p-3.5">Tugas</th>
+                                            <th class="p-3.5">Batas Waktu</th>
+                                            <th class="p-3.5">Status</th>
+                                            <th class="p-3.5 text-right">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($r['items'] as $it)
+                                            <tr class="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition-colors">
+                                                <td class="p-3.5">
+                                                    <strong class="font-extrabold text-slate-900">{{ $it['assignment']->title }}</strong>
+                                                </td>
+                                                <td class="p-3.5 text-xs text-slate-500 font-semibold whitespace-nowrap">
+                                                    {{ $it['assignment']->due_at->translatedFormat('d M Y, H:i') }} WITA
+                                                </td>
+                                                <td class="p-3.5">
+                                                    <div class="flex items-center gap-1.5 flex-wrap">
                                                         @if ($it['state'] === 'graded')
-                                                            <span class="badge-status badge-status-active">Dinilai</span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800">
+                                                                Dinilai
+                                                            </span>
                                                         @elseif ($it['state'] === 'waiting')
-                                                            <span class="badge-status badge-status-warning">Menunggu penilaian</span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-800">
+                                                                Menunggu penilaian
+                                                            </span>
                                                         @elseif ($it['state'] === 'missed')
-                                                            <span class="badge-status badge-status-danger">Tidak dikumpulkan</span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-rose-100 text-rose-800">
+                                                                Tidak dikumpulkan
+                                                            </span>
                                                         @else
-                                                            <span class="badge-status">Belum dikumpulkan</span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-slate-100 text-slate-600">
+                                                                Belum dikumpulkan
+                                                            </span>
                                                         @endif
-                                                        @if ($it['late'])<span class="tag-late">Terlambat</span>@endif
-                                                    </td>
-                                                    <td style="text-align:right; font-weight:900;">
-                                                        @if ($it['score'] !== null)
-                                                            <a href="{{ route('submissions.show', $it['submission_id']) }}" style="color:#0369A1; text-decoration:none;">
-                                                                {{ $fmt($it['score']) }} / {{ $it['assignment']->max_score }}
-                                                            </a>
-                                                        @elseif ($it['submission_id'])
-                                                            <a href="{{ route('submissions.show', $it['submission_id']) }}" style="color:#64748B; font-size:12px; text-decoration:none;">Lihat pengumpulan</a>
-                                                        @else
-                                                            <span style="color:#CBD5E1;">&mdash;</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                        </div>
-                    @empty
-                        <div style="padding: 28px 16px; text-align: center; font-size: 13px; font-weight: 700; color: #64748B;">
-                            Anda belum terdaftar di mata kuliah aktif mana pun.
-                        </div>
-                    @endforelse
 
-                    <p style="font-size:12px; font-weight:600; color:#64748B; margin-top:4px;">
-                        Rata-rata dihitung dari persentase (nilai &divide; nilai maksimal tugas) pada tugas yang sudah dinilai. Klik nilai untuk melihat umpan balik dosen.
-                    </p>
-                </div>
+                                                        @if ($it['late'])
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">
+                                                                Terlambat
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <td class="p-3.5 text-right font-black">
+                                                    @if ($it['score'] !== null)
+                                                        <a href="{{ route('submissions.show', $it['submission_id']) }}" class="text-sky-600 hover:text-sky-800 hover:underline">
+                                                            {{ $fmt($it['score']) }} <span class="text-xs text-slate-400 font-bold">/ {{ $it['assignment']->max_score }}</span>
+                                                        </a>
+                                                    @elseif ($it['submission_id'])
+                                                        <a href="{{ route('submissions.show', $it['submission_id']) }}" class="text-xs font-bold text-slate-500 hover:text-sky-600 hover:underline">
+                                                            Lihat pengumpulan &rarr;
+                                                        </a>
+                                                    @else
+                                                        <span class="text-slate-300">&mdash;</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="py-12 text-center text-xs sm:text-sm font-semibold text-slate-400">
+                        Anda belum terdaftar di mata kuliah aktif mana pun.
+                    </div>
+                @endforelse
+
+                <p class="text-xs font-semibold text-slate-500 mt-2">
+                    Rata-rata dihitung dari persentase (nilai &divide; nilai maksimal tugas) pada tugas yang sudah dinilai. Klik nilai untuk melihat umpan balik dosen.
+                </p>
             </section>
 
         </main>
 
+        <!-- 3. Footer Global -->
         <x-footer />
     </div>
 

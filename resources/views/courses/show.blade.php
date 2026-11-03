@@ -14,81 +14,227 @@
     <!-- Font Nunito -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
-    <!-- CSS via Vite -->
+    <!-- CSS & JS via Vite (Hanya Tailwind murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/mahasiswa/mahasiswa.matkul.css', 'resources/js/app.js', 'resources/js/mahasiswa/mahasiswa.matkul.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/mahasiswa/mahasiswa.matkul.js'])
     @endif
-</head>
-<body>
-    <!-- Background Decorative Elements (Matching Dashboard & Login) -->
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
 
-    <div class="app-window">
+    <style>
+        /* State tombol tab aktif */
+        .subnav-tab-btn {
+            background-color: #F8FAFC;
+            border-color: #E2E8F0;
+            color: #64748B;
+        }
+        .subnav-tab-btn:hover {
+            background-color: #F1F5F9;
+            color: #0F172A;
+        }
+        .subnav-tab-btn.active {
+            background-color: #0284C7 !important;
+            border-color: #0284C7 !important;
+            color: #FFFFFF !important;
+        }
+        .subnav-tab-btn.active svg {
+            stroke: #FFFFFF !important;
+        }
+
+        /* Kartu sesi pertemuan terpilih via JS */
+        .session-card.selected-active {
+            border-color: #0284C7 !important;
+            background-color: #F0F9FF !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25) !important;
+        }
+
+        /* Elemen dinamis yang dibentuk JS saat kartu pertemuan diklik */
+        .resource-card {
+            background: #F8FAFC;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .resource-card:hover {
+            background: #F0F9FF;
+            border-color: #BAE6FD;
+        }
+        .resource-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .resource-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+        .resource-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0F172A;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .resource-meta {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+        }
+        .btn-mini-download {
+            font-size: 11px;
+            font-weight: 800;
+            color: #0284C7;
+            background: #FFFFFF;
+            border: 1px solid #BAE6FD;
+            padding: 5px 12px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+        .btn-mini-download:hover {
+            background: #0284C7;
+            color: #FFFFFF;
+        }
+
+        .task-card-box {
+            background: #FFFDF8;
+            border-radius: 14px;
+            padding: 14px;
+            border: 1px solid rgba(249, 115, 22, 0.25);
+            border-left: 4px solid #F97316;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .task-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .task-badge-tag {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #FFEDD5;
+            color: #C2410C;
+            text-transform: uppercase;
+        }
+        .task-card-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0F172A;
+            line-height: 1.3;
+        }
+        .task-deadline {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+        }
+        .btn-task-action {
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #0284C7, #039FFA);
+            padding: 8px 14px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+        }
+        .btn-task-action:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
+
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
         <!-- 1. NAVBAR UTAMA PORTAL MAHASISWA -->
         <x-layout />
 
         <!-- 2. NAVBAR KEDUA (SUB-NAVBAR DETAIL & NILAI MATA KULIAH) -->
-        <nav class="course-subnav">
-            <div class="course-subnav-inner">
-                <div class="course-subnav-left">
-                    <div class="course-title-crumb">
-                        <span class="crumb-badge">{{ $mataKuliah['kode'] }}</span>
-                        <span class="crumb-course-name">{{ $mataKuliah['nama'] }}</span>
-                    </div>
+        <nav class="bg-white/95 backdrop-blur-xs border-b border-slate-200/80 sticky top-0 z-20 shadow-xs">
+            <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-2.5 py-1 text-xs font-black tracking-wide rounded-lg bg-sky-100 text-sky-700 border border-sky-200">
+                        {{ $mataKuliah['kode'] }}
+                    </span>
+                    <span class="text-base sm:text-lg font-black text-slate-900 truncate">
+                        {{ $mataKuliah['nama'] }}
+                    </span>
+                </div>
 
-                    <!-- TABS: DETAIL, PRESENSI & NILAI -->
-                    <div class="course-subnav-tabs">
-                        <button class="subnav-tab-btn {{ $activeTab === 'detail' ? 'active' : '' }}" id="tabBtnDetail" onclick="switchCourseTab('detail')">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                            </svg>
-                            <span>Detail</span>
-                        </button>
-                        <button class="subnav-tab-btn {{ $activeTab === 'presensi' ? 'active' : '' }}" id="tabBtnPresensi" onclick="switchCourseTab('presensi')">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 11l3 3L22 4"></path>
-                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                            </svg>
-                            <span>Presensi</span>
-                            @if (isset($activeSessions) && $activeSessions->isNotEmpty())
-                                <span class="tab-badge-pill" style="background: #10B981; color: #FFF;">{{ $activeSessions->count() }} Aktif</span>
-                            @endif
-                        </button>
-                        <button class="subnav-tab-btn {{ $activeTab === 'nilai' ? 'active' : '' }}" id="tabBtnNilai" onclick="switchCourseTab('nilai')">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <polyline points="9 15 11 17 15 13"></polyline>
-                            </svg>
-                            <span>Nilai</span>
-                            <span class="tab-badge-pill">{{ $nilaiData['stats']['rata_rata'] }}</span>
-                        </button>
-                    </div>
+                <!-- TABS: DETAIL, PRESENSI & NILAI -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                    <button class="subnav-tab-btn inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm border transition-all cursor-pointer {{ $activeTab === 'detail' ? 'active' : '' }}" id="tabBtnDetail" onclick="switchCourseTab('detail')">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <span>Detail</span>
+                    </button>
+                    <button class="subnav-tab-btn inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm border transition-all cursor-pointer {{ $activeTab === 'presensi' ? 'active' : '' }}" id="tabBtnPresensi" onclick="switchCourseTab('presensi')">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        <span>Presensi</span>
+                        @if (isset($activeSessions) && $activeSessions->isNotEmpty())
+                            <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-emerald-500 text-white shadow-xs">{{ $activeSessions->count() }} Aktif</span>
+                        @endif
+                    </button>
+                    <button class="subnav-tab-btn inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm border transition-all cursor-pointer {{ $activeTab === 'nilai' ? 'active' : '' }}" id="tabBtnNilai" onclick="switchCourseTab('nilai')">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <polyline points="9 15 11 17 15 13"></polyline>
+                        </svg>
+                        <span>Nilai</span>
+                        <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-sky-100 text-sky-700 border border-sky-200">{{ $nilaiData['stats']['rata_rata'] }}</span>
+                    </button>
                 </div>
             </div>
         </nav>
 
         <!-- 3. KONTEN MATA KULIAH -->
-        <main class="course-main-content">
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
             <!-- VIEW 1: DETAIL (Alur 16 Sesi & Info Matkul) -->
             <div id="panelCourseDetail" style="{{ $activeTab !== 'detail' ? 'display: none;' : '' }}">
-                <div class="split-layout">
-                    <!-- ==============================================
-                         KOLOM KIRI: TIMELINE PERTEMUAN (DENGAN SCROLL INTERNAL)
-                         ============================================== -->
-                    <section class="left-panel">
-                        <div class="panel-header">
-                            <h2>Rencana Pertemuan</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- KOLOM KIRI: TIMELINE PERTEMUAN -->
+                    <section class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col gap-4">
+                        <div class="pb-3 border-b border-slate-100">
+                            <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Rencana Pertemuan</h2>
                         </div>
                         @php
                             $courseAssignments = $course->assignments->sortBy('due_at')->values();
                             $pertemuanList = [];
 
-                            // Format ukuran berkas tanpa ekstensi intl (Number::fileSize butuh intl).
+                            // Format ukuran berkas tanpa ekstensi intl.
                             $fmtUkuran = function ($byte) {
                                 $byte = (int) $byte;
                                 if ($byte >= 1048576) return number_format($byte / 1048576, 1, ',', '.') . ' MB';
@@ -96,7 +242,7 @@
                                 return $byte . ' B';
                             };
 
-                            // Bentuk data materi untuk ditampilkan (semua unduhan lewat route berpolicy).
+                            // Bentuk data materi untuk ditampilkan.
                             $fmtMateri = fn ($m) => [
                                 'id'        => $m->id,
                                 'judul'     => $m->title,
@@ -109,17 +255,15 @@
                                 'kind'      => $m->type,
                                 'url'       => route('mahasiswa.materi.download', $m),
                             ];
-                            // Materi yang tidak terikat pertemuan tertentu (session = NULL).
+                            // Materi umum (session = NULL).
                             $materiUmum = $course->materials->whereNull('session')->map($fmtMateri)->values();
 
                             for ($minggu = 1; $minggu <= 16; $minggu++) {
                                 $isExam = ($minggu == 8 || $minggu == 16);
                                 $judul = $minggu == 8 ? 'Minggu 8 (UTS)' : ($minggu == 16 ? 'Minggu 16 (UAS)' : 'Minggu ' . $minggu);
 
-                                // 1. Hubungkan berkas materi jika ada di database untuk sesi ini
                                 $matFiles = $course->materials->where('session', $minggu)->map($fmtMateri)->values()->all();
 
-                                // 2. Hubungkan tugas jika ada di database
                                 $assignIdx = $minggu - 1;
                                 $dbAssign = $courseAssignments->get($assignIdx);
                                 $tasks = [];
@@ -147,7 +291,6 @@
                                     ];
                                 }
 
-                                // 3. Tentukan status & label dinamis berbasis data tugas & materi di database
                                 if ($isExam) {
                                     $status = 'exam';
                                     $label = $minggu == 8 ? 'Ujian UTS' : 'Ujian UAS';
@@ -179,7 +322,6 @@
                                 ];
                             }
 
-                            // Pastikan jika ada mata kuliah aktif dan belum ada sesi aktif, tentukan sesi berjalan berikutnya
                             $hasActive = collect($pertemuanList)->contains('status', 'active');
                             if (!$hasActive && ($mataKuliah['status'] ?? 'active') === 'active') {
                                 foreach ($pertemuanList as $m => &$pItem) {
@@ -192,34 +334,55 @@
                                 unset($pItem);
                             }
                         @endphp
-                        <!-- KOTAK SCROLL HANYA DI BAGIAN INI -->
-                        <div class="timeline-scroll-box">
+
+                        <!-- KOTAK SCROLL TIMELINE -->
+                        <div class="flex flex-col gap-3 max-h-[720px] overflow-y-auto pr-1">
                             @foreach ($pertemuanList as $minggu => $item)
                                 @php
                                     $isExam = ($minggu == 8 || $minggu == 16);
                                 @endphp
-                                <div class="timeline-item">
-                                    <div class="timeline-node {{ $item['status'] }} {{ $isExam ? 'exam' : '' }}">
-                                        <div class="timeline-node-inner"></div>
+                                <div class="flex items-start gap-3">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-xs shrink-0 shadow-xs
+                                            {{ $item['status'] === 'active' ? 'bg-sky-500 text-white ring-4 ring-sky-100' : '' }}
+                                            {{ $item['status'] === 'done' ? 'bg-emerald-500 text-white' : '' }}
+                                            {{ $item['status'] === 'exam' ? 'bg-amber-500 text-white ring-4 ring-amber-100' : '' }}
+                                            {{ $item['status'] === 'locked' ? 'bg-slate-200 text-slate-500' : '' }}
+                                        ">
+                                            {{ $minggu }}
+                                        </div>
+                                        @if ($minggu < 16)
+                                            <div class="w-0.5 h-8 bg-slate-200 my-1"></div>
+                                        @endif
                                     </div>
-                                    <div class="session-card" id="cardWeek{{ $minggu }}"
+
+                                    <div class="session-card flex-1 p-3.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 hover:border-sky-300 transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 shadow-xs"
+                                         id="cardWeek{{ $minggu }}"
                                          data-judul="{{ $item['judul'] }}"
                                          data-materi="{{ json_encode($item['materi']) }}"
                                          data-tasks="{{ json_encode($item['tasks']) }}"
                                          onclick="switchRightToDetail({{ $minggu }}, this)">
-                                        <div class="session-left">
-                                            <div class="session-icon-circle {{ $item['status'] }} {{ $isExam ? 'exam-icon' : '' }}">
-                                                {{ $minggu }}
-                                            </div>
-                                            <div class="session-text">
-                                                <h4>{{ $item['judul'] }}</h4>
+                                        <div>
+                                            <h4 class="text-sm font-black text-slate-800">{{ $item['judul'] }}</h4>
+                                            <div class="text-[11px] font-semibold text-slate-500 mt-0.5">
+                                                @if (!empty($item['materi']))
+                                                    <span>📄 {{ count($item['materi']) }} Materi</span>
+                                                @endif
+                                                @if (!empty($item['tasks']))
+                                                    <span class="ml-1">📝 {{ count($item['tasks']) }} Tugas</span>
+                                                @endif
                                             </div>
                                         </div>
-                                        <div class="session-right">
-                                            <span class="badge-status {{ $item['status'] }}">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full
+                                                {{ $item['status'] === 'active' ? 'bg-sky-100 text-sky-700 border border-sky-200' : '' }}
+                                                {{ $item['status'] === 'done' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : '' }}
+                                                {{ $item['status'] === 'exam' ? 'bg-amber-100 text-amber-700 border border-amber-200' : '' }}
+                                                {{ $item['status'] === 'locked' ? 'bg-slate-100 text-slate-600 border border-slate-200' : '' }}
+                                            ">
                                                 {{ $item['label'] }}
                                             </span>
-                                            <div class="arrow-btn">&rsaquo;</div>
+                                            <span class="text-slate-400 font-bold">&rsaquo;</span>
                                         </div>
                                     </div>
                                 </div>
@@ -227,75 +390,69 @@
                         </div>
                     </section>
 
-                    <!-- ==============================================
-                         KOLOM KANAN: INFO MATA KULIAH & DETAIL SESI
-                         ============================================== -->
-                    <aside class="right-panel">
-                        <!-- 1. TAMPILAN DEFAULT (INFO MATA KULIAH & CPMK) -->
-                        <div id="defaultRightPanel" class="content-fade" style="display: flex; flex-direction: column; gap: 18px;">
-                            <div class="card-course-info">
-                                <h3>Informasi Mata Kuliah</h3>
-                                <div class="lecturer-box">
-                                    <div class="lecturer-avatar">
+                    <!-- KOLOM KANAN: INFO MATA KULIAH & DETAIL SESI -->
+                    <aside class="lg:col-span-5 flex flex-col gap-6">
+                        <!-- TAMPILAN DEFAULT (INFO MATA KULIAH) -->
+                        <div id="defaultRightPanel" class="flex flex-col gap-6">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col gap-4">
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 pb-3 border-b border-slate-100">Informasi Mata Kuliah</h3>
+                                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-sky-500 to-sky-600 text-white font-black flex items-center justify-center text-sm shadow-xs shrink-0">
                                         {{ strtoupper(substr($mataKuliah['dosen'], 0, 2)) }}
                                     </div>
-                                    <div class="lecturer-info">
-                                        <h5>{{ $mataKuliah['dosen'] }}</h5>
-                                        <span>Dosen Pengampu Utama</span>
+                                    <div class="flex-1 min-w-0">
+                                        <h5 class="text-sm font-extrabold text-slate-900 truncate">{{ $mataKuliah['dosen'] }}</h5>
+                                        <span class="text-xs font-semibold text-slate-500">Dosen Pengampu Utama</span>
                                     </div>
                                 </div>
-                                <div class="meta-list">
-                                    <div class="meta-row">
-                                        <span>Kode Mata Kuliah</span>
-                                        <span class="meta-chip chip-cyan">{{ $mataKuliah['kode'] }}</span>
+                                <div class="flex flex-col text-xs sm:text-sm">
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+                                        <span class="text-slate-500 font-bold">Kode Mata Kuliah</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-sky-100 text-sky-700 border border-sky-200 text-xs">{{ $mataKuliah['kode'] }}</span>
                                     </div>
-                                    <div class="meta-row">
-                                        <span>Beban Kredit</span>
-                                        <span class="meta-chip chip-amber">{{ $mataKuliah['sks'] }} SKS</span>
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+                                        <span class="text-slate-500 font-bold">Beban Kredit</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-amber-100 text-amber-800 border border-amber-200 text-xs">{{ $mataKuliah['sks'] }} SKS</span>
                                     </div>
-                                    <div class="meta-row">
-                                        <span>Peserta Terdaftar</span>
-                                        <span class="meta-chip chip-green">
-                                            {{ $courseDb ? $courseDb->students->count() : 0 }} Mahasiswa
-                                        </span>
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+                                        <span class="text-slate-500 font-bold">Peserta Terdaftar</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs">{{ $courseDb ? $courseDb->students->count() : 0 }} Mahasiswa</span>
                                     </div>
-                                    <div class="meta-row">
-                                        <span>Tugas Terjadwal</span>
-                                        <span class="meta-chip chip-orange">
-                                            {{ $courseDb ? $courseDb->assignments->count() : 0 }} Tugas Terdata
-                                        </span>
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+                                        <span class="text-slate-500 font-bold">Tugas Terjadwal</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-orange-100 text-orange-800 border border-orange-200 text-xs">{{ $courseDb ? $courseDb->assignments->count() : 0 }} Tugas</span>
                                     </div>
-                                    <div class="meta-row">
-                                        <span>Materi Tersedia</span>
-                                        <span class="meta-chip chip-cyan">{{ $courseDb->materials->count() }} Materi</span>
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+                                        <span class="text-slate-500 font-bold">Materi Tersedia</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-sky-100 text-sky-700 border border-sky-200 text-xs">{{ $courseDb->materials->count() }} Materi</span>
                                     </div>
-                                    <div class="meta-row">
-                                        <span>Status Kelas</span>
-                                        <span class="meta-chip chip-green">{{ ucfirst($mataKuliah['status'] ?? 'Aktif') }}</span>
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-100">
+                                        <span class="text-slate-500 font-bold">Status Kelas</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs">{{ ucfirst($mataKuliah['status'] ?? 'Aktif') }}</span>
                                     </div>
-                                    <div class="meta-row" style="align-items: flex-start;">
-                                        <span>Deskripsi</span>
-                                        <span style="font-size:12px;color:#0F172A;text-align:right;max-width:62%;font-weight:600;">{{ $mataKuliah['deskripsi'] }}</span>
+                                    <div class="flex flex-col gap-1 py-2">
+                                        <span class="text-slate-500 font-bold">Deskripsi</span>
+                                        <p class="text-xs text-slate-700 leading-relaxed font-medium">{{ $mataKuliah['deskripsi'] }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 1b. MATERI UMUM (tidak terikat pertemuan) -->
+                        <!-- MATERI UMUM (tidak terikat pertemuan) -->
                         @if ($materiUmum->isNotEmpty())
-                            <div class="card-course-info" style="margin-top: 18px;">
-                                <h3>Materi Umum</h3>
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col gap-3">
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 pb-2 border-b border-slate-100">Materi Umum</h3>
+                                <div class="flex flex-col gap-2.5">
                                     @foreach ($materiUmum as $m)
-                                        <div class="resource-card">
-                                            <div class="resource-left">
-                                                <div class="resource-icon">{{ $m['kind'] === 'link' ? '🔗' : '📄' }}</div>
-                                                <div>
-                                                    <div class="resource-name">{{ $m['judul'] }}</div>
-                                                    <div class="resource-meta">{{ $m['meta'] }}</div>
+                                        <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/60 hover:bg-sky-50/60 hover:border-sky-200 transition-all">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <span class="text-lg">{{ $m['kind'] === 'link' ? '🔗' : '📄' }}</span>
+                                                <div class="min-w-0">
+                                                    <div class="text-xs sm:text-sm font-black text-slate-900 truncate">{{ $m['judul'] }}</div>
+                                                    <div class="text-[11px] font-semibold text-slate-500">{{ $m['meta'] }}</div>
                                                 </div>
                                             </div>
-                                            <a class="btn-mini-download" href="{{ $m['url'] }}" @if($m['kind'] === 'link') target="_blank" rel="noopener noreferrer" @endif style="text-decoration:none;">
+                                            <a class="px-3 py-1 text-xs font-black rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition-colors shrink-0" href="{{ $m['url'] }}" @if($m['kind'] === 'link') target="_blank" rel="noopener noreferrer" @endif>
                                                 {{ $m['kind'] === 'link' ? 'Buka' : 'Unduh' }}
                                             </a>
                                         </div>
@@ -304,29 +461,27 @@
                             </div>
                         @endif
 
-                        <!-- 2. TAMPILAN PENGGANTI (DETAIL SESI MINGGUAN) -->
-                        <div id="detailRightPanel" class="content-fade" style="display: none;">
-                            <div class="card-week-detail-panel">
-                                <div class="detail-top-bar">
-                                    <button class="btn-restore-info" onclick="restoreDefaultInfo()">
-                                        &larr; Kembali ke Info Matkul
-                                    </button>
-                                    <span id="detailBadgeSession" class="header-pill">Minggu 1</span>
-                                </div>
-                                <div class="detail-title-group">
-                                    <span class="detail-badge-session">Rincian Pertemuan</span>
-                                    <h3 id="detailHeading">Minggu 1</h3>
-                                </div>
+                        <!-- TAMPILAN PENGGANTI (DETAIL SESI MINGGUAN) -->
+                        <div id="detailRightPanel" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col gap-5" style="display: none;">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                <button class="text-xs font-black text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer" onclick="restoreDefaultInfo()">
+                                    &larr; Kembali ke Info Matkul
+                                </button>
+                                <span id="detailBadgeSession" class="text-xs font-black px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-200">Minggu 1</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rincian Pertemuan</span>
+                                <h3 id="detailHeading" class="text-lg font-black text-slate-900">Minggu 1</h3>
+                            </div>
 
-                                <div class="detail-block">
-                                    <span class="detail-block-title detail-title-materi">Materi & Berkas Perkuliahan</span>
-                                    <div class="materi-container" id="materiListContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
-                                </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-xs font-black uppercase tracking-wider text-sky-600">Materi &amp; Berkas Perkuliahan</span>
+                                <div class="flex flex-col gap-2.5" id="materiListContainer"></div>
+                            </div>
 
-                                <div class="detail-block">
-                                    <span class="detail-block-title detail-title-tasks" id="tasksHeaderTitle">Aktivitas & Tugas</span>
-                                    <div class="tasks-container" id="tasksListContainer"></div>
-                                </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-xs font-black uppercase tracking-wider text-orange-600" id="tasksHeaderTitle">Aktivitas &amp; Tugas</span>
+                                <div class="flex flex-col gap-2.5" id="tasksListContainer"></div>
                             </div>
                         </div>
                     </aside>
@@ -334,150 +489,144 @@
             </div>
 
             <!-- VIEW 2: NILAI (Rekapitulasi Nilai Tugas Mahasiswa) -->
-            <div id="panelCourseNilai" style="{{ $activeTab === 'nilai' ? '' : 'display: none;' }}">
+            <div id="panelCourseNilai" style="{{ $activeTab === 'nilai' ? '' : 'display: none;' }}" class="flex flex-col gap-6">
                 <!-- Stat Cards Ringkasan Nilai -->
-                <div class="grades-stat-grid">
-                    <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#E0F2FE;color:#039FFA;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                         </div>
-                        <div class="grade-card-info">
-                            <span class="grade-card-label">RATA-RATA NILAI TUGAS</span>
-                            <div class="grade-card-num">{{ $nilaiData['stats']['rata_rata'] }} <span style="font-size:14px;color:#64748B;font-weight:700;">/ 100</span></div>
-                            <span class="grade-card-sub">Perhitungan kumulatif semester berjalan</span>
+                        <div>
+                            <span class="text-[11px] font-black tracking-wider uppercase text-slate-400">Rata-Rata Nilai</span>
+                            <div class="text-2xl font-black text-slate-900">{{ $nilaiData['stats']['rata_rata'] }} <span class="text-xs font-bold text-slate-400">/ 100</span></div>
+                            <span class="text-[11px] text-slate-500 font-semibold">Semester berjalan</span>
                         </div>
                     </div>
 
-                    <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#EBF9F1;color:#1B8A5A;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <circle cx="12" cy="8" r="7"></circle>
                                 <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                             </svg>
                         </div>
-                        <div class="grade-card-info">
-                            <span class="grade-card-label">PREDIKAT AKADEMIK</span>
-                            <div class="grade-card-num" style="color:#1B8A5A;">{{ $nilaiData['stats']['indeks'] }} <span style="font-size:13px;color:#1B8A5A;font-weight:700;">({{ $nilaiData['stats']['predikat'] }})</span></div>
-                            <span class="grade-card-sub">Skala huruf penilaian standar kampus</span>
+                        <div>
+                            <span class="text-[11px] font-black tracking-wider uppercase text-slate-400">Predikat Akademik</span>
+                            <div class="text-2xl font-black text-emerald-600">{{ $nilaiData['stats']['indeks'] }} <span class="text-xs font-bold">({{ $nilaiData['stats']['predikat'] }})</span></div>
+                            <span class="text-[11px] text-slate-500 font-semibold">Skala huruf standar</span>
                         </div>
                     </div>
 
-                    <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#FFF7ED;color:#F96305;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <path d="M9 11l3 3L22 4"></path>
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                             </svg>
                         </div>
-                        <div class="grade-card-info">
-                            <span class="grade-card-label">PROGRES TUGAS DINILAI</span>
-                            <div class="grade-card-num">{{ $nilaiData['stats']['tugas_dinilai'] }}</div>
-                            <span class="grade-card-sub">{{ $nilaiData['stats']['rata_rata'] !== '-' ? 'Perhitungan dari tugas yang dinilai' : 'Menunggu proses penilaian dosen' }}</span>
+                        <div>
+                            <span class="text-[11px] font-black tracking-wider uppercase text-slate-400">Tugas Dinilai</span>
+                            <div class="text-2xl font-black text-slate-900">{{ $nilaiData['stats']['tugas_dinilai'] }}</div>
+                            <span class="text-[11px] text-slate-500 font-semibold">Tugas terkoreksi</span>
                         </div>
                     </div>
 
-                    <div class="grade-summary-card">
-                        <div class="grade-card-icon" style="background:#E0F2FE;color:#039FFA;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <path d="M18 20V10"></path>
                                 <path d="M12 20V4"></path>
                                 <path d="M6 20v-6"></path>
                             </svg>
                         </div>
-                        <div class="grade-card-info">
-                            <span class="grade-card-label">BOBOT NILAI TERCAPAI</span>
-                            <div class="grade-card-num" style="color:#039FFA;">{{ $nilaiData['stats']['bobot_tercapai'] }} <span style="font-size:13px;color:#64748B;font-weight:700;">/ 100% Total</span></div>
-                            <span class="grade-card-sub">Akumulasi persentase SKS mata kuliah</span>
+                        <div>
+                            <span class="text-[11px] font-black tracking-wider uppercase text-slate-400">Bobot Tercapai</span>
+                            <div class="text-2xl font-black text-sky-600">{{ $nilaiData['stats']['bobot_tercapai'] }} <span class="text-xs font-bold text-slate-400">/ 100%</span></div>
+                            <span class="text-[11px] text-slate-500 font-semibold">Akumulasi bobot</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card Tabel Rincian Nilai -->
-                <div class="grade-table-card">
-                    <div class="grade-table-header">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
-                            <h3 class="grade-table-title">Daftar Nilai & Evaluasi Tugas</h3>
-                            <p class="grade-table-desc">Hasil penilaian, bobot persentase, dan catatan umpan balik resmi dari dosen pengampu: <strong>{{ $mataKuliah['dosen'] }}</strong></p>
+                            <h3 class="text-lg font-black text-slate-900">Daftar Nilai &amp; Evaluasi Tugas</h3>
+                            <p class="text-xs text-slate-500 font-semibold mt-0.5">Hasil penilaian dan feedback resmi dari dosen pengampu: <strong>{{ $mataKuliah['dosen'] }}</strong></p>
                         </div>
-                        <div class="grade-search-box">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="relative w-full sm:w-64">
+                            <input type="text" id="gradeSearchInput" placeholder="Cari nama tugas..." class="w-full text-xs font-bold pl-8 pr-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-sky-500 transition-all">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
-                            <input type="text" id="gradeSearchInput" placeholder="Cari nama tugas...">
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="custom-grade-table" id="gradeTable">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm" id="gradeTable">
                             <thead>
-                                <tr>
-                                    <th>Aktivitas / Tugas</th>
-                                    <th>Waktu Pengumpulan</th>
-                                    <th>Status</th>
-                                    <th>Bobot</th>
-                                    <th>Nilai Akhir</th>
-                                    <th>Catatan &amp; Feedback Dosen</th>
+                                <tr class="bg-slate-50/80 text-slate-600 uppercase font-black tracking-wider text-[11px] border-b border-slate-200">
+                                    <th class="p-4">Aktivitas / Tugas</th>
+                                    <th class="p-4">Waktu Pengumpulan</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Bobot</th>
+                                    <th class="p-4">Nilai Akhir</th>
+                                    <th class="p-4">Catatan &amp; Feedback</th>
                                 </tr>
                             </thead>
                             <tbody id="gradeTableBody">
                                 @forelse ($nilaiData['items'] as $item)
-                                    <tr>
-                                        <td>
-                                            <div class="task-name-cell">
-                                                <div class="task-info">
-                                                    <a href="{{ $item['url'] }}" class="task-title-text" style="text-decoration:none;color:inherit;">{{ $item['judul'] }}</a>
-                                                </div>
-                                            </div>
+                                    <tr class="border-b border-slate-100 hover:bg-slate-50/60 transition-colors">
+                                        <td class="p-4">
+                                            <a href="{{ $item['url'] }}" class="font-extrabold text-slate-900 hover:text-sky-600 transition-colors">{{ $item['judul'] }}</a>
                                         </td>
-                                        <td style="font-size:12.5px;color:#0F172A;font-weight:700;white-space:nowrap;">
+                                        <td class="p-4 font-bold text-slate-600 whitespace-nowrap">
                                             {{ $item['tanggal_kumpul'] }}
                                         </td>
-                                        <td>
+                                        <td class="p-4">
                                             @if ($item['status'] === 'Dinilai')
-                                                <span class="status-pill status-pill-success">
-                                                    <span class="status-dot-green"></span>
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                                                     Dinilai
                                                 </span>
                                             @elseif ($item['status'] === 'Menunggu Penilaian')
-                                                <span class="status-pill status-pill-warning">
-                                                    <span class="status-dot-orange"></span>
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                                                     Sedang Dievaluasi
                                                 </span>
                                             @elseif ($item['status'] === 'Lewat Deadline')
-                                                <span class="status-pill status-pill-danger">
-                                                    <span class="status-dot-red"></span>
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
                                                     Lewat Deadline
                                                 </span>
                                             @elseif ($item['status'] === 'Belum Dikumpulkan')
-                                                <span class="status-pill status-pill-warning">
-                                                    <span class="status-dot-orange"></span>
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                                                     Belum Dikumpulkan
                                                 </span>
                                             @else
-                                                <span class="status-pill status-pill-muted">
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-slate-100 text-slate-600">
                                                     Belum Dibuka
                                                 </span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <span class="weight-badge">{{ $item['bobot'] }}</span>
+                                        <td class="p-4 font-black text-slate-700">
+                                            {{ $item['bobot'] }}
                                         </td>
-                                        <td>
+                                        <td class="p-4">
                                             @if ($item['nilai'] !== null)
-                                                <div class="score-display">
-                                                    <span class="score-number">{{ $item['nilai'] }}</span>
-                                                    <span class="score-max">/ 100</span>
-                                                </div>
+                                                <span class="text-base font-black text-slate-900">{{ $item['nilai'] }}</span>
+                                                <span class="text-xs text-slate-400 font-bold">/ 100</span>
                                             @else
-                                                <span class="score-pending">&mdash;</span>
+                                                <span class="text-slate-400 font-bold">&mdash;</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <div class="feedback-bubble">
-                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#039FFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
+                                        <td class="p-4">
+                                            <div class="flex items-start gap-2 text-xs font-medium text-slate-600 bg-sky-50/60 p-2.5 rounded-xl border border-sky-100">
+                                                <svg class="w-3.5 h-3.5 text-sky-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                                 </svg>
                                                 <span>{{ $item['feedback'] }}</span>
@@ -486,9 +635,9 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" style="text-align: center; padding: 36px 20px; color: #64748B;">
-                                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #0F172A;">Belum Ada Tugas di Database</div>
-                                            <div style="font-size: 12.5px; color: #64748B;">Mata kuliah ini belum memiliki penugasan atau rekaman nilai aktif.</div>
+                                        <td colspan="6" class="p-8 text-center text-slate-400">
+                                            <div class="font-extrabold text-sm text-slate-700 mb-1">Belum Ada Tugas di Database</div>
+                                            <div class="text-xs">Mata kuliah ini belum memiliki penugasan atau rekaman nilai aktif.</div>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -499,10 +648,10 @@
             </div>
 
             <!-- VIEW 3: PRESENSI KELAS KHUSUS MATA KULIAH INI -->
-            <div id="panelCoursePresensi" style="{{ $activeTab === 'presensi' ? '' : 'display: none;' }}; padding-top: 10px;">
+            <div id="panelCoursePresensi" style="{{ $activeTab === 'presensi' ? '' : 'display: none;' }}" class="flex flex-col gap-6">
                 @if (session('success'))
-                    <div style="background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; border-radius: 14px; padding: 16px 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl p-4 font-bold flex items-center gap-3 shadow-xs">
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
@@ -511,8 +660,8 @@
                 @endif
 
                 @if ($errors->any())
-                    <div style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; border-radius: 14px; padding: 16px 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0;">
+                    <div class="bg-rose-50 text-rose-800 border border-rose-200 rounded-xl p-4 font-bold flex items-center gap-3 shadow-xs">
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -526,30 +675,30 @@
                 @endif
 
                 <!-- Hero Input Card Khusus Mata Kuliah Ini -->
-                <div style="background: linear-gradient(135deg, #0284C7 0%, #039FFA 50%, #38BDF8 100%); border-radius: 20px; padding: 32px; color: #FFF; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(3, 159, 250, 0.22); position: relative; overflow: hidden;">
-                    <div style="max-width: 650px;">
-                        <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.95;">
+                <div class="bg-gradient-to-r from-sky-600 via-sky-500 to-sky-400 rounded-2xl p-6 sm:p-8 text-white shadow-lg shadow-sky-500/20 relative overflow-hidden">
+                    <div class="max-w-xl">
+                        <span class="text-xs font-black uppercase tracking-wider opacity-90">
                             Presensi Kehadiran Kelas
                         </span>
-                        <h2 style="font-size: 26px; font-weight: 900; margin: 4px 0 8px 0; color: #FFF;">
+                        <h2 class="text-2xl sm:text-3xl font-black mt-1 mb-2 text-white">
                             {{ $mataKuliah['kode'] }} &bull; {{ $mataKuliah['nama'] }}
                         </h2>
-                        <p style="font-size: 14px; opacity: 0.92; line-height: 1.5; margin: 0;">
+                        <p class="text-xs sm:text-sm opacity-90 leading-relaxed">
                             Presensi kehadiran pada halaman ini hanya berlaku untuk mata kuliah ini. Masukkan kode unik yang diberikan oleh dosen pengampu di kelas.
                         </p>
                     </div>
 
-                    <div style="background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px); border: 2px dashed rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 20px 24px; margin-top: 20px; max-width: 580px;">
+                    <div class="bg-white/20 backdrop-blur-md border-2 border-dashed border-white/60 rounded-2xl p-5 sm:p-6 mt-6 max-w-lg">
                         <form method="POST" action="{{ route('mahasiswa.mata-kuliah.presensi.store', $course) }}">
                             @csrf
-                            <label for="inputPresensiCode" style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #FFF; margin-bottom: 8px; text-align: center;">
+                            <label for="inputPresensiCode" class="block text-xs font-black uppercase tracking-wider text-white mb-2 text-center">
                                 Masukkan Kode Presensi:
                             </label>
 
-                            <input type="text" name="code" id="inputPresensiCode" placeholder="CONTOH: 8K9P2X" maxlength="16" autocomplete="off" required value="{{ old('code') }}" style="width: 100%; font-family: 'Consolas', monospace; font-size: 24px; font-weight: 900; letter-spacing: 5px; text-align: center; text-transform: uppercase; padding: 12px 18px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.8); background: #FFF; color: #0F172A; outline: none; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);">
+                            <input type="text" name="code" id="inputPresensiCode" placeholder="CONTOH: 8K9P2X" maxlength="16" autocomplete="off" required value="{{ old('code') }}" class="w-full font-mono text-2xl sm:text-3xl font-black text-center tracking-widest uppercase py-3 px-4 rounded-xl border-2 border-white/80 bg-white text-slate-900 shadow-inner outline-none focus:ring-4 focus:ring-white/40">
 
-                            <button type="submit" style="width: 100%; margin-top: 10px; background: #F9B804; color: #78350F; border: none; font-size: 15px; font-weight: 900; padding: 12px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(249, 184, 4, 0.4); transition: transform 0.15s;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <button type="submit" class="w-full mt-3 py-3 px-6 rounded-xl font-black text-amber-950 bg-amber-400 hover:bg-amber-300 shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <path d="M9 11l3 3L22 4"></path>
                                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                                 </svg>
@@ -560,9 +709,9 @@
                 </div>
 
                 <!-- Sesi Presensi Aktif di Mata Kuliah Ini -->
-                <div style="margin-bottom: 24px;">
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+                <div class="flex flex-col gap-3">
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         Sesi Presensi yang Sedang Berlangsung di Mata Kuliah Ini
                     </h3>
 
@@ -571,27 +720,27 @@
                             @php
                                 $alreadyAttended = in_array($active->id, $attendedSessionIds ?? []);
                             @endphp
-                            <div style="background: #FFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);">
+                            <div class="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
                                 <div>
-                                    <div style="font-size: 15px; font-weight: 800; color: #0F172A;">
+                                    <div class="text-sm sm:text-base font-black text-slate-900">
                                         {{ $active->title }}
                                     </div>
-                                    <div style="font-size: 12.5px; color: #64748B; margin-top: 3px;">
+                                    <div class="text-xs text-slate-500 font-semibold mt-1">
                                         Masa berlaku sampai <strong>{{ $active->expires_at->format('H:i') }} WIB</strong> ({{ $active->remainingTimeForHumans() }})
                                     </div>
                                 </div>
 
                                 <div>
                                     @if ($alreadyAttended)
-                                        <span style="font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 20px; background: #DCFCE7; color: #166534; display: inline-flex; align-items: center; gap: 6px;">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">
+                                            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
                                             Anda Sudah Hadir
                                         </span>
                                     @else
-                                        <span style="font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 20px; background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; display: inline-flex; align-items: center; gap: 6px;">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-200">
+                                            <svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <line x1="12" y1="8" x2="12" y2="12"></line>
                                                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -603,17 +752,17 @@
                             </div>
                         @endforeach
                     @else
-                        <div style="background: #FFF; border: 1px dashed #CBD5E1; border-radius: 14px; padding: 20px; text-align: center; color: #64748B; font-size: 13.5px; font-weight: 600;">
+                        <div class="bg-white border border-dashed border-slate-200 rounded-xl p-5 text-center text-slate-400 text-xs sm:text-sm font-semibold">
                             Tidak ada sesi presensi yang sedang berlangsung untuk mata kuliah ini saat ini.
                         </div>
                     @endif
                 </div>
 
                 <!-- Riwayat Kehadiran Mahasiswa di Mata Kuliah Ini -->
-                <div style="background: #FFF; border-radius: 18px; border: 1px solid rgba(3, 159, 250, 0.18); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); overflow: hidden;">
-                    <div style="padding: 18px 24px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between;">
-                        <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 8px;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#039FFA" stroke-width="2.3">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="16" y1="2" x2="16" y2="6"></line>
                                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -621,58 +770,52 @@
                             </svg>
                             Riwayat Kehadiran di Mata Kuliah Ini
                         </h3>
-                        <span style="font-size: 12.5px; font-weight: 700; color: #64748B;">
+                        <span class="text-xs font-bold text-slate-500">
                             Total: {{ isset($attendanceHistory) ? $attendanceHistory->count() : 0 }} Pertemuan
                         </span>
                     </div>
 
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
                             <thead>
-                                <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; color: #475569; font-size: 12px; font-weight: 800; text-transform: uppercase;">
-                                    <th style="padding: 12px 20px;">Pertemuan / Sesi</th>
-                                    <th style="padding: 12px 16px;">Waktu Presensi</th>
-                                    <th style="padding: 12px 16px;">Status</th>
-                                    <th style="padding: 12px 20px;">Keterangan</th>
+                                <tr class="bg-slate-50/80 text-slate-600 uppercase font-black tracking-wider text-[11px] border-b border-slate-200">
+                                    <th class="p-4">Pertemuan / Sesi</th>
+                                    <th class="p-4">Waktu Presensi</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($attendanceHistory ?? [] as $att)
                                     @php
-                                        $badgeBg = match($att->status) {
-                                            'hadir' => '#DCFCE7',
-                                            'izin' => '#E0F2FE',
-                                            'sakit' => '#FEF3C7',
-                                            default => '#FEE2E2',
-                                        };
-                                        $badgeColor = match($att->status) {
-                                            'hadir' => '#166534',
-                                            'izin' => '#0369A1',
-                                            'sakit' => '#92400E',
-                                            default => '#991B1B',
+                                        $badgeClass = match($att->status) {
+                                            'hadir' => 'bg-emerald-100 text-emerald-800',
+                                            'izin' => 'bg-sky-100 text-sky-800',
+                                            'sakit' => 'bg-amber-100 text-amber-800',
+                                            default => 'bg-rose-100 text-rose-800',
                                         };
                                     @endphp
-                                    <tr style="border-bottom: 1px solid #F1F5F9;">
-                                        <td style="padding: 14px 20px; font-weight: 800; color: #0F172A;">
+                                    <tr class="border-b border-slate-100 hover:bg-slate-50/60 transition-colors">
+                                        <td class="p-4 font-black text-slate-900">
                                             {{ $att->session?->title ?? '-' }}
                                         </td>
-                                        <td style="padding: 14px 16px; color: #475569; font-weight: 600;">
+                                        <td class="p-4 text-slate-600 font-bold">
                                             {{ $att->attended_at ? $att->attended_at->format('d/m/Y H:i') . ' WIB' : '-' }}
                                         </td>
-                                        <td style="padding: 14px 16px;">
-                                            <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; background: {{ $badgeBg }}; color: {{ $badgeColor }};">
+                                        <td class="p-4">
+                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-black uppercase {{ $badgeClass }}">
                                                 {{ strtoupper($att->status) }}
                                             </span>
                                         </td>
-                                        <td style="padding: 14px 20px; font-size: 12.5px; color: #64748B;">
+                                        <td class="p-4 text-slate-500 font-medium">
                                             {{ $att->notes ?: 'Tercatat di sistem' }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="padding: 36px 20px; text-align: center; color: #94A3B8;">
-                                            <div style="font-weight: 700; font-size: 14px; color: #475569;">Belum ada riwayat kehadiran pada mata kuliah ini.</div>
-                                            <div style="font-size: 12.5px; margin-top: 4px;">Masukkan kode presensi dari dosen pada formulir di atas.</div>
+                                        <td colspan="4" class="p-8 text-center text-slate-400">
+                                            <div class="font-extrabold text-sm text-slate-700 mb-1">Belum ada riwayat kehadiran pada mata kuliah ini.</div>
+                                            <div class="text-xs">Masukkan kode presensi dari dosen pada formulir di atas.</div>
                                         </td>
                                     </tr>
                                 @endforelse
