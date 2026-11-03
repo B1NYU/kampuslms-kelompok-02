@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DosenDashboardStats;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,14 +36,20 @@ class Material extends Model
     }
 
     /**
-     * Otomatis hapus berkas fisik saat record Material dihancurkan/dihapus dari DB
+     * Otomatis hapus berkas fisik saat record Material dihancurkan/dihapus dari DB.
+     * Juga membersihkan cache statistik dashboard dosen (jumlah materi) saat materi
+     * ditambah, diubah, atau dihapus.
      */
     protected static function booted(): void
     {
+        static::saved(fn (Material $material) => DosenDashboardStats::forgetForCourse($material->course_id));
+
         static::deleted(function (Material $material) {
             if ($material->file_path && Storage::exists($material->file_path)) {
                 Storage::delete($material->file_path);
             }
+
+            DosenDashboardStats::forgetForCourse($material->course_id);
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DosenDashboardStats;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
@@ -28,6 +29,16 @@ class Assignment extends Model
             'allow_late' => 'boolean',
             'max_score' => 'integer',
         ];
+    }
+
+    /**
+     * Statistik dashboard dosen (jumlah tugas) di-cache. Hook model menangkap semua
+     * jalur penulisan sekaligus: controller dosen, controller admin, dan API v1.
+     */
+    protected static function booted(): void
+    {
+        static::saved(fn (Assignment $assignment) => DosenDashboardStats::forgetForCourse($assignment->course_id));
+        static::deleted(fn (Assignment $assignment) => DosenDashboardStats::forgetForCourse($assignment->course_id));
     }
 
     /** Aturan ada di AssignmentPolicy@update. Dipertahankan untuk pemanggil lama. */
