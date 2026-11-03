@@ -29,11 +29,29 @@ class AdminStudentController extends Controller
             ->get(['id', 'name', 'nim_nip']);
 
         // Filter MK yang sedang aktif (?mk=KODE), default semua.
-        $selectedCode = $courses->firstWhere('code', $request->query('mk'))?->code ?? 'all';
+        $selectedCode = $request->query('mk', 'all');
+
+        $enrollmentsList = collect();
+        foreach ($courses as $course) {
+            if ($selectedCode !== 'all' && $course->code !== $selectedCode) {
+                continue;
+            }
+            foreach ($course->students as $student) {
+                $enrollmentsList->push(['course' => $course, 'student' => $student]);
+            }
+        }
+
+        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page');
+        $perPage = 10;
+        $items = $enrollmentsList->slice(($page - 1) * $perPage, $perPage)->values();
+        $allEnrollments = new \Illuminate\Pagination\LengthAwarePaginator($items, $enrollmentsList->count(), $perPage, $page, [
+            'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
+            'query' => $request->query(),
+        ]);
 
         return view()->file(
             resource_path('views/admin/admin.pendaftaran.blade.php'),
-            compact('courses', 'mahasiswaList', 'selectedCode')
+            compact('courses', 'mahasiswaList', 'selectedCode', 'allEnrollments')
         );
     }
 

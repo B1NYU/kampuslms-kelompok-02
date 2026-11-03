@@ -84,6 +84,13 @@
                     </div>
                 @endforelse
 
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($courses->hasPages())
+                    <div style="grid-column: 1 / -1; margin-top: 16px;">
+                        {{ $courses->links() }}
+                    </div>
+                @endif
+
             </section>
 
         </main>

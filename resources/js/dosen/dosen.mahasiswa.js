@@ -211,7 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (selectCurrentCourse) {
-        selectCurrentCourse.addEventListener('change', applyCourseFilter);
+        selectCurrentCourse.addEventListener('change', () => {
+            const selectedVal = selectCurrentCourse.value;
+            window.location.href = `?course=${encodeURIComponent(selectedVal)}`;
+        });
     }
 
     if (searchStudentInput) {
@@ -219,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     sortStudentRows();
-    applyCourseFilter();
 
     if (configEl) {
         if (configEl.dataset.toastSuccess) {

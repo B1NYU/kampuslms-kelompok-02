@@ -27,12 +27,13 @@ class RekapNilaiController extends Controller
                 'assignments.submissions' => fn ($q) => $q->where('user_id', $student->id),
                 'assignments.submissions.grade',
             ])
-            ->get();
+            ->paginate(4)
+            ->withQueryString();
 
         $totalGraded = 0;
         $totalPercent = 0.0;
 
-        $rekap = $courses->map(function ($course) use ($student, &$totalGraded, &$totalPercent) {
+        $rekap = $courses->through(function ($course) use ($student, &$totalGraded, &$totalPercent) {
             $items = [];
             $graded = 0;
             $sumPercent = 0.0;

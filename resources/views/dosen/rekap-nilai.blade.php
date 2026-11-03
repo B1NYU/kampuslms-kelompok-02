@@ -122,7 +122,7 @@
                                         <th class="col-avg" style="text-align:center;">Rata-rata</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="rekapDosenTbody">
                                     @foreach ($rows as $row)
                                         <tr>
                                             <td class="col-student">
@@ -163,6 +163,14 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        {{-- Navigasi Pagination Laravel --}}
+                        @if ($rows->hasPages())
+                            <div style="padding: 12px 16px; border-top: 1px solid #F1F5F9; background: #FAFAFA; border-radius: 0 0 16px 16px;">
+                                {{ $rows->links() }}
+                            </div>
+                        @endif
+
                         <p class="rekap-legend">
                             Angka = nilai &bull; <b>Menunggu</b> = sudah dikumpulkan, belum dinilai &bull; &mdash; = belum mengumpulkan &bull;
                             <span class="tag-late">T</span> = terlambat &bull; Rata-rata dihitung dari persentase (nilai &divide; nilai maksimal tugas) pada tugas yang sudah dinilai.

@@ -66,6 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (statusSelect) statusSelect.addEventListener('change', applyFilters);
     if (gradeSelect) gradeSelect.addEventListener('change', applyFilters);
 
+    applyFilters();
+
     // Modal Detail Lembar Nilai
     const modal = document.getElementById('modalGradeDetail');
     const btnCloseModal = document.getElementById('btnCloseModal');

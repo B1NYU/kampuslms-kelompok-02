@@ -336,6 +336,13 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Navigasi Pagination Laravel --}}
+                    @if ($allSubmissions->hasPages())
+                        <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between rounded-b-2xl">
+                            {{ $allSubmissions->links() }}
+                        </div>
+                    @endif
                 </div>
             </section>
 

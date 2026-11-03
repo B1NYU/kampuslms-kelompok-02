@@ -19,7 +19,7 @@ class StudentController extends Controller
     {
         $courses = $request->user()
             ->taughtCourses()
-            ->with('students')
+            ->withCount('students')
             ->orderBy('code')
             ->get();
 
@@ -32,7 +32,24 @@ class StudentController extends Controller
         $selectedCode = $courses->firstWhere('code', $request->query('course'))?->code
             ?? $courses->first()?->code;
 
-        return view('dosen.mahasiswa', compact('courses', 'registeredStudents', 'selectedCode'));
+        $currentCourse = $courses->firstWhere('code', $selectedCode);
+        $search = trim((string) $request->query('q', ''));
+
+        $students = $currentCourse
+            ? $currentCourse->students()
+                ->when($search !== '', function ($q) use ($search) {
+                    $like = '%' . $search . '%';
+                    $q->where(function ($sq) use ($like) {
+                        $sq->where('users.name', 'like', $like)
+                           ->orWhere('users.nim_nip', 'like', $like);
+                    });
+                })
+                ->orderBy('users.name')
+                ->paginate(10)
+                ->withQueryString()
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+
+        return view('dosen.mahasiswa', compact('courses', 'registeredStudents', 'selectedCode', 'students', 'search'));
     }
 
     /**

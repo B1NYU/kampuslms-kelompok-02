@@ -392,7 +392,7 @@
                                     <th style="padding: 14px 20px; text-align: right;">Ubah Status Manual</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="attendedTbody">
                                 @forelse ($attendedList as $idx => $row)
                                     <tr style="border-bottom: 1px solid #F1F5F9;">
                                         <td style="padding: 14px 20px; font-weight: 700; color: #94A3B8;">{{ $idx + 1 }}</td>
@@ -437,6 +437,12 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Paginator Client-side --}}
+                    <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <span id="attendedPaginatorInfo" style="font-size: 12px; font-weight: 600; color: #64748B;"></span>
+                        <div id="attendedPaginator" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"></div>
+                    </div>
                 </div>
 
                 <!-- TAB 2: MAHASISWA BELUM HADIR -->
@@ -452,7 +458,7 @@
                                     <th style="padding: 14px 20px; text-align: right;">Presensi Cepat Manual oleh Dosen</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="unattendedTbody">
                                 @forelse ($unattendedList as $idx => $row)
                                     <tr style="border-bottom: 1px solid #F1F5F9;">
                                         <td style="padding: 14px 20px; font-weight: 700; color: #94A3B8;">{{ $idx + 1 }}</td>
@@ -521,6 +527,12 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Paginator Client-side --}}
+                    <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <span id="unattendedPaginatorInfo" style="font-size: 12px; font-weight: 600; color: #64748B;"></span>
+                        <div id="unattendedPaginator" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -553,13 +565,73 @@
                 btnBelum.classList.remove('active');
                 panelHadir.style.display = 'block';
                 panelBelum.style.display = 'none';
+                if (window.renderAttended) window.renderAttended();
             } else {
                 btnBelum.classList.add('active');
                 btnHadir.classList.remove('active');
                 panelBelum.style.display = 'block';
                 panelHadir.style.display = 'none';
+                if (window.renderUnattended) window.renderUnattended();
             }
         }
+
+        // ── Client-side Pagination — Presensi Show (Dosen) ─────────────────
+        (function() {
+            function setupPager(tbodyId, paginatorId, infoId, perPage = 10) {
+                let currentPage = 1;
+                function getRows() {
+                    return Array.from(document.querySelectorAll('#' + tbodyId + ' tr'))
+                        .filter(r => !r.querySelector('td[colspan]'));
+                }
+                function render() {
+                    const rows = getRows();
+                    const total = rows.length;
+                    const totalPages = Math.max(1, Math.ceil(total / perPage));
+                    if (currentPage > totalPages) currentPage = 1;
+                    const start = (currentPage - 1) * perPage;
+                    const end = Math.min(start + perPage, total);
+                    rows.forEach((r, i) => { r.style.display = (i >= start && i < end) ? '' : 'none'; });
+                    const infoEl = document.getElementById(infoId);
+                    if (infoEl) infoEl.textContent = total > 0 ? `Menampilkan ${start + 1}–${end} dari ${total} mahasiswa` : '';
+                    renderControls(totalPages);
+                }
+                function goTo(p) {
+                    const rows = getRows();
+                    const totalPages = Math.max(1, Math.ceil(rows.length / perPage));
+                    currentPage = Math.max(1, Math.min(p, totalPages));
+                    render();
+                }
+                function renderControls(totalPages) {
+                    const el = document.getElementById(paginatorId);
+                    if (!el) return;
+                    if (totalPages <= 1) { el.innerHTML = ''; return; }
+                    const btnStyle = (active, disabled) =>
+                        `style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:13px;font-weight:700;cursor:${disabled ? 'default' : 'pointer'};border:1px solid ${active ? 'transparent' : (disabled ? '#E2E8F0' : '#CBD5E1')};background:${active ? '#039FFA' : (disabled ? '#F8FAFC' : '#FFF')};color:${active ? '#FFF' : (disabled ? '#CBD5E1' : '#334155')};transition:all .15s;"`;
+                    let html = '';
+                    const prevDis = currentPage === 1;
+                    html += `<button type="button" ${btnStyle(false, prevDis)} data-p="${currentPage - 1}" ${prevDis ? 'disabled' : ''}>&#8249;</button>`;
+                    const delta = 2;
+                    for (let i = Math.max(1, currentPage - delta); i <= Math.min(totalPages, currentPage + delta); i++) {
+                        html += `<button type="button" ${btnStyle(i === currentPage, false)} data-p="${i}">${i}</button>`;
+                    }
+                    const nextDis = currentPage === totalPages;
+                    html += `<button type="button" ${btnStyle(false, nextDis)} data-p="${currentPage + 1}" ${nextDis ? 'disabled' : ''}>&#8250;</button>`;
+                    el.innerHTML = html;
+                    el.querySelectorAll('button[data-p]').forEach(btn => {
+                        if (!btn.disabled) btn.addEventListener('click', () => goTo(Number(btn.dataset.p)));
+                    });
+                }
+                return render;
+            }
+
+            window.renderAttended = setupPager('attendedTbody', 'attendedPaginator', 'attendedPaginatorInfo', 10);
+            window.renderUnattended = setupPager('unattendedTbody', 'unattendedPaginator', 'unattendedPaginatorInfo', 10);
+
+            document.addEventListener('DOMContentLoaded', () => {
+                window.renderAttended();
+            });
+        })();
+        // ──────────────────────────────────────────────────────────────────
     </script>
 
 </body>

@@ -19,11 +19,14 @@ class AssignmentController extends Controller
         if ($user->role === 'mahasiswa') {
             // Mahasiswa: hanya melihat pengumpulan milik sendiri
             $mySubmission = $assignment->submissions()->with('grade')->where('user_id', $user->id)->first();
-            $submissions = collect();
+            $submissions = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
         } else {
             // Dosen & Admin: melihat semua berkas pengumpulan mahasiswa
             $mySubmission = null;
-            $submissions = $assignment->submissions()->with(['student', 'grade'])->get();
+            $submissions = $assignment->submissions()
+                ->with(['student', 'grade'])
+                ->paginate(10)
+                ->withQueryString();
         }
 
         return view('assignments.show', compact('assignment', 'mySubmission', 'submissions'));
