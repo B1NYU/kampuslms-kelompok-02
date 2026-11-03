@@ -33,25 +33,14 @@
         <main class="dosen-content" id="overview">
 
             @php
-                $dosenUser = auth()->user();
-                $dashCourses = collect();
-                if ($dosenUser && $dosenUser->role === 'dosen') {
-                    $dashCourses = $dosenUser->taughtCourses()->where('status', 'active')->with(['students', 'materials', 'assignments.submissions.grade'])->get();
-                    if ($dashCourses->isEmpty()) {
-                        $dashCourses = $dosenUser->taughtCourses()->with(['students', 'materials', 'assignments.submissions.grade'])->get();
-                    }
-                }
-                if ($dashCourses->isEmpty()) {
-                    $dashCourses = \App\Models\Course::where('status', 'active')->with(['students', 'materials', 'assignments.submissions.grade'])->get();
-                }
-                if ($dashCourses->isEmpty()) {
-                    $dashCourses = \App\Models\Course::with(['students', 'materials', 'assignments.submissions.grade'])->get();
-                }
-                $totalStudents = $dashCourses->flatMap->students->unique('id')->count();
-                $totalMaterials = $dashCourses->flatMap->materials->count();
-                $totalAssignments = $dashCourses->flatMap->assignments->count();
-                $allSubs = $dashCourses->flatMap->assignments->flatMap->submissions;
-                $pendingGrading = $allSubs->whereNull('grade')->count();
+                // Perhitungan dipindah ke App\Support\DosenDashboardStats (COUNT di database + cache 10 menit,
+                // kecuali "perlu dinilai" yang sengaja selalu segar). Lihat docs/performa.md bagian Cache.
+                $stats = \App\Support\DosenDashboardStats::for(auth()->user());
+                $dashCourses = $stats['courses'];
+                $totalStudents = $stats['totalStudents'];
+                $totalMaterials = $stats['totalMaterials'];
+                $totalAssignments = $stats['totalAssignments'];
+                $pendingGrading = $stats['pendingGrading'];
             @endphp
 
             <!-- Topbar Header -->

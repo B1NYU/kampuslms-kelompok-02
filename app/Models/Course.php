@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DosenDashboardStats;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
@@ -24,6 +25,23 @@ class Course extends Model
         return [
             'sks' => 'integer',
         ];
+    }
+
+    /**
+     * Daftar mata kuliah dan statistik dashboard dosen bergantung pada dosen pengampu
+     * dan status mata kuliah. Kalau dosen pengampu berganti, cache dosen lama ikut dibersihkan.
+     */
+    protected static function booted(): void
+    {
+        static::saved(function (Course $course) {
+            DosenDashboardStats::forgetForLecturer($course->lecturer_id);
+
+            if ($course->wasChanged('lecturer_id')) {
+                DosenDashboardStats::forgetForLecturer($course->getOriginal('lecturer_id'));
+            }
+        });
+
+        static::deleted(fn (Course $course) => DosenDashboardStats::forgetForLecturer($course->lecturer_id));
     }
 
     /** Apakah $user dosen pengampu mata kuliah ini? (murni fakta relasi, bukan aturan akses) */

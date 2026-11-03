@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dosen;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\User;
+use App\Support\DosenDashboardStats;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -89,6 +90,9 @@ class StudentController extends Controller
 
         $course->students()->attach($student->id, ['enrolled_at' => now()]);
 
+        // attach() tidak memicu event model, jadi cache statistik dashboard dibersihkan manual.
+        DosenDashboardStats::forgetForLecturer($course->lecturer_id);
+
         return redirect()
             ->route('dosen.mahasiswa', ['course' => $course->code])
             ->with('success', "Mahasiswa {$student->name} ({$student->nim_nip}) berhasil didaftarkan ke {$course->code}.");
@@ -103,6 +107,9 @@ class StudentController extends Controller
         Gate::authorize('manageEnrollment', $course);
 
         $course->students()->detach($student->id);
+
+        // detach() juga tidak memicu event model.
+        DosenDashboardStats::forgetForLecturer($course->lecturer_id);
 
         return redirect()
             ->route('dosen.mahasiswa', ['course' => $course->code])
