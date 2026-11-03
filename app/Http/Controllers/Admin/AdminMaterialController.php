@@ -12,14 +12,29 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminMaterialController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $coursesList = Course::with('lecturer')->orderBy('code')->get();
-        $materials = Material::with(['course', 'uploader'])->latest()->get();
+        $courseId = $request->query('course_id');
+        $search = trim((string) $request->query('q', ''));
+
+        $materials = Material::with(['course', 'uploader'])
+            ->when($courseId, fn ($q) => $q->where('course_id', $courseId))
+            ->when($search !== '', fn ($q) => $q->where('title', 'like', '%' . $search . '%'))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $totalDoc = Material::where('type', 'file')->count();
+        $totalLink = Material::where('type', 'link')->count();
 
         return view()->file(resource_path('views/admin/admin.materi.blade.php'), [
             'coursesList' => $coursesList,
-            'materials' => $materials
+            'materials' => $materials,
+            'selectedCourseId' => $courseId,
+            'search' => $search,
+            'totalDoc' => $totalDoc,
+            'totalLink' => $totalLink,
         ]);
     }
 

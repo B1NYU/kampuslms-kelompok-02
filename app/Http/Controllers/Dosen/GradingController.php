@@ -27,16 +27,21 @@ class GradingController extends Controller
             ->orderBy('code')
             ->get();
 
-        $allSubmissions = Submission::query()
-            ->whereHas('assignment', fn ($q) => $q->whereIn('course_id', $courses->pluck('id')))
-            ->with(['assignment.course', 'student', 'grade'])
-            ->latest('submitted_at')
-            ->get();
+        $courseIds = $courses->pluck('id');
 
-        $totalSubmissions = $allSubmissions->count();
-        $totalGraded      = $allSubmissions->filter(fn ($s) => $s->grade !== null)->count();
+        $submissionsQuery = Submission::query()
+            ->whereHas('assignment', fn ($q) => $q->whereIn('course_id', $courseIds));
+
+        $totalSubmissions = (clone $submissionsQuery)->count();
+        $totalGraded      = (clone $submissionsQuery)->whereHas('grade')->count();
         $totalPending     = $totalSubmissions - $totalGraded;
         $persenGraded     = $totalSubmissions > 0 ? (int) round(($totalGraded / $totalSubmissions) * 100) : 0;
+
+        $allSubmissions = $submissionsQuery
+            ->with(['assignment.course', 'student', 'grade'])
+            ->latest('submitted_at')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('dosen.penilaian', compact(
             'courses',

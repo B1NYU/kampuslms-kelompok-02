@@ -18,7 +18,8 @@ class AdminGradeController extends Controller
     {
         $dbSubmissions = Submission::with(['student', 'assignment.course.lecturer', 'grade.grader'])
             ->latest('submitted_at')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         // Helper predikat huruf mutu
         $getGradeLetter = function ($score) {
@@ -44,12 +45,10 @@ class AdminGradeController extends Controller
             return 'grade-pill-pending';
         };
 
-        $gradeItems = collect();
-
-        foreach ($dbSubmissions as $sub) {
+        $gradeItems = $dbSubmissions->through(function ($sub) use ($getGradeLetter, $getGradeClass) {
             $score = $sub->grade ? (float) $sub->grade->score : null;
             $letter = $getGradeLetter($score);
-            $gradeItems->push([
+            return [
                 'id' => $sub->id,
                 'student_name' => $sub->student?->name ?? 'Mahasiswa',
                 'student_nim' => $sub->student?->nim_nip ?? '10221000',
@@ -67,23 +66,22 @@ class AdminGradeController extends Controller
                 'graded_at' => $sub->grade?->graded_at ? Carbon::parse($sub->grade->graded_at)->format('d M Y, H:i') : '-',
                 'file_name' => $sub->original_name ?? 'tugas_mahasiswa.pdf',
                 'file_size' => $sub->file_size ? number_format($sub->file_size / 1024, 1) . ' KB' : '1.4 MB',
-            ]);
-        }
+            ];
+        });
 
         // Kalkulasi KPI statistik dari database
-        $totalCount = $gradeItems->count();
-        $gradedCount = $gradeItems->where('status', 'graded')->count();
-        $pendingCount = $gradeItems->where('status', 'pending')->count();
-        $gradedItems = $gradeItems->where('status', 'graded');
-        $avgScore = $gradedItems->isNotEmpty() ? round($gradedItems->avg(fn($i) => (float)$i['score']), 1) : 0;
+        $totalCount = Submission::count();
+        $gradedCount = Submission::has('grade')->count();
+        $pendingCount = $totalCount - $gradedCount;
+        $avgScore = round((float) \App\Models\Grade::avg('score'), 1);
         $pctGraded = $totalCount > 0 ? round(($gradedCount / $totalCount) * 100) : 0;
 
         // Distribusi predikat
-        $countA = $gradeItems->filter(fn($i) => str_starts_with($i['letter'], 'A'))->count();
-        $countB = $gradeItems->filter(fn($i) => str_starts_with($i['letter'], 'B'))->count();
+        $countA = \App\Models\Grade::where('score', '>=', 80)->count();
+        $countB = \App\Models\Grade::where('score', '>=', 65)->where('score', '<', 80)->count();
 
         // Opsi unik mata kuliah untuk filter
-        $uniqueCourses = $gradeItems->pluck('course_name', 'course_code')->unique();
+        $uniqueCourses = Course::orderBy('code')->pluck('name', 'code');
 
         return view()->file(
             resource_path('views/admin/admin.nilai.blade.php'),

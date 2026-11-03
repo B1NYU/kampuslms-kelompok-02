@@ -295,31 +295,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== Course Filter =====
     const selectCurrentCourse = document.getElementById('selectCurrentCourse');
     const materialCourse = document.getElementById('materialCourse');
-    const materialsGrid = document.getElementById('materialsGrid');
-    const materialListCount = document.getElementById('materialListCount');
 
     function applyCourseFilter() {
-        if (!selectCurrentCourse || !materialsGrid) return;
-
+        if (!selectCurrentCourse) return;
         const selectedVal = selectCurrentCourse.value;
-        let visibleCount = 0;
-
-        materialsGrid.querySelectorAll('.material-card').forEach(card => {
-            const show = !selectedVal || card.getAttribute('data-course-id') === selectedVal;
-            card.style.display = show ? '' : 'none';
-            if (show) visibleCount++;
-        });
-
-        if (materialListCount) materialListCount.textContent = visibleCount;
-
-        // Dropdown di modal ikut mata kuliah yang sedang dilihat
-        if (configEl && configEl.dataset.hasErrors !== '1') {
-            if (materialCourse && selectedVal) materialCourse.value = selectedVal;
-        }
+        window.location.href = `?course_id=${encodeURIComponent(selectedVal)}`;
     }
 
     if (selectCurrentCourse) {
         selectCurrentCourse.addEventListener('change', applyCourseFilter);
-        applyCourseFilter();
     }
 });

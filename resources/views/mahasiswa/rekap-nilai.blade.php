@@ -134,6 +134,13 @@
                         </div>
                     @endforelse
 
+                    {{-- Navigasi Pagination Laravel --}}
+                    @if ($rekap->hasPages())
+                        <div style="margin-top: 16px;">
+                            {{ $rekap->links() }}
+                        </div>
+                    @endif
+
                     <p style="font-size:12px; font-weight:600; color:#64748B; margin-top:4px;">
                         Rata-rata dihitung dari persentase (nilai &divide; nilai maksimal tugas) pada tugas yang sudah dinilai. Klik nilai untuk melihat umpan balik dosen.
                     </p>

@@ -65,13 +65,6 @@
                 </div>
             </header>
 
-            @php
-                $materials = $materials ?? \App\Models\Material::with(['course', 'uploader'])->latest()->get();
-                $coursesList = $coursesList ?? \App\Models\Course::with('lecturer')->orderBy('code')->get();
-                $totalDoc = $materials->where('type', 'file')->count();
-                $totalLink = $materials->where('type', 'link')->count();
-            @endphp
-
             @if(session('success'))
                 <div class="text-xs sm:text-sm font-bold px-4 py-3 rounded-xl shadow-xs bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center gap-2">
                     <span>✅</span>
@@ -99,7 +92,7 @@
                 <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-100 shadow-sm flex items-center justify-between">
                     <div>
                         <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">Total Materi</span>
-                        <span class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 block" id="statTotalMateri">{{ $materials->count() }}</span>
+                        <span class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 block" id="statTotalMateri">{{ $materials->total() }}</span>
                         <span class="text-[11px] font-semibold text-slate-400">Semua format</span>
                     </div>
                     <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 text-[#039FFA] border border-sky-100 flex items-center justify-center shrink-0">
@@ -321,6 +314,13 @@
                         </div>
                     </div>
                 @endforeach
+
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($materials->hasPages())
+                    <div class="col-span-full p-4 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        {{ $materials->links() }}
+                    </div>
+                @endif
 
                 <!-- Empty State -->
                 <div class="col-span-full bg-white rounded-2xl border border-slate-200/80 p-12 text-center" id="materiEmptyState" style="display: none;">

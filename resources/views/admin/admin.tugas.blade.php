@@ -358,6 +358,13 @@
                     </div>
                 @endforelse
 
+                {{-- Navigasi Pagination Laravel --}}
+                @if ($assignments->hasPages())
+                    <div class="col-span-full p-4 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        {{ $assignments->links() }}
+                    </div>
+                @endif
+
                 <!-- Filter Empty State (Hidden by default, shown by filter search) -->
                 <div class="col-span-full bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-12 text-center shadow-xs flex flex-col items-center justify-center gap-3" id="tugasFilterEmptyState" style="display: none;">
                     <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 text-2xl flex items-center justify-center">🔍</div>

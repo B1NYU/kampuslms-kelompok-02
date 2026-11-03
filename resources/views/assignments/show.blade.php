@@ -356,7 +356,7 @@
                                         <th style="text-align: right;">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="submissionShowTbody">
                                     @forelse($submissions as $s)
                                         @php
                                             $name = $s->student->name;
@@ -425,6 +425,13 @@
                                     @endforelse
                                 </tbody>
                             </table>
+
+                            {{-- Navigasi Pagination Laravel --}}
+                            @if ($submissions->hasPages())
+                                <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA;">
+                                    {{ $submissions->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </section>
@@ -434,7 +441,6 @@
 
         <x-footer />
     </div>
-
 
 </body>
 

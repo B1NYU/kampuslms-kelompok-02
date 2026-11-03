@@ -442,7 +442,7 @@
                                 <th style="padding: 14px 20px; text-align: right;">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="presensiDosenTbody">
                             @forelse ($sessions as $session)
                                 @php
                                     $isOpen = $session->isOpen();
@@ -552,6 +552,13 @@
                             @endforelse
                         </tbody>
                     </table>
+
+                    {{-- Navigasi Pagination Laravel --}}
+                    @if ($sessions->hasPages())
+                        <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA; border-radius: 0 0 16px 16px;">
+                            {{ $sessions->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
 

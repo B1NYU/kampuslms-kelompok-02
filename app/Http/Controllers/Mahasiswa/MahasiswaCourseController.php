@@ -29,7 +29,8 @@ class MahasiswaCourseController extends Controller
                 'materials',
             ])
             ->orderBy('code')
-            ->get();
+            ->paginate(9)
+            ->withQueryString();
 
         $terkumpul = Submission::query()
             ->join('assignments', 'assignments.id', '=', 'submissions.assignment_id')
