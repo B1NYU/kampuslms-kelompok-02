@@ -195,7 +195,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/materi', [AdminMaterialController::class, 'store'])->name('materi.store');
         Route::put('/materi/{material}', [AdminMaterialController::class, 'update'])->name('materi.update');
         Route::delete('/materi/{material}', [AdminMaterialController::class, 'destroy'])->name('materi.destroy');
-        Route::get('/materi/{material}/download', [AdminMaterialController::class, 'download'])->name('materi.download');
+        Route::get('/materi/{material}/download', [MaterialController::class, 'download'])->name('materi.download');
 
         Route::get('/tugas', [AdminAssignmentController::class, 'index'])->name('tugas');
         Route::post('/tugas', [AdminAssignmentController::class, 'store'])->name('tugas.store');

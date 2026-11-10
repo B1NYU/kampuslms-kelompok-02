@@ -61,7 +61,15 @@ RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/fra
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+# 9. Batas upload PHP (bawaan image hanya 2 MB; aplikasi mengizinkan s.d. 20 MB)
+RUN { echo "upload_max_filesize=25M"; echo "post_max_size=30M"; } > /usr/local/etc/php/conf.d/uploads.ini
+
 EXPOSE 8080
 
-# 9. Startup: PORT dinamis Railway, bersihkan cache, migrasi, seed, jalankan Apache
-CMD ["sh", "-c", "rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* && export PORT=\"${PORT:-8080}\" && sed -i \"s/Listen .*/Listen $PORT/\" /etc/apache2/ports.conf && sed -i \"s/<VirtualHost \\*:.*>/<VirtualHost \\*:$PORT>/\" /etc/apache2/sites-available/000-default.conf && php artisan config:clear && php artisan route:clear && php artisan view:clear && (php artisan migrate --force || true) && (php artisan db:seed --force || true) && exec apache2-foreground"]
+# 10. Startup:
+#   - PORT dinamis Railway
+#   - FRESH_SEED=true  -> migrate:fresh --seed (HAPUS semua data, jalankan sekali lalu hapus variabelnya)
+#   - selain itu       -> migrate + seed biasa (seed gagal diam-diam bila data sudah ada)
+#   - chown di akhir   -> migrasi/seed berjalan sebagai root; tanpa chown, file/folder yang
+#                         dibuatnya tidak bisa ditulis Apache (www-data) dan upload jadi 500
+CMD ["sh", "-c", "rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* && export PORT=\"${PORT:-8080}\" && sed -i \"s/Listen .*/Listen $PORT/\" /etc/apache2/ports.conf && sed -i \"s/<VirtualHost \\*:.*>/<VirtualHost \\*:$PORT>/\" /etc/apache2/sites-available/000-default.conf && php artisan config:clear && php artisan route:clear && php artisan view:clear && if [ \"$FRESH_SEED\" = \"true\" ]; then php artisan migrate:fresh --seed --force; else (php artisan migrate --force || true); (php artisan db:seed --force || true); fi; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && exec apache2-foreground"]
