@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libzip-dev \
+    supervisor \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -37,6 +38,10 @@ RUN a2enmod rewrite \
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# 3b. Konfigurasi Supervisor (Apache + queue worker)
+COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
+RUN sed -i 's/\r$//' /etc/supervisor/supervisord.conf
 
 # 4. Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -70,6 +75,7 @@ EXPOSE 8080
 #   - PORT dinamis Railway
 #   - FRESH_SEED=true  -> migrate:fresh --seed (HAPUS semua data, jalankan sekali lalu hapus variabelnya)
 #   - selain itu       -> migrate + seed biasa (seed gagal diam-diam bila data sudah ada)
+#   - supervisord      -> proses utama container; menjalankan Apache + queue worker
 #   - chown di akhir   -> migrasi/seed berjalan sebagai root; tanpa chown, file/folder yang
 #                         dibuatnya tidak bisa ditulis Apache (www-data) dan upload jadi 500
-CMD ["sh", "-c", "rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* && export PORT=\"${PORT:-8080}\" && sed -i \"s/Listen .*/Listen $PORT/\" /etc/apache2/ports.conf && sed -i \"s/<VirtualHost \\*:.*>/<VirtualHost \\*:$PORT>/\" /etc/apache2/sites-available/000-default.conf && php artisan config:clear && php artisan route:clear && php artisan view:clear && if [ \"$FRESH_SEED\" = \"true\" ]; then php artisan migrate:fresh --seed --force; else (php artisan migrate --force || true); (php artisan db:seed --force || true); fi; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && exec apache2-foreground"]
+CMD ["sh", "-c", "rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* && export PORT=\"${PORT:-8080}\" && sed -i \"s/Listen .*/Listen $PORT/\" /etc/apache2/ports.conf && sed -i \"s/<VirtualHost \\*:.*>/<VirtualHost \\*:$PORT>/\" /etc/apache2/sites-available/000-default.conf && php artisan config:clear && php artisan route:clear && php artisan view:clear && if [ \"$FRESH_SEED\" = \"true\" ]; then php artisan migrate:fresh --seed --force; else (php artisan migrate --force || true); (php artisan db:seed --force || true); fi; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && exec /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf"]
