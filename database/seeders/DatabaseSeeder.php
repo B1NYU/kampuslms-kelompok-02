@@ -143,16 +143,19 @@ class DatabaseSeeder extends Seeder
             $pastDeadline = Assignment::factory()->pastDeadline()->create([
                 'course_id' => $course->id,
                 'created_by' => $lecturerId,
+                'session' => 1,
             ]);
 
             $active = Assignment::factory()->active()->create([
                 'course_id' => $course->id,
                 'created_by' => $lecturerId,
+                'session' => 2,
             ]);
 
             Assignment::factory()->draft()->create([
                 'course_id' => $course->id,
                 'created_by' => $lecturerId,
+                'session' => 3,
             ]);
 
             $publishedAssignments->push($pastDeadline);

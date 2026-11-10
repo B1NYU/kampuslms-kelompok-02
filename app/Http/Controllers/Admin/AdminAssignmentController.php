@@ -103,6 +103,7 @@ class AdminAssignmentController extends Controller
         return $request->validate([
             'course_id'    => ['required', 'exists:courses,id'],
             'title'        => ['required', 'string', 'max:255'],
+            'session'      => ['required', 'integer', 'between:1,16'], // <-- Ditambahkan di sini
             'instructions' => ['required', 'string'],
             'due_at'       => ['required', 'date'],
             'max_score'    => ['required', 'integer', 'min:1', 'max:100'],
@@ -111,6 +112,7 @@ class AdminAssignmentController extends Controller
         ], [], [
             'course_id'    => 'mata kuliah',
             'title'        => 'judul tugas',
+            'session'      => 'sesi perkuliahan', // <-- Ditambahkan di sini untuk kustom nama atribut error
             'instructions' => 'instruksi / petunjuk pengerjaan',
             'due_at'       => 'batas waktu',
             'max_score'    => 'nilai maksimal',

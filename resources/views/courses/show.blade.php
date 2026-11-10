@@ -231,7 +231,7 @@
                             <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Rencana Pertemuan</h2>
                         </div>
                         @php
-                            $courseAssignments = $course->assignments->sortBy('due_at')->values();
+                            $assignmentsByWeek = $course->assignments->sortBy('due_at')->groupBy('session');
                             $pertemuanList = [];
 
                             // Format ukuran berkas tanpa ekstensi intl.
@@ -264,22 +264,22 @@
 
                                 $matFiles = $course->materials->where('session', $minggu)->map($fmtMateri)->values()->all();
 
-                                $assignIdx = $minggu - 1;
-                                $dbAssign = $courseAssignments->get($assignIdx);
+                                $weekAssignments = $assignmentsByWeek->get($minggu, collect());
                                 $tasks = [];
-                                $studentSub = null;
+                                $semuaSelesai = $weekAssignments->isNotEmpty();
 
-                                if ($dbAssign) {
+                                foreach ($weekAssignments as $dbAssign) {
                                     $studentSub = $student ? $dbAssign->submissions->firstWhere('user_id', $student->id) : null;
-                                    $btnAction = 'Kumpulkan Tugas &rarr;';
+                                    $lewat = $dbAssign->due_at && $dbAssign->due_at->isPast();
+
                                     if ($studentSub && $studentSub->grade) {
                                         $btnAction = 'Lihat Nilai (' . round((float) $studentSub->grade->score, 1) . ') &rarr;';
                                     } elseif ($studentSub) {
                                         $btnAction = 'Sudah Dikumpulkan &rarr;';
-                                    } elseif ($dbAssign->status === 'draft') {
-                                        $btnAction = 'Belum Dibuka';
-                                    } elseif ($dbAssign->due_at && $dbAssign->due_at->isPast()) {
+                                    } elseif ($lewat) {
                                         $btnAction = 'Lewat Batas Waktu';
+                                    } else {
+                                        $btnAction = 'Kumpulkan Tugas &rarr;';
                                     }
 
                                     $tasks[] = [
@@ -289,22 +289,18 @@
                                         'btn' => $btnAction,
                                         'url' => route('assignments.show', $dbAssign),
                                     ];
+
+                                    if (! $studentSub && ! $lewat) {
+                                        $semuaSelesai = false;
+                                    }
                                 }
 
                                 if ($isExam) {
                                     $status = 'exam';
                                     $label = $minggu == 8 ? 'Ujian UTS' : 'Ujian UAS';
-                                } elseif ($dbAssign) {
-                                    if ($studentSub || ($dbAssign->due_at && $dbAssign->due_at->isPast())) {
-                                        $status = 'done';
-                                        $label = 'Selesai';
-                                    } elseif ($dbAssign->status === 'draft') {
-                                        $status = 'locked';
-                                        $label = 'Mendatang';
-                                    } else {
-                                        $status = 'active';
-                                        $label = 'Berjalan';
-                                    }
+                                } elseif ($weekAssignments->isNotEmpty()) {
+                                    $status = $semuaSelesai ? 'done' : 'active';
+                                    $label = $semuaSelesai ? 'Selesai' : 'Berjalan';
                                 } elseif (!empty($matFiles)) {
                                     $status = 'done';
                                     $label = 'Selesai';
@@ -416,7 +412,7 @@
                                     </div>
                                     <div class="flex items-center justify-between py-2 border-b border-slate-100">
                                         <span class="text-slate-500 font-bold">Peserta Terdaftar</span>
-                                        <span class="px-2 py-0.5 rounded-md font-black bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs">{{ $courseDb ? $courseDb->students->count() : 0 }} Mahasiswa</span>
+                                        <span class="px-2 py-0.5 rounded-md font-black bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs">{{ $courseDb ? $courseDb->students_count : 0 }} Mahasiswa</span>
                                     </div>
                                     <div class="flex items-center justify-between py-2 border-b border-slate-100">
                                         <span class="text-slate-500 font-bold">Tugas Terjadwal</span>

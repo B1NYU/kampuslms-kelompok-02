@@ -120,6 +120,7 @@ class AssignmentController extends Controller
         ]);
 
         return $request->validate([
+            'session'      => ['required', 'integer', 'between:1,16'],
             'title'        => ['required', 'string', 'max:255'],
             'instructions' => ['required', 'string'],
             'due_at'       => ['required', 'date'],
@@ -127,6 +128,7 @@ class AssignmentController extends Controller
             'allow_late'   => ['boolean'],
             'status'       => ['required', Rule::in(['draft', 'published'])],
         ], [], [
+            'session'      => 'pertemuan',
             'title'        => 'judul tugas',
             'instructions' => 'instruksi',
             'due_at'       => 'batas waktu',
