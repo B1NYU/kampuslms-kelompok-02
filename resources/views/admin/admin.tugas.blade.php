@@ -231,7 +231,7 @@
                         // Penyesuaian informasi mode dosen: Pertemuan & Progress Pengumpulan
                         $weekNum = $t->session;
 
-                        $studentCount = $t->course ? $t->course->students()->count() : 0;
+                        $studentCount = $t->course?->students_count ?? 0; // dimuat lewat withCount di controller (tanpa query per kartu)
                         $pct = $studentCount > 0 ? min(100, round($t->submissions_count / $studentCount * 100)) : 0;
 
                         $creatorName = $t->creator?->name ?? 'Administrator';
