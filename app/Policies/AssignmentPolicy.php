@@ -72,7 +72,12 @@ class AssignmentPolicy
             return false;
         }
 
-        return $assignment->submissions()->exists()
+        // withCount('submissions') sudah dimuat di daftar tugas: pakai itu, jangan exists() per baris.
+        $punyaPengumpulan = $assignment->submissions_count !== null
+            ? $assignment->submissions_count > 0
+            : $assignment->submissions()->exists();
+
+        return $punyaPengumpulan
             ? Response::denyWithStatus(409, 'Tugas ini sudah memiliki pengumpulan dari mahasiswa, sehingga tidak dapat dihapus.')
             : true;
     }

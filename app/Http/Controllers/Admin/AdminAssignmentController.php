@@ -6,9 +6,11 @@ use App\Events\AssignmentPublished;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\Submission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -19,16 +21,30 @@ class AdminAssignmentController extends Controller
     {
         $coursesList = Course::with('lecturer')->orderBy('code')->get();
 
-        $assignments = Assignment::with(['course.lecturer', 'creator'])
+        // withCount('students') pada course: jumlah mahasiswa per kartu ikut terambil di query yang sama.
+        // Sebelumnya view memanggil $t->course->students()->count() per kartu (1 query per kartu).
+        $assignments = Assignment::with([
+                'course' => fn ($q) => $q->withCount('students'),
+                'course.lecturer',
+                'creator',
+            ])
             ->withCount('submissions')
             ->orderBy('due_at')
             ->paginate(10)
             ->withQueryString();
 
-        $totalAssignments = Assignment::count();
-        $totalPublished   = Assignment::where('status', 'published')->count();
-        $totalDraft       = Assignment::where('status', 'draft')->count();
-        $totalSubmissions = \App\Models\Submission::count();
+        // Empat angka kartu ringkasan dalam SATU query (sebelumnya 4 COUNT terpisah).
+        $stat = DB::query()
+            ->selectSub(Assignment::query()->selectRaw('count(*)')->toBase(), 'total')
+            ->selectSub(Assignment::where('status', 'published')->selectRaw('count(*)')->toBase(), 'published')
+            ->selectSub(Assignment::where('status', 'draft')->selectRaw('count(*)')->toBase(), 'draft')
+            ->selectSub(Submission::query()->selectRaw('count(*)')->toBase(), 'submissions')
+            ->first();
+
+        $totalAssignments = (int) $stat->total;
+        $totalPublished   = (int) $stat->published;
+        $totalDraft       = (int) $stat->draft;
+        $totalSubmissions = (int) $stat->submissions;
 
         return view()->file(resource_path('views/admin/admin.tugas.blade.php'), [
             'coursesList'      => $coursesList,

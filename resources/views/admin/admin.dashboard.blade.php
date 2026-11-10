@@ -44,21 +44,35 @@
             </header>
 
             @php
-                $dbMahasiswaCount = \App\Models\User::where('role', 'mahasiswa')->count();
-                $dbDosenCount     = \App\Models\User::where('role', 'dosen')->count();
-                $dbAdminCount     = \App\Models\User::where('role', 'admin')->count();
-                $dbCourseCount    = \App\Models\Course::count();
-                $dbEnrollCount    = \Illuminate\Support\Facades\DB::table('course_user')->count();
-                $dbMaterialCount  = \App\Models\Material::count();
-                $dbAssignCount    = \App\Models\Assignment::count();
-                $dbSubmissCount   = \App\Models\Submission::count();
-                $dbGradeCount     = \App\Models\Grade::count();
+                // Optimasi query: semua angka kartu diambil dengan SATU query (subselect), dan tiap daftar
+                // aktivitas memakai JOIN (1 query per daftar). Sebelumnya 9 COUNT + 5 eager load (±19 query).
+                $hitung = fn ($q) => $q->selectRaw('count(*)')->toBase();
+
+                $dbCount = \Illuminate\Support\Facades\DB::query()
+                    ->selectSub($hitung(\App\Models\User::where('role', 'mahasiswa')), 'mahasiswa')
+                    ->selectSub($hitung(\App\Models\User::where('role', 'dosen')), 'dosen')
+                    ->selectSub($hitung(\App\Models\Course::query()), 'courses')
+                    ->selectSub(\Illuminate\Support\Facades\DB::table('course_user')->selectRaw('count(*)'), 'enroll')
+                    ->selectSub($hitung(\App\Models\Material::query()), 'materials')
+                    ->selectSub($hitung(\App\Models\Assignment::query()), 'assignments')
+                    ->selectSub($hitung(\App\Models\Submission::query()), 'submissions')
+                    ->selectSub($hitung(\App\Models\Grade::query()), 'grades')
+                    ->first();
+
+                $dbMahasiswaCount = (int) $dbCount->mahasiswa;
+                $dbDosenCount     = (int) $dbCount->dosen;
+                $dbCourseCount    = (int) $dbCount->courses;
+                $dbEnrollCount    = (int) $dbCount->enroll;
+                $dbMaterialCount  = (int) $dbCount->materials;
+                $dbAssignCount    = (int) $dbCount->assignments;
+                $dbSubmissCount   = (int) $dbCount->submissions;
+                $dbGradeCount     = (int) $dbCount->grades;
                 $gradePercent     = $dbSubmissCount > 0 ? round(($dbGradeCount / $dbSubmissCount) * 100) : 0;
 
                 // Mengumpulkan riwayat aktivitas dinamis dari database
                 $activities = collect();
 
-                foreach (\App\Models\User::latest()->take(3)->get() as $u) {
+                foreach (\App\Models\User::latest()->take(3)->get(['id', 'name', 'role', 'nim_nip', 'created_at']) as $u) {
                     $activities->push([
                         'time_sort' => $u->created_at ?? now(),
                         'dot' => '#039FFA',
@@ -68,7 +82,8 @@
                     ]);
                 }
 
-                foreach (\App\Models\Course::with('lecturer')->latest()->take(3)->get() as $c) {
+                // Dosen pengampu tidak ditampilkan di aktivitas, jadi relasi lecturer tidak dimuat.
+                foreach (\App\Models\Course::latest()->take(3)->get(['id', 'code', 'name', 'sks', 'created_at']) as $c) {
                     $activities->push([
                         'time_sort' => $c->created_at ?? now(),
                         'dot' => '#10B981',
@@ -78,33 +93,58 @@
                     ]);
                 }
 
-                foreach (\App\Models\Material::with('course')->latest()->take(3)->get() as $m) {
+                $materiBaru = \App\Models\Material::query()
+                    ->leftJoin('courses', 'courses.id', '=', 'materials.course_id')
+                    ->latest('materials.created_at')
+                    ->take(3)
+                    ->get(['materials.title', 'materials.created_at', 'courses.code as course_code']);
+
+                foreach ($materiBaru as $m) {
                     $activities->push([
                         'time_sort' => $m->created_at ?? now(),
                         'dot' => '#F59E0B',
                         'title' => 'Materi kuliah diunggah',
-                        'desc' => e($m->title) . ($m->course ? ' pada ' . e($m->course->code) : ''),
+                        'desc' => e($m->title) . ($m->course_code ? ' pada ' . e($m->course_code) : ''),
                         'time' => $m->created_at ? $m->created_at->diffForHumans() : 'Baru saja',
                     ]);
                 }
 
-                foreach (\App\Models\Assignment::with('course')->latest()->take(3)->get() as $a) {
+                $tugasBaru = \App\Models\Assignment::query()
+                    ->leftJoin('courses', 'courses.id', '=', 'assignments.course_id')
+                    ->latest('assignments.created_at')
+                    ->take(3)
+                    ->get(['assignments.title', 'assignments.created_at', 'courses.code as course_code']);
+
+                foreach ($tugasBaru as $a) {
                     $activities->push([
                         'time_sort' => $a->created_at ?? now(),
                         'dot' => '#F96305',
                         'title' => 'Tugas kuliah dibuat',
-                        'desc' => e($a->title) . ($a->course ? ' &bull; ' . e($a->course->code) : ''),
+                        'desc' => e($a->title) . ($a->course_code ? ' &bull; ' . e($a->course_code) : ''),
                         'time' => $a->created_at ? $a->created_at->diffForHumans() : 'Baru saja',
                     ]);
                 }
 
-                foreach (\App\Models\Submission::with(['student', 'assignment'])->latest('submitted_at')->take(3)->get() as $s) {
+                // Mahasiswa yang akunnya sudah dihapus (soft delete) tetap tampil sebagai "Mahasiswa", seperti sebelumnya.
+                $pengumpulanBaru = \App\Models\Submission::query()
+                    ->leftJoin('users', fn ($j) => $j->on('users.id', '=', 'submissions.user_id')->whereNull('users.deleted_at'))
+                    ->leftJoin('assignments', 'assignments.id', '=', 'submissions.assignment_id')
+                    ->orderByDesc('submissions.submitted_at')
+                    ->take(3)
+                    ->get([
+                        'submissions.submitted_at',
+                        'submissions.created_at',
+                        'users.name as student_name',
+                        'assignments.title as assignment_title',
+                    ]);
+
+                foreach ($pengumpulanBaru as $s) {
                     $subTime = $s->submitted_at ? \Carbon\Carbon::parse($s->submitted_at) : ($s->created_at ?? now());
                     $activities->push([
                         'time_sort' => $subTime,
                         'dot' => '#8B5CF6',
                         'title' => 'Pengumpulan tugas masuk',
-                        'desc' => e($s->student?->name ?? 'Mahasiswa') . ' &mdash; ' . e($s->assignment?->title ?? 'Tugas'),
+                        'desc' => e($s->student_name ?? 'Mahasiswa') . ' &mdash; ' . e($s->assignment_title ?? 'Tugas'),
                         'time' => $subTime->diffForHumans(),
                     ]);
                 }
