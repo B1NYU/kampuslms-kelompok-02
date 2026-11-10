@@ -12,6 +12,7 @@ class AssignmentFactory extends Factory
     {
         return [
             'course_id' => Course::factory(),
+            'session' => fake()->numberBetween(1, 7),
             'created_by' => User::factory()->dosen(),
             'title' => 'Tugas ' . ucfirst(fake()->words(3, true)),
             'instructions' => fake()->paragraphs(2, true),

@@ -13,6 +13,7 @@ class Assignment extends Model
 
     protected $fillable = [
         'course_id',
+        'session',
         'created_by',
         'title',
         'instructions',
@@ -28,6 +29,7 @@ class Assignment extends Model
             'due_at' => 'datetime',
             'allow_late' => 'boolean',
             'max_score' => 'integer',
+            'session' => 'integer',
         ];
     }
 

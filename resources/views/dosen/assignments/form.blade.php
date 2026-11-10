@@ -7,9 +7,9 @@
         @csrf
         @if($assignment->exists) @method('PUT') @endif
         <label>Pertemuan / Minggu Ke-
-            <select name="session">
+            <select name="session" required>
                 @for ($w = 1; $w <= 16; $w++)
-                    <option value="{{ $w }}" @selected(old('session') == $w || Str::contains($assignment->title ?? '', ['Pertemuan ' . $w, 'Minggu ' . $w]))>
+                    <option value="{{ $w }}" @selected((int) old('session', $assignment->session) === $w)>
                         Pertemuan {{ $w }} (Minggu ke-{{ $w }})
                     </option>
                 @endfor
