@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modalCourseSelect.value = '';
             }
             if (taskSession) {
-                taskSession.value = '';
+                taskSession.value = '1';
             }
         }
 

@@ -127,8 +127,7 @@
                                     <div class="assignment-card-header">
                                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                             @php
-                                                preg_match('/(Pertemuan|Minggu)\s*(\d+)/i', $a->title, $matches);
-                                                $weekNum = $matches[2] ?? $loop->iteration;
+                                                $weekNum = $a->session ?? $loop->iteration;
                                             @endphp
                                             <span class="card-subtitle-tag" style="padding:2px 8px; font-size:10px; background: rgba(3, 159, 250, 0.1); color: #039FFA; border-color: rgba(3, 159, 250, 0.25);">Pertemuan {{ $weekNum }}</span>
                                             <h4 class="assignment-card-title" style="margin: 0;">{{ $a->title }}</h4>
@@ -245,11 +244,12 @@
                                 <label for="taskSession">Pertemuan / Minggu Ke- <span class="required">*</span></label>
                                 <select id="taskSession" name="session" class="form-select" required>
                                     @for ($w = 1; $w <= 16; $w++)
-                                        <option value="{{ $w }}" @selected(old('session') == $w || Str::contains($assignment->title ?? '', ['Pertemuan ' . $w, 'Minggu ' . $w, 'Tugas 0' . $w, 'Tugas ' . $w]))>
+                                        <option value="{{ $w }}" @selected((int) old('session', $assignment->session) === $w)>
                                             Pertemuan {{ $w }} (Minggu ke-{{ $w }})
                                         </option>
                                     @endfor
                                 </select>
+                                @error('session') <span class="field-error">{{ $message }}</span> @enderror
                             </div>
                         </div>
 

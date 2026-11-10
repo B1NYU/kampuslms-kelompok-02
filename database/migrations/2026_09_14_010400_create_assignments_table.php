@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
+            $table->unsignedTinyInteger('session')->nullable();   // pertemuan 1-16
             $table->foreignId('created_by')->constrained('users');
             $table->string('title');
             $table->text('instructions');
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['course_id', 'due_at']);
+            $table->index(['course_id', 'session']);
         });
     }
 

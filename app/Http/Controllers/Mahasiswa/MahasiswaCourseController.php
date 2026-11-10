@@ -58,14 +58,14 @@ class MahasiswaCourseController extends Controller
 
         Gate::authorize('view', $mata_kuliah);
 
+        // 'students' tidak dimuat: view hanya butuh jumlahnya, jadi cukup COUNT.
         $course = $mata_kuliah->load([
             'lecturer',
-            'students',
             'materials' => fn ($q) => $q->orderBy('created_at'),
             'assignments' => fn ($q) => $q->where('status', 'published')->orderBy('due_at'),
             'assignments.submissions' => fn ($q) => $q->where('user_id', $student->id),
             'assignments.submissions.grade',
-        ]);
+        ])->loadCount('students');
 
         $mataKuliah = $this->formatCourseMetadata($course);
         $nilaiData = $this->calculateGradesAndTasks($course, $student);
@@ -78,18 +78,14 @@ class MahasiswaCourseController extends Controller
             ->orderBy('expires_at')
             ->get();
 
-        $courseSessionIds = $course->attendanceSessions()->pluck('id');
-
-        $attendedSessionIds = \App\Models\Attendance::where('user_id', $student->id)
-            ->whereIn('attendance_session_id', $courseSessionIds)
-            ->pluck('attendance_session_id')
-            ->toArray();
-
+        // Satu query (subquery id sesi) menggantikan pluck id + dua query Attendance.
         $attendanceHistory = \App\Models\Attendance::where('user_id', $student->id)
-            ->whereIn('attendance_session_id', $courseSessionIds)
+            ->whereIn('attendance_session_id', $course->attendanceSessions()->select('id'))
             ->with('session')
             ->orderByDesc('attended_at')
             ->get();
+
+        $attendedSessionIds = $attendanceHistory->pluck('attendance_session_id')->all();
 
         return view()->file(
             resource_path('views/courses/show.blade.php'),
@@ -106,7 +102,7 @@ class MahasiswaCourseController extends Controller
             'sks'            => $course->sks,
             'dosen'          => $course->lecturer?->name ?? 'Dosen Pengampu',
             'deskripsi'      => $course->description ?: 'Mata kuliah kurikulum aktif semester ini.',
-            'students_count' => $course->students->count(),
+            'students_count' => $course->students_count,
             'status'         => $course->status ?? 'active',
         ];
     }
@@ -161,7 +157,7 @@ class MahasiswaCourseController extends Controller
             $items[] = [
                 'id'             => $assignment->id,
                 'url'            => route('assignments.show', $assignment),
-                'pertemuan'      => 'Sesi ' . ($index + 1),
+                'pertemuan'      => 'Sesi ' . ($assignment->session ?? ($index + 1)),
                 'tipe'           => 'Tugas Kuliah',
                 'judul'          => $assignment->title,
                 'tanggal_kumpul' => $tanggalKumpul,
