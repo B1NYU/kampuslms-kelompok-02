@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-BASE_URL="http://localhost:8000"
-COOKIE_JAR="/tmp/auth_cookies.txt"
+BASE_URL="https://kampuslms-kelompok-02-production.up.railway.app"
+COOKIE_JAR="/tmp/auth_cookies_kampuslms.txt"
 
 # Kredensial Pengujian (Sesuai DatabaseSeeder)
 ADMIN_IDENTIFIER="admin@kampuslms.test"
@@ -10,13 +10,13 @@ MAHASISWA_IDENTIFIER="mahasiswa@kampuslms.test"
 PASSWORD="password"
 
 # Resource ID Deterministik dari DatabaseSeeder
-COURSE_ID_UNENROLLED="2"   # MK 2 diampu Dosen B, Mahasiswa Demo TIDAK terdaftar
-ASSIGNMENT_ID_OTHER="3"    # Assignment di MK 2
-SUBMISSION_ID_OTHER="2"    # Submission dummy
+COURSE_ID_UNENROLLED="2"    # MK 2 diampu Dosen B, Mahasiswa Demo TIDAK terdaftar
+ASSIGNMENT_ID_OTHER="3"     # Assignment di MK 2
+SUBMISSION_ID_OTHER="2"     # Submission dummy
 
-# Helper Ambil CSRF Token dari Form Login
-get_csrf_token() {
-    curl -s -c "$COOKIE_JAR" -b "$COOKIE_JAR" "$BASE_URL/" \
+# Helper Ambil CSRF Token khusus untuk login (tanpa merusak cookie utama)
+get_login_csrf() {
+    curl -s -c "$COOKIE_JAR" -b "$COOKIE_JAR" -L "$BASE_URL/login" \
         | grep -o 'name="_token" value="[^"]*"' \
         | head -n 1 \
         | cut -d'"' -f4
@@ -26,12 +26,12 @@ get_csrf_token() {
 login_web() {
     local identifier="$1"
     rm -f "$COOKIE_JAR"
-    
-    local csrf_token
-    csrf_token=$(get_csrf_token)
 
-    # Menggunakan nama input 'identifier' (bukan 'email') sesuai AuthController
-    curl -s -o /dev/null -X POST \
+    local csrf_token
+    csrf_token=$(get_login_csrf)
+
+    # Kirim request POST login dengan mengikuti redirect (-L)
+    curl -s -o /dev/null -X POST -L \
         -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
         -H "Content-Type: application/x-www-form-urlencoded" \
         -d "_token=$csrf_token" \
@@ -49,13 +49,15 @@ run_test() {
 
     echo -n "Testing: $title ... "
 
-    local csrf_token=""
-    if [ "$method" != "GET" ]; then
-        csrf_token=$(get_csrf_token)
-    fi
+    # Ambil CSRF token dari halaman utama tanpa menghapus cookie login yang ada di COOKIE_JAR
+    local csrf_token
+    csrf_token=$(curl -s -b "$COOKIE_JAR" -L "$BASE_URL" \
+        | grep -o 'name="_token" value="[^"]*"' \
+        | head -n 1 \
+        | cut -d'"' -f4)
 
     local status_code
-    status_code=$(curl -s -o /dev/null -w "%{http_code}" -X "$method" \
+    status_code=$(curl -s -o /dev/null -w "%{http_code}" -X "$method" -L \
         -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
         -H "Accept: application/json" \
         -H "X-CSRF-TOKEN: $csrf_token" \
@@ -98,5 +100,5 @@ login_web "$ADMIN_IDENTIFIER"
 run_test "Admin mengakses dashboard Admin" "GET" "/admin/dashboard" 200
 
 echo -e "\n=================================================="
-echo "            PENGUJIAN SELESAI                     "
+echo "                PENGUJIAN SELESAI                 "
 echo "=================================================="
