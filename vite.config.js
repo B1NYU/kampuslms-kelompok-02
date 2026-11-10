@@ -11,13 +11,6 @@ export default defineConfig({
                 'resources/css/sidebar.css',
                 // Mode Mahasiswa
                 'resources/css/mahasiswa/anggota.css',
-                // Mode Dosen
-                'resources/css/dosen/dosen.common.css',
-                'resources/css/dosen/dosen.dashboard.css',
-                'resources/css/dosen/dosen.mahasiswa.css',
-                'resources/css/dosen/dosen.materi.css',
-                'resources/css/dosen/dosen.tugas.css',
-                'resources/css/dosen/dosen.penilaian.css',
                 // Fallbacks & JS
                 'resources/css/welcome.css',
                 'resources/css/index.css',

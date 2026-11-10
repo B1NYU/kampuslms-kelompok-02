@@ -13,33 +13,39 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
+    <!-- Memuat CSS & JS via Vite (Hanya Tailwind app.css murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.penilaian.css', 'resources/js/app.js', 'resources/js/dosen/dosen.penilaian.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.penilaian.css') }}">
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/dosen/dosen.penilaian.js'])
     @endif
 </head>
 
-<body>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-    <div class="app-window">
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
 
         <!-- Navbar Khusus Dosen -->
         <x-navbar-dosen />
 
         <!-- Konten Utama Penilaian & Feedback -->
-        <main class="dosen-content">
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="dash-topbar justify-end">
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                        Penilaian &amp; Feedback
+                    </h1>
+                </div>
 
-                <div class="course-filter-bar">
-                    <span class="course-filter-label">Mata Kuliah Aktif:</span>
-                    <select id="selectCurrentCourse" class="course-select">
+                <div class="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-xl border border-sky-100 shadow-xs self-start sm:self-auto">
+                    <span class="text-xs font-bold text-slate-500 shrink-0">Mata Kuliah Aktif:</span>
+                    <select id="selectCurrentCourse" class="text-xs font-extrabold text-sky-700 bg-transparent border-none outline-none cursor-pointer focus:ring-0">
                         <option value="all">Semua Mata Kuliah Aktif ({{ $totalSubmissions }} Pengumpulan)</option>
                         @foreach ($courses as $c)
                             @php
@@ -54,30 +60,32 @@
             </header>
 
             <!-- Section: Penilaian & Feedback -->
-            <section class="feature-section" id="penilaian-tugas">
-                <div class="section-card">
-                    <div class="section-header">
-                        <div class="section-header-left">
-                            <div class="section-header-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <section class="flex flex-col gap-6" id="penilaian-tugas">
+                <div class="bg-white rounded-2xl border border-sky-100 shadow-xs p-5 sm:p-6 flex flex-col gap-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
                             </div>
-                            <div class="section-header-text">
-                                <h2>Penilaian &amp; Umpan Balik (Feedback) Pengumpulan Mahasiswa</h2>
-                                <p>Evaluasi tugas mahasiswa, berikan skor angka (sesuai nilai maksimal tugas), dan cantumkan catatan konstruktif yang tersimpan langsung ke database.</p>
+                            <div>
+                                <h2 class="text-base sm:text-lg font-black text-slate-900 leading-tight">Penilaian &amp; Umpan Balik Pengumpulan Mahasiswa</h2>
+                                <p class="text-xs text-slate-500 font-bold">Evaluasi tugas mahasiswa, berikan skor angka, dan cantumkan catatan konstruktif.</p>
                             </div>
                         </div>
-                        <span class="section-header-badge">Evaluasi &amp; Grading</span>
+                        <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                            Evaluasi &amp; Grading
+                        </span>
                     </div>
 
                     <!-- Tampilan Statistik KPI Tugas: Total Semua Tugas, Sudah Dinilai, Belum Dinilai -->
-                    <div class="grading-kpi-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px;">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <!-- KPI 1: Total Semua Tugas -->
-                        <div class="kpi-card" style="background: #FFFFFF; border: 1.5px solid rgba(3, 159, 250, 0.22); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 14px rgba(3, 159, 250, 0.05);">
-                            <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(3, 159, 250, 0.12); color: #039FFA; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="bg-white rounded-2xl border border-sky-200/80 p-5 shadow-xs flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                     <polyline points="14 2 14 8 20 8"></polyline>
                                     <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -85,90 +93,91 @@
                                     <polyline points="10 9 9 9 8 9"></polyline>
                                 </svg>
                             </div>
-                            <div style="flex: 1;">
-                                <span style="font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.06em; display: block;">Total Semua Tugas</span>
-                                <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
-                                    <span id="kpiTotalAll" style="font-size: 26px; font-weight: 900; color: #0F172A; line-height: 1.1;">{{ $totalSubmissions }}</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: #64748B;">Pengumpulan</span>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[11px] font-black text-slate-500 uppercase tracking-wider block">Total Semua Tugas</span>
+                                <div class="flex items-baseline gap-1.5 my-0.5">
+                                    <span id="kpiTotalAll" class="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{{ $totalSubmissions }}</span>
+                                    <span class="text-xs font-bold text-slate-500">Pengumpulan</span>
                                 </div>
-                                <span style="font-size: 11px; color: #94A3B8; font-weight: 600;">Semua berkas tugas mahasiswa</span>
+                                <span class="text-[11px] text-slate-400 font-semibold block truncate">Semua berkas tugas mahasiswa</span>
                             </div>
                         </div>
 
                         <!-- KPI 2: Tugas Sudah Dinilai -->
-                        <div class="kpi-card" style="background: #FFFFFF; border: 1.5px solid rgba(16, 185, 129, 0.28); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.05);">
-                            <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #10B981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="bg-white rounded-2xl border border-emerald-200/80 p-5 shadow-xs flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
                             </div>
-                            <div style="flex: 1;">
-                                <span style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.06em; display: block;">Tugas Sudah Dinilai</span>
-                                <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
-                                    <span id="kpiTotalGraded" style="font-size: 26px; font-weight: 900; color: #10B981; line-height: 1.1;">{{ $totalGraded }}</span>
-                                    <span id="kpiGradedPercent" style="font-size: 11px; font-weight: 800; color: #059669; background: #ECFDF5; padding: 2px 8px; border-radius: 12px;">{{ $persenGraded }}%</span>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[11px] font-black text-emerald-600 uppercase tracking-wider block">Tugas Sudah Dinilai</span>
+                                <div class="flex items-baseline gap-2 my-0.5">
+                                    <span id="kpiTotalGraded" class="text-2xl sm:text-3xl font-black text-emerald-600 leading-none">{{ $totalGraded }}</span>
+                                    <span id="kpiGradedPercent" class="text-[11px] font-black text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">{{ $persenGraded }}%</span>
                                 </div>
-                                <span style="font-size: 11px; color: #64748B; font-weight: 600;">Telah dievaluasi &amp; diberi nilai</span>
+                                <span class="text-[11px] text-slate-400 font-semibold block truncate">Telah dievaluasi &amp; diberi nilai</span>
                             </div>
                         </div>
 
                         <!-- KPI 3: Tugas Belum Dinilai -->
-                        <div class="kpi-card" style="background: #FFFFFF; border: 1.5px solid rgba(249, 184, 4, 0.35); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 14px rgba(249, 184, 4, 0.05);">
-                            <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(249, 184, 4, 0.14); color: #D97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="bg-white rounded-2xl border border-amber-200/80 p-5 shadow-xs flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <polyline points="12 6 12 12 16 14"></polyline>
                                 </svg>
                             </div>
-                            <div style="flex: 1;">
-                                <span style="font-size: 11px; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 0.06em; display: block;">Tugas Belum Dinilai</span>
-                                <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
-                                    <span id="kpiTotalPending" style="font-size: 26px; font-weight: 900; color: #D97706; line-height: 1.1;">{{ $totalPending }}</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: #B45309;">Menunggu</span>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[11px] font-black text-amber-600 uppercase tracking-wider block">Tugas Belum Dinilai</span>
+                                <div class="flex items-baseline gap-1.5 my-0.5">
+                                    <span id="kpiTotalPending" class="text-2xl sm:text-3xl font-black text-amber-600 leading-none">{{ $totalPending }}</span>
+                                    <span class="text-xs font-bold text-amber-600">Menunggu</span>
                                 </div>
-                                <span style="font-size: 11px; color: #64748B; font-weight: 600;">Perlu pemeriksaan dosen</span>
+                                <span class="text-[11px] text-slate-400 font-semibold block truncate">Perlu pemeriksaan dosen</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Filter & Summary Bar -->
-                    <div class="table-header-tools" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button class="btn-secondary-action filter-submission-btn active" data-sub-filter="all">Semua Pengumpulan</button>
-                            <button class="btn-secondary-action filter-submission-btn" data-sub-filter="pending">Belum Dinilai</button>
-                            <button class="btn-secondary-action filter-submission-btn" data-sub-filter="graded">Sudah Dinilai</button>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button class="filter-submission-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 [&.active]:bg-sky-50 [&.active]:text-sky-600 [&.active]:border-sky-300 [&.active]:font-black [&.active]:shadow-xs active" data-sub-filter="all">Semua Pengumpulan</button>
+                            <button class="filter-submission-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 [&.active]:bg-sky-50 [&.active]:text-sky-600 [&.active]:border-sky-300 [&.active]:font-black [&.active]:shadow-xs" data-sub-filter="pending">Belum Dinilai</button>
+                            <button class="filter-submission-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 [&.active]:bg-sky-50 [&.active]:text-sky-600 [&.active]:border-sky-300 [&.active]:font-black [&.active]:shadow-xs" data-sub-filter="graded">Sudah Dinilai</button>
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.2); border-radius: 8px; padding: 6px 12px; gap: 8px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div class="relative">
+                                <input type="text" id="filterSearchInput" placeholder="Cari nama / tugas / berkas..."
+                                       class="pl-8 pr-3 py-1.5 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400 w-52">
+                                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
-                                <input type="text" id="filterSearchInput" placeholder="Cari nama / tugas / berkas..." style="border: none; outline: none; background: transparent; font-size: 12px; color: #0F172A; width: 190px;">
                             </div>
-                            <div style="font-size: 12px; font-weight: 800; color: #64748B;">
-                                Status: <span style="color:#10B981;" id="gradedSummary">{{ $totalGraded }} Dinilai</span> &middot; <span style="color:#D97706;" id="ungradedSummary">{{ $totalPending }} Menunggu Review</span>
+                            <div class="text-xs font-extrabold text-slate-600">
+                                Status: <span class="text-emerald-600" id="gradedSummary">{{ $totalGraded }} Dinilai</span> &middot; <span class="text-amber-600" id="ungradedSummary">{{ $totalPending }} Menunggu Review</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tabel Pengumpulan & Penilaian -->
-                    <div class="table-responsive" style="max-height: 580px; overflow-y: auto; border: 1px solid rgba(3, 159, 250, 0.18); border-radius: 10px;">
-                        <table class="custom-dosen-table" id="submissionTable">
-                            <thead style="position: sticky; top: 0; z-index: 2; background: #F8FAFC;">
+                    <div class="w-full overflow-x-auto border border-sky-100 rounded-2xl">
+                        <table class="w-full text-left text-xs sm:text-sm" id="submissionTable">
+                            <thead class="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-black uppercase tracking-wider text-slate-500 sticky top-0 z-10">
                                 <tr>
-                                    <th>Mahasiswa</th>
-                                    <th>Tugas yang Dikumpulkan</th>
-                                    <th>Waktu Pengumpulan</th>
-                                    <th>Berkas Tugas</th>
-                                    <th>Nilai</th>
-                                    <th>Feedback Dosen</th>
-                                    <th style="text-align: right;">Aksi</th>
+                                    <th class="px-5 py-3.5">Mahasiswa</th>
+                                    <th class="px-5 py-3.5">Tugas yang Dikumpulkan</th>
+                                    <th class="px-5 py-3.5">Waktu Pengumpulan</th>
+                                    <th class="px-5 py-3.5">Berkas Tugas</th>
+                                    <th class="px-5 py-3.5">Nilai</th>
+                                    <th class="px-5 py-3.5">Feedback Dosen</th>
+                                    <th class="px-5 py-3.5 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="submissionTableBody">
+                            <tbody id="submissionTableBody" class="divide-y divide-slate-100">
                                 @forelse ($allSubmissions as $sub)
                                     @php
                                         $student = $sub->student;
@@ -177,8 +186,6 @@
                                         $course = $assignment?->course;
                                         $grade = $sub->grade;
                                         $isGraded = !is_null($grade);
-                                        // 87.5 harus tetap "87.5" (bukan dibulatkan ke 88): angka ini diisikan kembali
-                                        // ke form "Edit Nilai", dan menyimpannya akan mengubah nilai mahasiswa.
                                         $scoreText = $isGraded ? rtrim(rtrim(number_format((float) $grade->score, 2, '.', ''), '0'), '.') : '';
 
                                         $name = $student?->name ?? ('Mahasiswa #' . $sub->user_id);
@@ -211,53 +218,54 @@
                                     <tr data-status="{{ $isGraded ? 'graded' : 'pending' }}"
                                         data-course-id="{{ $course?->id }}"
                                         data-id="{{ $sub->id }}"
-                                        data-search="{{ strtolower($name . ' ' . $nim . ' ' . ($assignment?->title ?? '') . ' ' . $filename . ' ' . ($course?->code ?? '')) }}">
-                                        <td>
-                                            <div class="student-cell">
-                                                <div class="student-avatar" style="background:{{ $color['bg'] }}; color:{{ $color['color'] }}; font-weight:800;">
+                                        data-search="{{ strtolower($name . ' ' . $nim . ' ' . ($assignment?->title ?? '') . ' ' . $filename . ' ' . ($course?->code ?? '')) }}"
+                                        class="hover:bg-sky-50/30 transition">
+                                        <td class="px-5 py-3.5">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0" style="background:{{ $color['bg'] }}; color:{{ $color['color'] }};">
                                                     {{ $initials }}
                                                 </div>
-                                                <div class="student-meta">
-                                                    <span class="student-name">{{ $name }}</span>
-                                                    <span class="student-nim">{{ $nim }}</span>
+                                                <div class="flex flex-col">
+                                                    <span class="student-name font-bold text-slate-800">{{ $name }}</span>
+                                                    <span class="student-nim text-[11px] font-semibold text-slate-500">{{ $nim }}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="px-5 py-3.5">
                                             @can('view', $sub)
-                                                <a href="{{ route('submissions.show', $sub) }}" style="color: inherit; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
-                                                    <strong>{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</strong>
+                                                <a href="{{ route('submissions.show', $sub) }}" class="font-bold text-slate-800 hover:text-sky-600 hover:underline">
+                                                    {{ $assignment?->title ?? 'Tugas Perkuliahan' }}
                                                 </a>
                                             @else
-                                                <strong>{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</strong>
+                                                <span class="font-bold text-slate-800">{{ $assignment?->title ?? 'Tugas Perkuliahan' }}</span>
                                             @endcan
-                                            <div style="font-size:11px; color:#64748B; font-weight:600; margin-top:2px;">
+                                            <div class="text-[11px] text-slate-500 font-semibold mt-0.5">
                                                 {{ $course?->code }} &bull; {{ $course?->name }}
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="px-5 py-3.5">
                                             @if ($sub->is_late)
-                                                <span class="badge-status badge-status-warning" style="display:inline-block; font-size:11px;">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200">
                                                     Terlambat ({{ $sub->submitted_at ? $sub->submitted_at->format('d M, H:i') : '-' }})
                                                 </span>
                                             @else
-                                                <span class="badge-status badge-status-active" style="display:inline-block; font-size:11px;">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                     Tepat Waktu ({{ $sub->submitted_at ? $sub->submitted_at->format('d M, H:i') : '-' }})
                                                 </span>
                                             @endif
-                                            <div style="font-size:11px; color:#64748B; margin-top:3px; font-weight:600;">
+                                            <div class="text-[11px] text-slate-500 font-semibold mt-1">
                                                 {{ $sub->submitted_at ? $sub->submitted_at->translatedFormat('d M Y, H:i') : '-' }} WITA
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="px-5 py-3.5">
                                             @can('view', $sub)
-                                            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                                <a href="{{ route('submissions.show', $sub) }}" class="btn-open-resource" style="font-size:11px; max-width: 160px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;" title="Buka Detail Pengumpulan: {{ $filename }} ({{ $fileSizeKb }})">
+                                            <div class="inline-flex items-center gap-1.5">
+                                                <a href="{{ route('submissions.show', $sub) }}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-sky-600 bg-sky-50 hover:bg-sky-500 hover:text-white transition max-w-[170px] truncate" title="Buka Detail: {{ $filename }} ({{ $fileSizeKb }})">
                                                     <span>{{ $icon }}</span>
-                                                    <span>{{ $filename }}</span>
+                                                    <span class="truncate">{{ $filename }}</span>
                                                 </a>
-                                                <a href="{{ route('submissions.download', $sub) }}" style="color: #64748B; display: inline-flex; align-items: center; padding: 5px; border-radius: 6px; transition: all 0.2s; background: #F1F5F9; border: 1px solid #E2E8F0;" title="Unduh berkas langsung" download>
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                <a href="{{ route('submissions.download', $sub) }}" class="p-1 rounded-md text-slate-500 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition" title="Unduh berkas langsung" download>
+                                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                                         <polyline points="7 10 12 15 17 10"></polyline>
                                                         <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -266,69 +274,67 @@
                                             </div>
                                             @endcan
                                             @if($sub->note)
-                                                <div style="font-size:10px; color:#64748B; font-style:italic; margin-top:2px;" title="{{ $sub->note }}">
-                                                    Catatan: {{ Str::limit($sub->note, 25) }}
+                                                <div class="text-[10px] text-slate-500 italic mt-1 max-w-[180px] truncate" title="{{ $sub->note }}">
+                                                    Catatan: {{ $sub->note }}
                                                 </div>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="px-5 py-3.5">
                                             @if ($isGraded)
-                                                <span class="score-badge score-badge-graded item-score">{{ $scoreText }} / {{ $maxScore }}</span>
+                                                <span class="score-badge item-score inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black bg-sky-50 text-sky-700 border border-sky-200">{{ $scoreText }} / {{ $maxScore }}</span>
                                             @else
-                                                <span class="score-badge score-badge-pending item-score">Belum Dinilai</span>
+                                                <span class="score-badge item-score inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black bg-amber-50 text-amber-700 border border-amber-200">Belum Dinilai</span>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="px-5 py-3.5 max-w-[220px]">
                                             @if ($isGraded && !empty($grade->feedback))
-                                                <span class="feedback-text item-feedback" title="{{ $grade->feedback }}">
-                                                    "{{ Str::limit($grade->feedback, 65) }}"
+                                                <span class="feedback-text item-feedback text-xs text-slate-700 font-semibold line-clamp-2" title="{{ $grade->feedback }}">
+                                                    "{{ $grade->feedback }}"
                                                 </span>
                                             @else
-                                                <span class="feedback-text item-feedback" style="color: #A37F89; font-style: italic;">
+                                                <span class="feedback-text item-feedback text-xs text-slate-400 italic">
                                                     Belum ada catatan umpan balik.
                                                 </span>
                                             @endif
                                         </td>
-                                        <td style="text-align: right; white-space: nowrap;">
-                                            <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                                        <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                                            <div class="inline-flex items-center gap-1.5 justify-end">
                                                 @can('view', $sub)
-                                                <a href="{{ route('submissions.show', $sub) }}" class="btn-secondary-action" style="padding: 6px 10px; font-size: 11px; text-decoration: none;" title="Buka detail pengumpulan">
+                                                <a href="{{ route('submissions.show', $sub) }}" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition" title="Buka detail pengumpulan">
                                                     Detail &rarr;
                                                 </a>
                                                 @endcan
                                                 @can('grade', $sub)
                                                 @if ($isGraded)
-                                                    <button class="btn-primary-action btn-grade-action"
+                                                    <button class="btn-grade-action px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-sky-500 hover:bg-sky-600 shadow-xs transition cursor-pointer"
                                                         data-id="{{ $sub->id }}"
                                                         data-student="{{ $name }} ({{ $nim }})"
                                                         data-title="{{ $assignment?->title ?? 'Tugas' }}"
                                                         data-max="{{ $maxScore }}"
                                                         data-score="{{ $scoreText }}"
-                                                        data-feedback="{{ $grade->feedback }}"
-                                                        style="padding: 6px 14px; font-size: 11px;">
+                                                        data-feedback="{{ $grade->feedback }}">
                                                         Edit Nilai
                                                     </button>
                                                 @else
-                                                    <button class="btn-primary-action btn-grade-action"
+                                                    <button class="btn-grade-action px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition cursor-pointer"
                                                         data-id="{{ $sub->id }}"
                                                         data-student="{{ $name }} ({{ $nim }})"
                                                         data-title="{{ $assignment?->title ?? 'Tugas' }}"
                                                         data-max="{{ $maxScore }}"
                                                         data-score=""
-                                                        data-feedback=""
-                                                        style="padding: 6px 14px; font-size: 11px; background:#1B8A5A;">
+                                                        data-feedback="">
                                                         Beri Nilai
                                                     </button>
                                                 @endif
                                                 @else
-                                                    <span style="font-size:11px; color:#94A3B8; font-weight:600;">Tidak dapat dinilai</span>
+                                                    <span class="text-[11px] text-slate-400 font-semibold">Tidak dapat dinilai</span>
                                                 @endcan
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" style="text-align:center; padding: 30px; color: #64748B;">
+                                        <td colspan="7" class="text-center py-10 px-4 text-slate-400 font-bold">
                                             Belum ada pengumpulan tugas dari mahasiswa di mata kuliah Anda.
                                         </td>
                                     </tr>
@@ -339,7 +345,7 @@
 
                     {{-- Navigasi Pagination Laravel --}}
                     @if ($allSubmissions->hasPages())
-                        <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between rounded-b-2xl">
+                        <div class="px-5 py-3 border-t border-slate-100 bg-white flex items-center justify-between">
                             {{ $allSubmissions->links() }}
                         </div>
                     @endif
@@ -351,39 +357,43 @@
     </div>
 
     <!-- MODAL PENILAIAN & FEEDBACK -->
-    <div class="dosen-modal-overlay" id="gradingModalOverlay">
-        <div class="dosen-modal-card" id="gradingModal">
-            <div class="dosen-modal-header">
-                <h3>Form Penilaian &amp; Umpan Balik Dosen</h3>
-                <button type="button" class="btn-close-modal" id="btnCloseGradingModal">&times;</button>
+    <div class="dosen-modal-overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs items-center justify-center p-4 transition-all duration-200" id="gradingModalOverlay" style="display: none;">
+        <div class="w-full max-w-[560px] bg-white rounded-2xl shadow-2xl border border-sky-100 overflow-hidden flex flex-col" id="gradingModal">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h3 class="text-sm font-black text-slate-900">Form Penilaian &amp; Umpan Balik Dosen</h3>
+                <button type="button" class="text-slate-400 hover:text-slate-700 text-xl font-black cursor-pointer leading-none" id="btnCloseGradingModal">&times;</button>
             </div>
-            <div class="dosen-modal-body">
-                <div class="submission-info-box">
-                    <span class="submission-info-title" id="modalAssignmentTitle">Tugas</span>
-                    <span class="submission-info-student" id="modalStudentName">Mahasiswa: Clara Shinta (10241018)</span>
+            <div class="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                <div class="p-3.5 bg-sky-50/60 border border-sky-100 rounded-xl flex flex-col gap-0.5">
+                    <span class="text-xs font-black text-sky-900 truncate" id="modalAssignmentTitle">Tugas</span>
+                    <span class="text-[11px] font-bold text-sky-700" id="modalStudentName">Mahasiswa: Clara Shinta (10241018)</span>
                 </div>
 
-                <div class="form-group">
-                    <label for="inputScore">Nilai Akhir (Skala 0 - <span id="modalMaxLabel">100</span>) <span class="required">*</span></label>
-                    <input type="number" id="inputScore" class="form-control" placeholder="Masukkan nilai..." min="0" max="100" step="any" required>
-                    <div class="score-quick-buttons">
-                        <span style="font-size: 11px; color: #64748B; align-self: center;">Pintasan Nilai:</span>
-                        <button type="button" class="btn-score-quick" data-pct="95">95% (A)</button>
-                        <button type="button" class="btn-score-quick" data-pct="88">88% (A-)</button>
-                        <button type="button" class="btn-score-quick" data-pct="82">82% (B+)</button>
-                        <button type="button" class="btn-score-quick" data-pct="75">75% (B)</button>
+                <div>
+                    <label for="inputScore" class="block text-xs font-black text-slate-700 mb-1.5">
+                        Nilai Akhir (Skala 0 - <span id="modalMaxLabel">100</span>) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" id="inputScore" class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400" placeholder="Masukkan nilai..." min="0" max="100" step="any" required>
+                    <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                        <span class="text-[11px] font-bold text-slate-500 mr-1">Pintasan Nilai:</span>
+                        <button type="button" class="btn-score-quick px-2 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-sky-100 hover:text-sky-700 transition cursor-pointer" data-pct="95">95% (A)</button>
+                        <button type="button" class="btn-score-quick px-2 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-sky-100 hover:text-sky-700 transition cursor-pointer" data-pct="88">88% (A-)</button>
+                        <button type="button" class="btn-score-quick px-2 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-sky-100 hover:text-sky-700 transition cursor-pointer" data-pct="82">82% (B+)</button>
+                        <button type="button" class="btn-score-quick px-2 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-sky-100 hover:text-sky-700 transition cursor-pointer" data-pct="75">75% (B)</button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="inputFeedback">Catatan &amp; Umpan Balik (Feedback) Konstruktif <span class="required">*</span></label>
-                    <textarea id="inputFeedback" class="form-textarea" rows="4" placeholder="Tuliskan ulasan spesifik mengenai pengumpulan ini, kelebihan kode, serta aspek yang perlu ditingkatkan oleh mahasiswa..."></textarea>
+                <div>
+                    <label for="inputFeedback" class="block text-xs font-black text-slate-700 mb-1.5">
+                        Catatan &amp; Umpan Balik (Feedback) Konstruktif <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="inputFeedback" class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-400" rows="4" placeholder="Tuliskan ulasan spesifik mengenai pengumpulan ini, kelebihan kode, serta aspek yang perlu ditingkatkan oleh mahasiswa..."></textarea>
                 </div>
             </div>
-            <div class="dosen-modal-footer">
-                <button type="button" class="btn-secondary-action" id="btnCancelGrading">Batal</button>
-                <button type="button" class="btn-primary-action" id="btnSaveGrading">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition cursor-pointer" id="btnCancelGrading">Batal</button>
+                <button type="button" class="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-xs shadow-sky-500/20 transition cursor-pointer" id="btnSaveGrading">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     Simpan Nilai &amp; Berikan Feedback
                 </button>
             </div>
@@ -391,7 +401,7 @@
     </div>
 
     <!-- Toast Notification Container -->
-    <div class="dosen-toast-container" id="toastContainer"></div>
+    <div class="fixed bottom-5 right-5 z-[99999] flex flex-col gap-2.5 max-w-sm pointer-events-none" id="toastContainer"></div>
 
     <div id="dosenPenilaianConfig" style="display:none;" data-grade-url-template="{{ route('dosen.penilaian.update', ['submission' => '__ID__']) }}"></div>
 </body>

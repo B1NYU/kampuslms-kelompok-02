@@ -1,6 +1,5 @@
 @php
     $isDosen = auth()->user()->role === 'dosen';
-    $cssPeran = $isDosen ? 'resources/css/dosen/dosen.common.css' : 'resources/css/mahasiswa/mahasiswa.dashboard.css';
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -13,213 +12,136 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
+    <!-- Memuat CSS & JS via Vite (Tailwind app.css murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', $cssPeran, 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
-
-    <style>
-        .pw-page-container {
-            width: 100%;
-            max-width: 580px;
-            margin: 10px auto 36px auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .pw-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(3, 159, 250, 0.2);
-            border-radius: 20px;
-            padding: 30px 32px;
-            box-shadow: 0 14px 34px -4px rgba(15, 23, 42, 0.07), 0 4px 14px -2px rgba(3, 159, 250, 0.05);
-            font-family: 'Nunito', sans-serif;
-            position: relative;
-        }
-        .pw-header-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #EFF6FF;
-            color: #0284C7;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(3, 159, 250, 0.2);
-        }
-        .pw-card h2 { margin: 0 0 6px; font-size: 22px; font-weight: 900; color: #0F172A; display: flex; align-items: center; gap: 8px; }
-        .pw-card p.pw-sub { margin: 0 0 16px; font-size: 13.5px; font-weight: 600; color: #64748B; line-height: 1.55; }
-        .pw-user-pill {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 22px;
-        }
-        .pw-user-pill-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #039FFA, #32B3F1);
-            color: #FFFFFF;
-            font-size: 12px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .pw-user-pill-text {
-            display: flex;
-            flex-direction: column;
-            font-size: 12px;
-            line-height: 1.3;
-        }
-        .pw-user-pill-name {
-            font-weight: 800;
-            color: #0F172A;
-            font-size: 13px;
-        }
-        .pw-user-pill-meta {
-            color: #64748B;
-            font-weight: 600;
-        }
-        .pw-field { margin-bottom: 18px; }
-        .pw-field label { display: block; font-size: 13px; font-weight: 800; color: #334155; margin-bottom: 6px; }
-        .pw-input-wrap { position: relative; display: flex; align-items: center; }
-        .pw-input-icon { position: absolute; left: 14px; color: #94A3B8; pointer-events: none; display: flex; align-items: center; }
-        .pw-input { width: 100%; box-sizing: border-box; height: 46px; padding: 0 44px 0 40px; border: 1.5px solid rgba(3, 159, 250, 0.28); border-radius: 12px; font: 600 14px 'Nunito', sans-serif; color: #0F172A; background: #F8FAFC; outline: none; transition: all 0.2s ease; }
-        .pw-input:focus { border-color: #039FFA; background: #FFF; box-shadow: 0 0 0 3.5px rgba(3, 159, 250, 0.16); }
-        .pw-input.is-invalid { border-color: #F87171; background: #FFF5F5; }
-        .pw-eye { position: absolute; right: 10px; background: none; border: 0; cursor: pointer; color: #64748B; padding: 6px; display: flex; border-radius: 6px; transition: color 0.2s; }
-        .pw-eye:hover { color: #039FFA; }
-        .pw-error { display: block; margin-top: 6px; font-size: 12.5px; font-weight: 700; color: #B42318; }
-        .pw-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid #F1F5F9; }
-        .pw-btn { height: 44px; padding: 0 22px; border-radius: 12px; border: 0; font: 800 14px 'Nunito', sans-serif; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; }
-        .pw-btn-primary { background: linear-gradient(135deg, #039FFA, #0284C7); color: #FFF; box-shadow: 0 4px 12px rgba(3, 159, 250, 0.25); }
-        .pw-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(3, 159, 250, 0.35); }
-        .pw-btn-ghost { background: #F1F5F9; color: #475569; }
-        .pw-btn-ghost:hover { background: #E2E8F0; color: #1E293B; }
-        .pw-info { margin-top: 20px; padding: 14px 16px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 14px; font-size: 12.5px; font-weight: 600; color: #1E40AF; line-height: 1.55; display: flex; align-items: flex-start; gap: 10px; }
-        .pw-info svg { flex-shrink: 0; margin-top: 2px; }
-    </style>
 </head>
 
-<body>
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <div class="app-window">
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
         @if ($isDosen)
             <x-navbar-dosen />
         @else
             <x-layout />
         @endif
 
-        <main class="{{ $isDosen ? 'dosen-content' : 'dashboard-content' }}" style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: calc(100vh - 160px); padding-top: 24px; padding-bottom: 40px;">
-            <div class="pw-page-container">
-                <section class="pw-card">
-                    <div class="pw-header-badge">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col items-center justify-center box-border">
+            <div class="w-full max-w-xl mx-auto">
+                <section class="bg-white rounded-3xl border border-sky-100 shadow-xl shadow-sky-950/5 p-6 sm:p-8 relative">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-sky-50 text-sky-700 border border-sky-200 mb-3">
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                         <span>KEAMANAN AKUN</span>
                     </div>
 
-                    <h2>Ubah Kata Sandi</h2>
-                    <p class="pw-sub">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        Ubah Kata Sandi
+                    </h2>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-500 mt-1 mb-5 leading-relaxed">
                         Untuk keamanan akun Anda, masukkan kata sandi saat ini sebelum menetapkan kata sandi baru.
                     </p>
 
-                    <div class="pw-user-pill">
+                    <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-3 sm:p-3.5 mb-6 flex items-center gap-3">
                         @php
                             $uName = auth()->user()->name ?? 'Pengguna';
                             $uParts = preg_split('/\s+/', trim($uName));
                             $uInit = strtoupper(mb_substr($uParts[0], 0, 1) . mb_substr($uParts[1] ?? '', 0, 1));
                         @endphp
-                        <div class="pw-user-pill-avatar">{{ $uInit }}</div>
-                        <div class="pw-user-pill-text">
-                            <span class="pw-user-pill-name">{{ $uName }}</span>
-                            <span class="pw-user-pill-meta">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-500 to-sky-400 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-xs">
+                            {{ $uInit }}
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-xs sm:text-sm font-black text-slate-900 truncate">{{ $uName }}</span>
+                            <span class="text-[11px] font-bold text-slate-500 truncate">
                                 {{ auth()->user()->nim_nip ? (auth()->user()->role === 'dosen' ? 'NIP: ' : 'NIM: ') . auth()->user()->nim_nip : ucfirst(auth()->user()->role) }}
                                 &bull; {{ auth()->user()->email }}
                             </span>
                         </div>
                     </div>
 
-                    <form action="{{ route('akun.kata-sandi.update') }}" method="POST" novalidate>
+                    <form action="{{ route('akun.kata-sandi.update') }}" method="POST" novalidate class="space-y-4">
                         @csrf
                         @method('PUT')
 
-                        <div class="pw-field">
-                            <label for="current_password">Kata Sandi Saat Ini</label>
-                            <div class="pw-input-wrap">
-                                <span class="pw-input-icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div>
+                            <label for="current_password" class="block text-xs sm:text-sm font-black text-slate-800 mb-1.5">
+                                Kata Sandi Saat Ini
+                            </label>
+                            <div class="relative flex items-center">
+                                <span class="absolute left-3.5 text-slate-400 pointer-events-none">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                     </svg>
                                 </span>
                                 <input type="password" id="current_password" name="current_password"
-                                       class="pw-input @error('current_password') is-invalid @enderror"
+                                       class="w-full h-11 pl-10 pr-11 rounded-xl border bg-slate-50/50 text-xs sm:text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 transition @error('current_password') border-rose-300 bg-rose-50/50 @else border-slate-200 @enderror"
                                        placeholder="Masukkan kata sandi saat ini"
                                        autocomplete="current-password" required>
-                                <button type="button" class="pw-eye" data-toggle-sandi="current_password" title="Lihat / sembunyikan">&#128065;</button>
+                                <button type="button" class="absolute right-2.5 text-slate-400 hover:text-sky-600 p-1.5 rounded-lg transition cursor-pointer text-sm leading-none" data-toggle-sandi="current_password" title="Lihat / sembunyikan">&#128065;</button>
                             </div>
                             @error('current_password')
-                                <span class="pw-error" role="alert">{{ $message }}</span>
+                                <span class="block text-xs font-bold text-rose-600 mt-1.5" role="alert">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <div class="pw-field">
-                            <label for="password">Kata Sandi Baru</label>
-                            <div class="pw-input-wrap">
-                                <span class="pw-input-icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div>
+                            <label for="password" class="block text-xs sm:text-sm font-black text-slate-800 mb-1.5">
+                                Kata Sandi Baru
+                            </label>
+                            <div class="relative flex items-center">
+                                <span class="absolute left-3.5 text-slate-400 pointer-events-none">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M21 2l-2 2m-2-2l2 2m0 0l-3.5 3.5M7 11v4a2 2 0 0 0 2 2h4M7 11V7a5 5 0 0 1 10 0v4"></path>
                                     </svg>
                                 </span>
                                 <input type="password" id="password" name="password"
-                                       class="pw-input @error('password') is-invalid @enderror"
+                                       class="w-full h-11 pl-10 pr-11 rounded-xl border bg-slate-50/50 text-xs sm:text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 transition @error('password') border-rose-300 bg-rose-50/50 @else border-slate-200 @enderror"
                                        placeholder="Minimal 8 karakter"
                                        autocomplete="new-password" required>
-                                <button type="button" class="pw-eye" data-toggle-sandi="password" title="Lihat / sembunyikan">&#128065;</button>
+                                <button type="button" class="absolute right-2.5 text-slate-400 hover:text-sky-600 p-1.5 rounded-lg transition cursor-pointer text-sm leading-none" data-toggle-sandi="password" title="Lihat / sembunyikan">&#128065;</button>
                             </div>
                             @error('password')
-                                <span class="pw-error" role="alert">{{ $message }}</span>
+                                <span class="block text-xs font-bold text-rose-600 mt-1.5" role="alert">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <div class="pw-field">
-                            <label for="password_confirmation">Ulangi Kata Sandi Baru</label>
-                            <div class="pw-input-wrap">
-                                <span class="pw-input-icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div>
+                            <label for="password_confirmation" class="block text-xs sm:text-sm font-black text-slate-800 mb-1.5">
+                                Ulangi Kata Sandi Baru
+                            </label>
+                            <div class="relative flex items-center">
+                                <span class="absolute left-3.5 text-slate-400 pointer-events-none">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                 </span>
                                 <input type="password" id="password_confirmation" name="password_confirmation"
-                                       class="pw-input"
+                                       class="w-full h-11 pl-10 pr-11 rounded-xl border border-slate-200 bg-slate-50/50 text-xs sm:text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 transition"
                                        placeholder="Ulangi kata sandi baru yang sama"
                                        autocomplete="new-password" required>
-                                <button type="button" class="pw-eye" data-toggle-sandi="password_confirmation" title="Lihat / sembunyikan">&#128065;</button>
+                                <button type="button" class="absolute right-2.5 text-slate-400 hover:text-sky-600 p-1.5 rounded-lg transition cursor-pointer text-sm leading-none" data-toggle-sandi="password_confirmation" title="Lihat / sembunyikan">&#128065;</button>
                             </div>
                             @include('auth._aturan-sandi')
                         </div>
 
-                        <div class="pw-actions">
-                            <a href="{{ route(auth()->user()->dashboardRoute()) }}" class="pw-btn pw-btn-ghost">
+                        <div class="flex justify-end items-center gap-3 pt-4 mt-6 border-t border-slate-100">
+                            <a href="{{ route(auth()->user()->dashboardRoute()) }}"
+                               class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
                                 Batal
                             </a>
-                            <button type="submit" class="pw-btn pw-btn-primary">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-md shadow-sky-500/20 transition cursor-pointer">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                     <polyline points="7 3 7 8 15 8"></polyline>
@@ -229,8 +151,8 @@
                         </div>
                     </form>
 
-                    <div class="pw-info">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="bg-sky-50/80 border border-sky-200 rounded-2xl p-4 mt-6 text-xs text-sky-900 font-semibold leading-relaxed flex items-start gap-2.5">
+                        <svg class="w-4 h-4 text-sky-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="16" x2="12" y2="12"></line>
                             <line x1="12" y1="8" x2="12.01" y2="8"></line>

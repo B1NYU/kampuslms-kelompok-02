@@ -10,213 +10,42 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
+    <!-- Memuat CSS & JS via Vite (Hanya Tailwind app.css murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.common.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.common.css') }}">
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
-
-    <style>
-        .code-display-card {
-            background: linear-gradient(135deg, #0284C7 0%, #039FFA 50%, #38BDF8 100%);
-            border-radius: 20px;
-            padding: 32px;
-            color: #FFFFFF;
-            box-shadow: 0 10px 30px rgba(3, 159, 250, 0.25);
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-        .code-display-card::after {
-            content: '';
-            position: absolute;
-            top: -60px;
-            right: -60px;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            pointer-events: none;
-        }
-        .code-big-box {
-            background: rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(8px);
-            border: 2px dashed rgba(255, 255, 255, 0.6);
-            border-radius: 16px;
-            padding: 16px 28px;
-            display: inline-flex;
-            align-items: center;
-            gap: 16px;
-            margin: 16px 0;
-        }
-        .code-big-text {
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 44px;
-            font-weight: 900;
-            letter-spacing: 6px;
-            color: #FFFFFF;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        .btn-copy-code {
-            background: #FFFFFF;
-            color: #0284C7;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-weight: 800;
-            font-size: 13px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.15s, background 0.15s;
-        }
-        .btn-copy-code:hover {
-            background: #F0F9FF;
-            transform: translateY(-1px);
-        }
-        .btn-copy-code:active {
-            transform: translateY(1px);
-        }
-        .status-badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .status-badge-pill.open {
-            background: rgba(255, 255, 255, 0.25);
-            color: #FFFFFF;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        .status-badge-pill.expired {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-        .status-badge-pill.closed {
-            background: #E2E8F0;
-            color: #475569;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card-custom {
-            background: #FFFFFF;
-            border: 1px solid rgba(3, 159, 250, 0.15);
-            border-radius: 16px;
-            padding: 18px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-        }
-        .stat-card-custom .val {
-            font-size: 26px;
-            font-weight: 800;
-            color: #0F172A;
-            line-height: 1.1;
-        }
-        .stat-card-custom .lbl {
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748B;
-            margin-top: 4px;
-        }
-        .tab-btn {
-            padding: 10px 18px;
-            font-size: 14px;
-            font-weight: 700;
-            border: none;
-            background: transparent;
-            color: #64748B;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            color: #039FFA;
-            border-bottom-color: #039FFA;
-        }
-        .btn-status-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-status-badge.hadir { background: #DCFCE7; color: #166534; }
-        .btn-status-badge.izin { background: #E0F2FE; color: #0369A1; }
-        .btn-status-badge.sakit { background: #FEF3C7; color: #92400E; }
-        .btn-status-badge.alpa { background: #FEE2E2; color: #991B1B; }
-
-        .btn-quick-mark {
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.15s;
-        }
-        .btn-qm-hadir { background: #DCFCE7; color: #166534; border-color: #86EFAC; }
-        .btn-qm-hadir:hover { background: #BBF7D0; }
-        .btn-qm-izin { background: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
-        .btn-qm-izin:hover { background: #BAE6FD; }
-        .btn-qm-sakit { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
-        .btn-qm-sakit:hover { background: #FDE68A; }
-        .btn-qm-alpa { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
-        .btn-qm-alpa:hover { background: #FECACA; }
-
-        .alert-box {
-            padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .alert-success { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
-        .alert-danger { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
-    </style>
 </head>
 
-<body>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-    <div class="app-window">
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
 
         <!-- 1. Navbar Dosen -->
         <x-navbar-dosen />
 
         <!-- 2. Konten Utama Detail Presensi -->
-        <main class="dosen-content">
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
             <!-- Breadcrumb Navigation -->
-            <div style="margin-bottom: 16px;">
-                <a href="{{ route('dosen.presensi.index', ['course_id' => $course->id]) }}" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #039FFA; text-decoration: none;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <div>
+                <a href="{{ route('dosen.presensi.index', ['course_id' => $course->id]) }}"
+                   class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-sky-600 hover:text-sky-700 transition">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    Kembali ke Daftar Presensi ({{ $course->code }})
+                    <span>Kembali ke Daftar Presensi ({{ $course->code }})</span>
                 </a>
             </div>
 
             @if (session('success'))
-                <div class="alert-box alert-success">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <div class="p-4 rounded-xl text-sm font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span>{{ session('success') }}</span>
@@ -224,13 +53,13 @@
             @endif
 
             @if ($errors->any())
-                <div class="alert-box alert-danger">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <div class="p-4 rounded-xl text-sm font-bold text-rose-800 bg-rose-50 border border-rose-200 flex items-start gap-3">
+                    <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    <div>
+                    <div class="space-y-1">
                         @foreach ($errors->all() as $err)
                             <div>{{ $err }}</div>
                         @endforeach
@@ -244,17 +73,20 @@
             @endphp
 
             <!-- Card Utama: Showcase Kode Unik Presensi -->
-            <div class="code-display-card">
-                <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+            <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white bg-gradient-to-br from-sky-600 via-sky-500 to-sky-400 shadow-xl shadow-sky-500/25">
+                <!-- Background Accent Glow Shape -->
+                <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/10 pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
-                        <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+                        <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-sky-100">
                             {{ $course->code }} &bull; {{ $course->name }} ({{ $course->sks }} SKS)
                         </div>
-                        <h1 style="font-size: 26px; font-weight: 900; margin: 4px 0 8px 0; color: #FFF;">
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1 mb-2 tracking-tight">
                             {{ $session->title }}
                         </h1>
                         @if ($session->description)
-                            <div style="font-size: 14px; opacity: 0.9; max-width: 600px;">
+                            <div class="text-xs sm:text-sm text-sky-50/90 max-w-2xl leading-relaxed">
                                 {{ $session->description }}
                             </div>
                         @endif
@@ -262,18 +94,18 @@
 
                     <div>
                         @if ($isOpen)
-                            <span class="status-badge-pill open">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; display: inline-block;"></span>
+                            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-xs">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-300/50 animate-pulse"></span>
                                 Sesi Aktif
                             </span>
                         @elseif ($isExpired)
-                            <span class="status-badge-pill expired">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #DC2626; display: inline-block;"></span>
+                            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200 shadow-xs">
+                                <span class="w-2 h-2 rounded-full bg-rose-600"></span>
                                 Masa Berlaku Habis
                             </span>
                         @else
-                            <span class="status-badge-pill closed">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #64748B; display: inline-block;"></span>
+                            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 shadow-xs">
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
                                 Sesi Ditutup
                             </span>
                         @endif
@@ -281,13 +113,15 @@
                 </div>
 
                 <!-- Bagian Kode Besar & Salin -->
-                <div style="margin-top: 14px; display: flex; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div class="code-big-box">
-                        <span class="code-big-text" id="presensiCodeVal">{{ $session->code }}</span>
+                <div class="relative z-10 mt-5 flex items-center flex-wrap gap-4">
+                    <div class="bg-white/15 backdrop-blur-md border-2 border-dashed border-white/60 rounded-2xl px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center gap-4">
+                        <span class="font-mono text-3xl sm:text-5xl font-black tracking-widest text-white drop-shadow-sm select-all" id="presensiCodeVal">{{ $session->code }}</span>
                     </div>
 
-                    <button type="button" class="btn-copy-code" onclick="copyCode('{{ $session->code }}')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <button type="button"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm text-sky-600 bg-white hover:bg-sky-50 active:scale-95 shadow-md shadow-sky-950/10 transition cursor-pointer"
+                            onclick="copyCode('{{ $session->code }}')">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                         </svg>
@@ -296,42 +130,42 @@
                 </div>
 
                 <!-- Info Masa Berlaku & Aksi Cepat Dosen -->
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-                    <div style="font-size: 14px; font-weight: 600;">
-                        <span>Waktu Presensi: <strong>{{ $session->start_time->format('H:i') }} &ndash; {{ $session->expires_at->format('H:i') }} WIB</strong> ({{ $session->start_time->format('d M Y') }})</span>
-                        <div style="font-size: 13px; opacity: 0.9; margin-top: 2px;">
+                <div class="relative z-10 mt-6 pt-5 border-t border-white/20 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="text-sm font-semibold text-white">
+                        <div>Waktu Presensi: <strong>{{ $session->start_time->format('H:i') }} &ndash; {{ $session->expires_at->format('H:i') }} WIB</strong> ({{ $session->start_time->format('d M Y') }})</div>
+                        <div class="text-xs sm:text-sm text-sky-100 mt-0.5">
                             Status waktu: <strong>{{ $session->remainingTimeForHumans() }}</strong>
                         </div>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div class="flex items-center gap-2.5 flex-wrap">
                         <!-- Perpanjang +15 Menit -->
-                        <form method="POST" action="{{ route('dosen.presensi.extend', $session) }}" style="display: inline;">
+                        <form method="POST" action="{{ route('dosen.presensi.extend', $session) }}" class="inline">
                             @csrf
                             <input type="hidden" name="minutes" value="15">
-                            <button type="submit" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: #FFF; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <button type="submit" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-white/20 hover:bg-white/30 border border-white/40 backdrop-blur-xs transition cursor-pointer">
                                 +15 Menit
                             </button>
                         </form>
 
                         <!-- Perpanjang +30 Menit -->
-                        <form method="POST" action="{{ route('dosen.presensi.extend', $session) }}" style="display: inline;">
+                        <form method="POST" action="{{ route('dosen.presensi.extend', $session) }}" class="inline">
                             @csrf
                             <input type="hidden" name="minutes" value="30">
-                            <button type="submit" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: #FFF; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <button type="submit" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-white/20 hover:bg-white/30 border border-white/40 backdrop-blur-xs transition cursor-pointer">
                                 +30 Menit
                             </button>
                         </form>
 
                         <!-- Toggle Tutup/Buka Sesi -->
-                        <form method="POST" action="{{ route('dosen.presensi.toggle', $session) }}" style="display: inline;">
+                        <form method="POST" action="{{ route('dosen.presensi.toggle', $session) }}" class="inline">
                             @csrf
                             @if ($session->is_active)
-                                <button type="submit" style="background: #EF4444; border: none; color: #FFF; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+                                <button type="submit" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-950/20 transition cursor-pointer">
                                     Tutup Sesi Sekarang
                                 </button>
                             @else
-                                <button type="submit" style="background: #10B981; border: none; color: #FFF; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+                                <button type="submit" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-950/20 transition cursor-pointer">
                                     Buka Kembali Sesi
                                 </button>
                             @endif
@@ -341,83 +175,97 @@
             </div>
 
             <!-- Statistik Kehadiran -->
-            <div class="stats-grid">
-                <div class="stat-card-custom">
-                    <div class="val">{{ $totalEnrolled }}</div>
-                    <div class="lbl">Total Mahasiswa di Kelas</div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-100 shadow-xs">
+                    <div class="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{{ $totalEnrolled }}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500 mt-2">Total Mahasiswa di Kelas</div>
                 </div>
-                <div class="stat-card-custom">
-                    <div class="val" style="color: #10B981;">{{ $totalAttended }}</div>
-                    <div class="lbl">Sudah Melakukan Presensi</div>
+                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-100 shadow-xs">
+                    <div class="text-2xl sm:text-3xl font-black text-emerald-600 leading-none">{{ $totalAttended }}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500 mt-2">Sudah Melakukan Presensi</div>
                 </div>
-                <div class="stat-card-custom">
-                    <div class="val" style="color: #F59E0B;">{{ count($unattendedList) }}</div>
-                    <div class="lbl">Belum Hadir</div>
+                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-100 shadow-xs">
+                    <div class="text-2xl sm:text-3xl font-black text-amber-500 leading-none">{{ count($unattendedList) }}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500 mt-2">Belum Hadir</div>
                 </div>
-                <div class="stat-card-custom">
-                    <div class="val" style="color: #039FFA;">{{ $percentAttended }}%</div>
-                    <div class="lbl">Tingkat Kehadiran Kelas</div>
+                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-sky-100 shadow-xs">
+                    <div class="text-2xl sm:text-3xl font-black text-sky-500 leading-none">{{ $percentAttended }}%</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-500 mt-2">Tingkat Kehadiran Kelas</div>
                 </div>
             </div>
 
             <!-- Nav Tabs Hadir vs Belum Hadir -->
-            <div style="background: #FFF; border-radius: 18px; border: 1px solid rgba(3, 159, 250, 0.18); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); overflow: hidden;">
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E2E8F0; padding: 0 20px; background: #F8FAFC;">
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" class="tab-btn active" id="tabBtnHadir" onclick="switchTab('hadir')">
+            <div class="bg-white rounded-2xl border border-sky-100 shadow-xs overflow-hidden flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 bg-slate-50/70 px-4 sm:px-6">
+                    <div class="flex gap-2 sm:gap-4 overflow-x-auto">
+                        <button type="button"
+                                class="py-3 sm:py-3.5 px-3 sm:px-4 text-xs sm:text-sm font-extrabold border-b-2 text-sky-600 border-sky-500 cursor-pointer transition whitespace-nowrap"
+                                id="tabBtnHadir"
+                                onclick="switchTab('hadir')">
                             Mahasiswa Hadir ({{ count($attendedList) }})
                         </button>
-                        <button type="button" class="tab-btn" id="tabBtnBelum" onclick="switchTab('belum')">
+                        <button type="button"
+                                class="py-3 sm:py-3.5 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 text-slate-500 border-transparent hover:text-slate-700 cursor-pointer transition whitespace-nowrap"
+                                id="tabBtnBelum"
+                                onclick="switchTab('belum')">
                             Belum Presensi ({{ count($unattendedList) }})
                         </button>
                     </div>
 
-                    <div style="font-size: 13px; color: #64748B; font-weight: 600;">
-                        Presensi Kelas: <strong>{{ $session->title }}</strong>
+                    <div class="py-2 sm:py-0 text-xs sm:text-sm text-slate-500 font-semibold">
+                        Presensi Kelas: <strong class="text-slate-700">{{ $session->title }}</strong>
                     </div>
                 </div>
 
                 <!-- TAB 1: MAHASISWA HADIR -->
-                <div id="panelHadir" style="display: block;">
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <div id="panelHadir" class="block">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
                             <thead>
-                                <tr style="background: #FFF; border-bottom: 2px solid #E2E8F0; color: #475569; font-size: 12px; font-weight: 800; text-transform: uppercase;">
-                                    <th style="padding: 14px 20px;">No</th>
-                                    <th style="padding: 14px 16px;">NIM</th>
-                                    <th style="padding: 14px 16px;">Nama Mahasiswa</th>
-                                    <th style="padding: 14px 16px;">Waktu Hadir</th>
-                                    <th style="padding: 14px 16px;">Status</th>
-                                    <th style="padding: 14px 16px;">Keterangan</th>
-                                    <th style="padding: 14px 20px; text-align: right;">Ubah Status Manual</th>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs font-black uppercase tracking-wider">
+                                    <th class="px-4 sm:px-6 py-3.5">No</th>
+                                    <th class="px-4 sm:px-6 py-3.5">NIM</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Nama Mahasiswa</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Waktu Hadir</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Status</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Keterangan</th>
+                                    <th class="px-4 sm:px-6 py-3.5 text-right">Ubah Status Manual</th>
                                 </tr>
                             </thead>
-                            <tbody id="attendedTbody">
+                            <tbody id="attendedTbody" class="divide-y divide-slate-100">
                                 @forelse ($attendedList as $idx => $row)
-                                    <tr style="border-bottom: 1px solid #F1F5F9;">
-                                        <td style="padding: 14px 20px; font-weight: 700; color: #94A3B8;">{{ $idx + 1 }}</td>
-                                        <td style="padding: 14px 16px; font-family: monospace; font-weight: 700; color: #0F172A;">
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-4 sm:px-6 py-3.5 font-bold text-slate-400 text-xs sm:text-sm">{{ $idx + 1 }}</td>
+                                        <td class="px-4 sm:px-6 py-3.5 font-mono font-bold text-slate-900 text-xs sm:text-sm">
                                             {{ $row['student']->nim_nip ?: '-' }}
                                         </td>
-                                        <td style="padding: 14px 16px; font-weight: 800; color: #0F172A;">
+                                        <td class="px-4 sm:px-6 py-3.5 font-extrabold text-slate-900 text-xs sm:text-sm">
                                             {{ $row['student']->name }}
                                         </td>
-                                        <td style="padding: 14px 16px; color: #475569; font-weight: 600;">
+                                        <td class="px-4 sm:px-6 py-3.5 text-slate-600 font-semibold text-xs sm:text-sm">
                                             {{ $row['attended_at'] ? $row['attended_at']->format('H:i:s') . ' WIB' : '-' }}
                                         </td>
-                                        <td style="padding: 14px 16px;">
-                                            <span class="btn-status-badge {{ $row['status'] }}">
+                                        <td class="px-4 sm:px-6 py-3.5">
+                                            @php
+                                                $statusClasses = [
+                                                    'hadir' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                                    'izin' => 'bg-sky-100 text-sky-800 border-sky-200',
+                                                    'sakit' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                                    'alpa' => 'bg-rose-100 text-rose-800 border-rose-200',
+                                                ][$row['status']] ?? 'bg-slate-100 text-slate-800 border-slate-200';
+                                            @endphp
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase border {{ $statusClasses }}">
                                                 {{ strtoupper($row['status']) }}
                                             </span>
                                         </td>
-                                        <td style="padding: 14px 16px; font-size: 13px; color: #64748B;">
+                                        <td class="px-4 sm:px-6 py-3.5 text-xs text-slate-500">
                                             {{ $row['notes'] ?: 'Melalui kode unik' }}
                                         </td>
-                                        <td style="padding: 14px 20px; text-align: right;">
-                                            <form method="POST" action="{{ route('dosen.presensi.manual', $session) }}" style="display: inline-flex; align-items: center; gap: 4px; justify-content: flex-end;">
+                                        <td class="px-4 sm:px-6 py-3.5 text-right">
+                                            <form method="POST" action="{{ route('dosen.presensi.manual', $session) }}" class="inline-flex items-center gap-1.5 justify-end">
                                                 @csrf
                                                 <input type="hidden" name="user_id" value="{{ $row['student']->id }}">
-                                                <select name="status" onchange="this.form.submit()" style="font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; border: 1px solid #CBD5E1; background: #FFF;">
+                                                <select name="status" onchange="this.form.submit()" class="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-sky-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 cursor-pointer">
                                                     <option value="hadir" {{ $row['status'] === 'hadir' ? 'selected' : '' }}>Hadir</option>
                                                     <option value="izin" {{ $row['status'] === 'izin' ? 'selected' : '' }}>Izin</option>
                                                     <option value="sakit" {{ $row['status'] === 'sakit' ? 'selected' : '' }}>Sakit</option>
@@ -428,9 +276,9 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" style="padding: 40px; text-align: center; color: #94A3B8;">
-                                            <div style="font-size: 15px; font-weight: 700; color: #475569;">Belum ada mahasiswa yang memasukkan kode presensi.</div>
-                                            <div style="font-size: 13px; margin-top: 4px;">Bagikan kode unik di atas kepada mahasiswa Anda.</div>
+                                        <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                                            <div class="text-sm sm:text-base font-bold text-slate-600">Belum ada mahasiswa yang memasukkan kode presensi.</div>
+                                            <div class="text-xs sm:text-sm mt-1">Bagikan kode unik di atas kepada mahasiswa Anda.</div>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -439,49 +287,49 @@
                     </div>
 
                     {{-- Paginator Client-side --}}
-                    <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                        <span id="attendedPaginatorInfo" style="font-size: 12px; font-weight: 600; color: #64748B;"></span>
-                        <div id="attendedPaginator" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"></div>
+                    <div class="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <span id="attendedPaginatorInfo" class="text-xs font-bold text-slate-500"></span>
+                        <div id="attendedPaginator" class="flex items-center gap-1.5 flex-wrap"></div>
                     </div>
                 </div>
 
                 <!-- TAB 2: MAHASISWA BELUM HADIR -->
-                <div id="panelBelum" style="display: none;">
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <div id="panelBelum" class="hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
                             <thead>
-                                <tr style="background: #FFF; border-bottom: 2px solid #E2E8F0; color: #475569; font-size: 12px; font-weight: 800; text-transform: uppercase;">
-                                    <th style="padding: 14px 20px;">No</th>
-                                    <th style="padding: 14px 16px;">NIM</th>
-                                    <th style="padding: 14px 16px;">Nama Mahasiswa</th>
-                                    <th style="padding: 14px 16px;">Status Saat Ini</th>
-                                    <th style="padding: 14px 20px; text-align: right;">Presensi Cepat Manual oleh Dosen</th>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs font-black uppercase tracking-wider">
+                                    <th class="px-4 sm:px-6 py-3.5">No</th>
+                                    <th class="px-4 sm:px-6 py-3.5">NIM</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Nama Mahasiswa</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Status Saat Ini</th>
+                                    <th class="px-4 sm:px-6 py-3.5 text-right">Presensi Cepat Manual oleh Dosen</th>
                                 </tr>
                             </thead>
-                            <tbody id="unattendedTbody">
+                            <tbody id="unattendedTbody" class="divide-y divide-slate-100">
                                 @forelse ($unattendedList as $idx => $row)
-                                    <tr style="border-bottom: 1px solid #F1F5F9;">
-                                        <td style="padding: 14px 20px; font-weight: 700; color: #94A3B8;">{{ $idx + 1 }}</td>
-                                        <td style="padding: 14px 16px; font-family: monospace; font-weight: 700; color: #0F172A;">
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-4 sm:px-6 py-3.5 font-bold text-slate-400 text-xs sm:text-sm">{{ $idx + 1 }}</td>
+                                        <td class="px-4 sm:px-6 py-3.5 font-mono font-bold text-slate-900 text-xs sm:text-sm">
                                             {{ $row['student']->nim_nip ?: '-' }}
                                         </td>
-                                        <td style="padding: 14px 16px; font-weight: 800; color: #0F172A;">
+                                        <td class="px-4 sm:px-6 py-3.5 font-extrabold text-slate-900 text-xs sm:text-sm">
                                             {{ $row['student']->name }}
                                         </td>
-                                        <td style="padding: 14px 16px;">
-                                            <span style="font-size: 12px; font-weight: 700; color: #94A3B8; background: #F1F5F9; padding: 4px 8px; border-radius: 6px;">
+                                        <td class="px-4 sm:px-6 py-3.5">
+                                            <span class="inline-flex items-center text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
                                                 Belum Presensi
                                             </span>
                                         </td>
-                                        <td style="padding: 14px 20px; text-align: right;">
-                                            <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                                        <td class="px-4 sm:px-6 py-3.5 text-right">
+                                            <div class="inline-flex items-center gap-1.5 justify-end flex-wrap">
                                                 <!-- Tandai Hadir -->
                                                 <form method="POST" action="{{ route('dosen.presensi.manual', $session) }}">
                                                     @csrf
                                                     <input type="hidden" name="user_id" value="{{ $row['student']->id }}">
                                                     <input type="hidden" name="status" value="hadir">
                                                     <input type="hidden" name="notes" value="Ditandai manual oleh dosen">
-                                                    <button type="submit" class="btn-quick-mark btn-qm-hadir">Hadir</button>
+                                                    <button type="submit" class="px-2.5 py-1 text-xs font-extrabold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 transition cursor-pointer">Hadir</button>
                                                 </form>
 
                                                 <!-- Tandai Izin -->
@@ -490,7 +338,7 @@
                                                     <input type="hidden" name="user_id" value="{{ $row['student']->id }}">
                                                     <input type="hidden" name="status" value="izin">
                                                     <input type="hidden" name="notes" value="Izin dikonfirmasi dosen">
-                                                    <button type="submit" class="btn-quick-mark btn-qm-izin">Izin</button>
+                                                    <button type="submit" class="px-2.5 py-1 text-xs font-extrabold rounded-md bg-sky-100 text-sky-800 border border-sky-300 hover:bg-sky-200 transition cursor-pointer">Izin</button>
                                                 </form>
 
                                                 <!-- Tandai Sakit -->
@@ -499,7 +347,7 @@
                                                     <input type="hidden" name="user_id" value="{{ $row['student']->id }}">
                                                     <input type="hidden" name="status" value="sakit">
                                                     <input type="hidden" name="notes" value="Sakit dikonfirmasi dosen">
-                                                    <button type="submit" class="btn-quick-mark btn-qm-sakit">Sakit</button>
+                                                    <button type="submit" class="px-2.5 py-1 text-xs font-extrabold rounded-md bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition cursor-pointer">Sakit</button>
                                                 </form>
 
                                                 <!-- Tandai Alpa -->
@@ -508,19 +356,19 @@
                                                     <input type="hidden" name="user_id" value="{{ $row['student']->id }}">
                                                     <input type="hidden" name="status" value="alpa">
                                                     <input type="hidden" name="notes" value="Tidak hadir tanpa keterangan">
-                                                    <button type="submit" class="btn-quick-mark btn-qm-alpa">Alpa</button>
+                                                    <button type="submit" class="px-2.5 py-1 text-xs font-extrabold rounded-md bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200 transition cursor-pointer">Alpa</button>
                                                 </form>
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" style="padding: 40px; text-align: center; color: #10B981;">
-                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; display: block;">
+                                        <td colspan="5" class="px-6 py-12 text-center text-emerald-600">
+                                            <svg class="w-10 h-10 mx-auto mb-2 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                             </svg>
-                                            <div style="font-size: 15px; font-weight: 800;">Luar biasa! Seluruh mahasiswa di kelas ini telah melakukan presensi.</div>
+                                            <div class="text-sm sm:text-base font-extrabold text-slate-800">Luar biasa! Seluruh mahasiswa di kelas ini telah melakukan presensi.</div>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -529,9 +377,9 @@
                     </div>
 
                     {{-- Paginator Client-side --}}
-                    <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                        <span id="unattendedPaginatorInfo" style="font-size: 12px; font-weight: 600; color: #64748B;"></span>
-                        <div id="unattendedPaginator" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"></div>
+                    <div class="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <span id="unattendedPaginatorInfo" class="text-xs font-bold text-slate-500"></span>
+                        <div id="unattendedPaginator" class="flex items-center gap-1.5 flex-wrap"></div>
                     </div>
                 </div>
             </div>
@@ -561,16 +409,20 @@
             const panelBelum = document.getElementById('panelBelum');
 
             if (tab === 'hadir') {
-                btnHadir.classList.add('active');
-                btnBelum.classList.remove('active');
-                panelHadir.style.display = 'block';
-                panelBelum.style.display = 'none';
+                btnHadir.className = 'py-3 sm:py-3.5 px-3 sm:px-4 text-xs sm:text-sm font-extrabold border-b-2 text-sky-600 border-sky-500 cursor-pointer transition whitespace-nowrap';
+                btnBelum.className = 'py-3 sm:py-3.5 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 text-slate-500 border-transparent hover:text-slate-700 cursor-pointer transition whitespace-nowrap';
+                panelHadir.classList.remove('hidden');
+                panelHadir.classList.add('block');
+                panelBelum.classList.remove('block');
+                panelBelum.classList.add('hidden');
                 if (window.renderAttended) window.renderAttended();
             } else {
-                btnBelum.classList.add('active');
-                btnHadir.classList.remove('active');
-                panelBelum.style.display = 'block';
-                panelHadir.style.display = 'none';
+                btnBelum.className = 'py-3 sm:py-3.5 px-3 sm:px-4 text-xs sm:text-sm font-extrabold border-b-2 text-sky-600 border-sky-500 cursor-pointer transition whitespace-nowrap';
+                btnHadir.className = 'py-3 sm:py-3.5 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 text-slate-500 border-transparent hover:text-slate-700 cursor-pointer transition whitespace-nowrap';
+                panelBelum.classList.remove('hidden');
+                panelBelum.classList.add('block');
+                panelHadir.classList.remove('block');
+                panelHadir.classList.add('hidden');
                 if (window.renderUnattended) window.renderUnattended();
             }
         }

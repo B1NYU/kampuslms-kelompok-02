@@ -10,21 +10,20 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:400,500,600,700,800,900" rel="stylesheet">
 
+    <!-- Memuat CSS & JS via Vite (Tailwind app.css murni tanpa file CSS eksternal) -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/css/dosen/dosen.tugas.css', 'resources/js/app.js', 'resources/js/mahasiswa/mahasiswa.tugas.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/dosen/dosen.tugas.css') }}">
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/mahasiswa/mahasiswa.tugas.js'])
     @endif
 </head>
 
-<body>
+<body class="bg-[#F1F5F9] min-h-screen text-slate-800 antialiased font-['Nunito',sans-serif] relative overflow-x-hidden">
 
-    <!-- Background Decorative Glow -->
-    <div class="bg-shape bg-shape-1"></div>
-    <div class="bg-shape bg-shape-2"></div>
-    <div class="bg-shape bg-shape-3"></div>
+    <!-- Soft Decorative Atmospheric Glow -->
+    <div class="fixed -top-24 -right-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-24 -left-24 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 right-1/4 w-72 h-72 bg-orange-400/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-    <div class="app-window">
+    <div class="min-h-screen flex flex-col justify-between relative z-10">
 
         <!-- Navbar Dinamis Sesuai Peran -->
         @if(auth()->user()->role === 'dosen')
@@ -36,37 +35,40 @@
         @endif
 
         <!-- Konten Utama Detail Tugas & Pengumpulan -->
-        <main class="dosen-content">
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="dash-topbar">
-                <div class="topbar-left">
-                    <div class="page-title">
-                        <span class="page-eyebrow">
-                            <span class="page-eyebrow-dot"></span>
-                            @if(auth()->user()->role === 'dosen')
-                                PORTAL DOSEN &bull; DETAIL PENGUMPULAN TUGAS
-                            @elseif(auth()->user()->role === 'admin')
-                                PANEL ADMIN &bull; DETAIL TUGAS &amp; PENGUMPULAN
-                            @else
-                                PORTAL MAHASISWA &bull; DETAIL PENUGASAN KULIAH
-                            @endif
-                        </span>
-                        <h1>{{ $assignment->title }}</h1>
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+                <div class="flex flex-col gap-1 min-w-0">
+                    <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-sky-600">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                        @if(auth()->user()->role === 'dosen')
+                            PORTAL DOSEN &bull; DETAIL PENGUMPULAN TUGAS
+                        @elseif(auth()->user()->role === 'admin')
+                            PANEL ADMIN &bull; DETAIL TUGAS &amp; PENGUMPULAN
+                        @else
+                            PORTAL MAHASISWA &bull; DETAIL PENUGASAN KULIAH
+                        @endif
                     </div>
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight truncate">
+                        {{ $assignment->title }}
+                    </h1>
                 </div>
 
-                <div class="topbar-actions">
+                <div class="flex items-center gap-2.5 shrink-0">
                     @if(auth()->user()->role === 'dosen')
-                        <a href="{{ route('dosen.tugas') }}" class="btn-secondary-action">
+                        <a href="{{ route('dosen.tugas') }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-xs transition">
                             &larr; Kembali ke Kelola Tugas
                         </a>
                     @elseif(auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="btn-secondary-action">
+                        <a href="{{ route('admin.dashboard') }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-xs transition">
                             &larr; Kembali ke Dashboard Admin
                         </a>
                     @else
-                        <a href="{{ route('mahasiswa.mata-kuliah.show', $assignment->course_id) }}" class="btn-secondary-action">
+                        <a href="{{ route('mahasiswa.mata-kuliah.show', $assignment->course_id) }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-xs transition">
                             &larr; Kembali ke Mata Kuliah
                         </a>
                     @endif
@@ -74,208 +76,210 @@
             </header>
 
             <!-- 1. Kartu Informasi & Instruksi Tugas -->
-            <section class="feature-section">
-                <div class="section-card">
-                    <div class="section-header">
-                        <div class="section-header-left">
-                            <div class="section-header-icon" style="background: rgba(3, 159, 250, 0.12); color: #039FFA;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
-                            </div>
-                            <div class="section-header-text">
-                                <h2>Informasi &amp; Instruksi Tugas</h2>
-                                <p><strong>{{ $assignment->course->code }}</strong> &middot; {{ $assignment->course->name }} &middot; Dosen: {{ $assignment->course->lecturer?->name ?? 'Dosen Pengampu' }}</p>
-                            </div>
+            <section class="bg-white rounded-2xl border border-sky-100 shadow-xs p-5 sm:p-6 flex flex-col gap-5">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 mt-0.5">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            <span class="badge-status {{ $assignment->due_at->isPast() ? 'badge-status-warning' : 'badge-status-active' }}">
-                                {{ $assignment->due_at->isPast() ? 'Batas Waktu Lewat' : 'Tugas Berjalan' }}
-                            </span>
-                            <span class="section-header-badge">Nilai Maks: {{ $assignment->max_score }}</span>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-900 leading-snug">Informasi &amp; Instruksi Tugas</h2>
+                            <p class="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
+                                <strong class="text-slate-700">{{ $assignment->course->code }}</strong> &middot; {{ $assignment->course->name }} &middot; Dosen: {{ $assignment->course->lecturer?->name ?? 'Dosen Pengampu' }}
+                            </p>
                         </div>
                     </div>
-
-                    <!-- Ringkasan Info Detail -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
-                        <div style="background: #F8FAFC; border: 1px solid rgba(3, 159, 250, 0.14); border-radius: 12px; padding: 14px 16px;">
-                            <span style="display: block; font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Tenggat Pengumpulan</span>
-                            <span style="display: block; font-size: 14px; font-weight: 800; color: #0F172A; margin-top: 4px;">{{ $assignment->due_at->format('d M Y, H:i') }} WIB</span>
-                        </div>
-                        <div style="background: #F8FAFC; border: 1px solid rgba(3, 159, 250, 0.14); border-radius: 12px; padding: 14px 16px;">
-                            <span style="display: block; font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Skor Maksimal</span>
-                            <span style="display: block; font-size: 14px; font-weight: 800; color: #039FFA; margin-top: 4px;">{{ $assignment->max_score }} Poin</span>
-                        </div>
-                        <div style="background: #F8FAFC; border: 1px solid rgba(3, 159, 250, 0.14); border-radius: 12px; padding: 14px 16px;">
-                            <span style="display: block; font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Status Pengumpulan</span>
-                            <span style="display: block; font-size: 14px; font-weight: 800; color: #10B981; margin-top: 4px;">
-                                @if(auth()->user()->role === 'mahasiswa')
-                                    {{ $mySubmission ? 'Sudah Dikumpulkan' : 'Belum Dikumpulkan' }}
-                                @else
-                                    {{ $submissions->count() }} Berkas Masuk
-                                @endif
+                    <div class="flex items-center gap-2 flex-wrap">
+                        @if ($assignment->due_at->isPast())
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                                Batas Waktu Lewat
                             </span>
-                        </div>
-                    </div>
-
-                    <!-- Petunjuk / Instruksi -->
-                    <div style="background: #FFFFFF; border: 1px solid rgba(3, 159, 250, 0.18); border-radius: 12px; padding: 16px 20px;">
-                        <span style="display: block; font-size: 11.5px; font-weight: 800; color: #039FFA; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
-                            Deskripsi &amp; Instruksi Pengerjaan:
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                Tugas Berjalan
+                            </span>
+                        @endif
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black text-sky-700 bg-sky-50 border border-sky-100">
+                            Nilai Maks: {{ $assignment->max_score }}
                         </span>
-                        <div style="font-size: 13.5px; color: #334155; line-height: 1.6; font-weight: 600;">
-                            {!! nl2br(e($assignment->instructions)) !!}
-                        </div>
+                    </div>
+                </div>
+
+                <!-- Ringkasan Info Detail -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div class="bg-slate-50/80 border border-sky-100/80 rounded-xl p-3.5 sm:p-4">
+                        <span class="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Tenggat Pengumpulan</span>
+                        <span class="block text-sm sm:text-base font-black text-slate-800 mt-1">{{ $assignment->due_at->format('d M Y, H:i') }} WIB</span>
+                    </div>
+                    <div class="bg-slate-50/80 border border-sky-100/80 rounded-xl p-3.5 sm:p-4">
+                        <span class="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Skor Maksimal</span>
+                        <span class="block text-sm sm:text-base font-black text-sky-600 mt-1">{{ $assignment->max_score }} Poin</span>
+                    </div>
+                    <div class="bg-slate-50/80 border border-sky-100/80 rounded-xl p-3.5 sm:p-4">
+                        <span class="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Status Pengumpulan</span>
+                        <span class="block text-sm sm:text-base font-black text-emerald-600 mt-1">
+                            @if(auth()->user()->role === 'mahasiswa')
+                                {{ $mySubmission ? 'Sudah Dikumpulkan' : 'Belum Dikumpulkan' }}
+                            @else
+                                {{ $submissions->count() }} Berkas Masuk
+                            @endif
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Petunjuk / Instruksi -->
+                <div class="bg-white border border-sky-100 rounded-xl p-4 sm:p-5">
+                    <span class="block text-xs font-black text-sky-600 uppercase tracking-wider mb-2">
+                        Deskripsi &amp; Instruksi Pengerjaan:
+                    </span>
+                    <div class="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold">
+                        {!! nl2br(e($assignment->instructions)) !!}
                     </div>
                 </div>
             </section>
 
             <!-- 2. Bagian Pengumpulan (Berdasarkan Role) -->
             @if(auth()->user()->role === 'mahasiswa')
-                <section class="feature-section" style="margin-top: 24px;">
-                    <div class="section-card">
-                        <div class="section-header">
-                            <div class="section-header-left">
-                                <div class="section-header-icon" style="background: rgba(3, 159, 250, 0.12); color: #039FFA;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                                    </svg>
-                                </div>
-                                <div class="section-header-text">
-                                    <h2>Pengumpulan Saya</h2>
-                                    <p>Unggah atau perbarui berkas jawaban tugas Anda sebelum batas tenggat berakhir.</p>
-                                </div>
+                <section class="bg-white rounded-2xl border border-sky-100 shadow-xs p-5 sm:p-6 flex flex-col gap-5">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
                             </div>
-                            <span class="section-header-badge">{{ $mySubmission ? 'Sudah Dikumpulkan' : 'Menunggu Pengumpulan' }}</span>
+                            <div>
+                                <h2 class="text-base sm:text-lg font-black text-slate-900 leading-snug">Pengumpulan Saya</h2>
+                                <p class="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">Unggah atau perbarui berkas jawaban tugas Anda sebelum batas tenggat berakhir.</p>
+                            </div>
                         </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black text-sky-700 bg-sky-50 border border-sky-100">
+                            {{ $mySubmission ? 'Sudah Dikumpulkan' : 'Menunggu Pengumpulan' }}
+                        </span>
+                    </div>
 
-                        @php
-                            $tenggatLewat = $assignment->due_at->isPast();
-                            $ditutup = $tenggatLewat && ! $assignment->allow_late;
-                            $nilaiSaya = $mySubmission?->grade;
-                        @endphp
+                    @php
+                        $tenggatLewat = $assignment->due_at->isPast();
+                        $ditutup = $tenggatLewat && ! $assignment->allow_late;
+                        $nilaiSaya = $mySubmission?->grade;
+                    @endphp
 
-                        @if (session('success'))
-                            <div role="status" style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; font-weight: 700;">
-                                {{ session('success') }}
-                            </div>
-                        @endif
+                    @if (session('success'))
+                        <div role="status" class="p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50 border border-emerald-200">
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
-                        @if ($errors->any())
-                            <div role="alert" style="background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; font-weight: 700;">
-                                @foreach ($errors->all() as $pesan)
-                                    <div>{{ $pesan }}</div>
-                                @endforeach
-                            </div>
-                        @endif
+                    @if ($errors->any())
+                        <div role="alert" class="p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm font-bold text-rose-800 bg-rose-50 border border-rose-200 space-y-1">
+                            @foreach ($errors->all() as $pesan)
+                                <div>{{ $pesan }}</div>
+                            @endforeach
+                        </div>
+                    @endif
 
-                        @if($mySubmission)
-                            <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-size: 20px;">✓</span>
-                                    <span style="font-size: 13px; font-weight: 700; color: #065F46;">
-                                        Sudah dikumpulkan: <strong>{{ $mySubmission->original_name }}</strong>
-                                        (<a href="{{ route('submissions.show', $mySubmission) }}" style="color: #039FFA; font-weight: 800; text-decoration: underline;">detail</a>
-                                        &middot; <a href="{{ route('submissions.download', $mySubmission) }}" style="color: #039FFA; font-weight: 800; text-decoration: underline;">unduh</a>)
-                                    </span>
-                                </div>
-                                <span class="badge-status badge-status-active">
-                                    Terkumpul {{ $mySubmission->submitted_at ? $mySubmission->submitted_at->format('d M Y, H:i') : '' }}
+                    @if($mySubmission)
+                        <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 sm:p-4 flex items-center justify-between flex-wrap gap-2.5">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="text-emerald-600 font-black text-base sm:text-lg">✓</span>
+                                <span class="text-xs sm:text-sm font-bold text-emerald-900 truncate">
+                                    Sudah dikumpulkan: <strong>{{ $mySubmission->original_name }}</strong>
+                                    (<a href="{{ route('submissions.show', $mySubmission) }}" class="text-sky-600 font-extrabold underline hover:text-sky-700">detail</a>
+                                    &middot; <a href="{{ route('submissions.download', $mySubmission) }}" class="text-sky-600 font-extrabold underline hover:text-sky-700">unduh</a>)
                                 </span>
                             </div>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                                Terkumpul {{ $mySubmission->submitted_at ? $mySubmission->submitted_at->format('d M Y, H:i') : '' }}
+                            </span>
+                        </div>
+                    @endif
+
+                    @if ($nilaiSaya)
+                        <div class="bg-sky-50 border border-sky-200 rounded-xl p-4">
+                            <div class="text-xs sm:text-sm font-black text-sky-900">
+                                Nilai: {{ rtrim(rtrim(number_format((float) $nilaiSaya->score, 2), '0'), '.') }} / {{ $assignment->max_score }}
+                            </div>
+                            @if ($nilaiSaya->feedback)
+                                <div class="text-xs sm:text-sm text-slate-700 mt-1.5 font-semibold leading-relaxed">{!! nl2br(e($nilaiSaya->feedback)) !!}</div>
+                            @endif
+                            <div class="text-xs text-slate-500 mt-2 font-bold">Tugas yang sudah dinilai tidak dapat dikumpulkan ulang.</div>
+                        </div>
+                    @elseif ($ditutup)
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs sm:text-sm font-bold text-amber-900">
+                            Batas waktu pengumpulan telah berakhir dan tugas ini tidak menerima pengumpulan terlambat.
+                            Hubungi dosen pengampu bila memerlukan dispensasi.
+                        </div>
+                    @else
+                        @if ($tenggatLewat)
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-3.5 text-xs sm:text-sm font-bold text-amber-900">
+                                Tenggat sudah lewat. Pengumpulan tetap diterima tetapi akan ditandai terlambat.
+                            </div>
                         @endif
 
-
-                        @if ($nilaiSaya)
-                            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 14px 18px; margin-bottom: 8px;">
-                                <div style="font-size: 13px; font-weight: 800; color: #1E40AF;">
-                                    Nilai: {{ rtrim(rtrim(number_format((float) $nilaiSaya->score, 2), '0'), '.') }} / {{ $assignment->max_score }}
-                                </div>
-                                @if ($nilaiSaya->feedback)
-                                    <div style="font-size: 13px; color: #334155; margin-top: 6px; font-weight: 600;">{!! nl2br(e($nilaiSaya->feedback)) !!}</div>
-                                @endif
-                                <div style="font-size: 12px; color: #64748B; margin-top: 6px; font-weight: 600;">Tugas yang sudah dinilai tidak dapat dikumpulkan ulang.</div>
-                            </div>
-                        @elseif ($ditutup)
-                            <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 12px; padding: 14px 18px; font-size: 13px; font-weight: 700; color: #92400E;">
-                                Batas waktu pengumpulan telah berakhir dan tugas ini tidak menerima pengumpulan terlambat.
-                                Hubungi dosen pengampu bila memerlukan dispensasi.
-                            </div>
-                        @else
-                            @if ($tenggatLewat)
-                                <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 13px; font-weight: 700; color: #92400E;">
-                                    Tenggat sudah lewat. Pengumpulan tetap diterima tetapi akan ditandai terlambat.
-                                </div>
-                            @endif
-                        <style>
-                            @media (max-width: 860px) {
-                                .submission-grid-layout {
-                                    grid-template-columns: 1fr !important;
-                                    gap: 18px !important;
-                                }
-                            }
-                        </style>
-                        <form id="submissionForm" action="{{ route('mahasiswa.assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data" class="card-form">
+                        <form id="submissionForm" action="{{ route('mahasiswa.assignments.submissions.store', $assignment) }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <div class="submission-grid-layout" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; align-items: start;">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                                 <!-- KOLOM KIRI: UNGGAH BERKAS TUGAS -->
-                                <div class="submission-col-left">
-                                    <label style="display: block; font-size: 13.5px; font-weight: 800; color: #1E293B; margin-bottom: 8px;">
-                                        Unggah Berkas Tugas <span class="required">*</span>
+                                <div class="lg:col-span-7 flex flex-col gap-2">
+                                    <label class="block text-xs sm:text-sm font-black text-slate-800">
+                                        Unggah Berkas Tugas <span class="text-rose-500">*</span>
                                     </label>
 
                                     <!-- DROPZONE INTERAKTIF -->
-                                    <div class="submission-dropzone" id="submissionDropzone" style="width: 100%; border: 2px dashed rgba(3, 159, 250, 0.4); border-radius: 16px; padding: 32px 20px; background: #F8FAFC; text-align: center; cursor: pointer; transition: all 0.25s ease; position: relative; box-sizing: border-box;">
-                                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #EFF6FF; color: #039FFA; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; transition: transform 0.2s ease;">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <div class="w-full border-2 border-dashed border-sky-300 rounded-2xl p-6 sm:p-8 bg-slate-50/70 text-center cursor-pointer transition hover:bg-sky-50/40 relative"
+                                         id="submissionDropzone">
+                                        <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-3">
+                                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                                 <polyline points="17 8 12 3 7 8"></polyline>
                                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                                             </svg>
                                         </div>
-                                        <div style="font-size: 14px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">
-                                            Tarik &amp; letakkan berkas di sini, atau <span style="color: #039FFA; text-decoration: underline;">Pilih File</span>
+                                        <div class="text-xs sm:text-sm font-extrabold text-slate-900 mb-1">
+                                            Tarik &amp; letakkan berkas di sini, atau <span class="text-sky-600 underline">Pilih File</span>
                                         </div>
-                                        <div style="font-size: 12px; font-weight: 600; color: #64748B;">
-                                            Mendukung: <strong style="color: #0284C7;">PDF, DOC, DOCX, ZIP, TXT</strong> &bull; Maksimal 10 MB
+                                        <div class="text-xs font-semibold text-slate-500">
+                                            Mendukung: <strong class="text-sky-700">PDF, DOC, DOCX, ZIP, TXT</strong> &bull; Maksimal 10 MB
                                         </div>
 
                                         <input type="file" id="submissionFileInput" name="file" required accept=".pdf,.doc,.docx,.zip,.txt"
-                                               style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; display: block;">
+                                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer block">
                                     </div>
 
                                     <!-- PREVIEW CONTAINER BERKAS TUGAS -->
-                                    <div id="submissionPreviewContainer" style="display: none; width: 100%; background: #FFFFFF; border: 1.5px solid rgba(3, 159, 250, 0.3); border-radius: 16px; padding: 16px 18px; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05); box-sizing: border-box;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-                                            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                                                <div id="fileTypeIcon" style="width: 40px; height: 40px; border-radius: 10px; background: #EFF6FF; color: #039FFA; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 900;">
+                                    <div id="submissionPreviewContainer" class="hidden w-full bg-white border border-sky-200 rounded-2xl p-4 shadow-xs">
+                                        <div class="flex items-center justify-between gap-3 flex-wrap">
+                                            <div class="flex items-center gap-3 min-w-0">
+                                                <div id="fileTypeIcon" class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 text-xs font-black">
                                                     DOC
                                                 </div>
-                                                <div style="min-width: 0;">
-                                                    <div id="previewFileName" style="font-size: 13px; font-weight: 800; color: #0F172A; word-break: break-all;">-</div>
-                                                    <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 11px; font-weight: 700;">
-                                                        <span id="previewFileSize" style="color: #64748B;">-</span>
-                                                        <span style="color: #CBD5E1;">&bull;</span>
-                                                        <span style="background: #ECFDF5; color: #059669; padding: 1px 6px; border-radius: 5px; border: 1px solid #A7F3D0;">✓ Siap Dikumpulkan</span>
+                                                <div class="min-w-0">
+                                                    <div id="previewFileName" class="text-xs sm:text-sm font-black text-slate-900 break-all">-</div>
+                                                    <div class="flex items-center gap-2 mt-0.5 text-xs font-bold">
+                                                        <span id="previewFileSize" class="text-slate-500">-</span>
+                                                        <span class="text-slate-300">&bull;</span>
+                                                        <span class="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200">✓ Siap Dikumpulkan</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div style="display: flex; align-items: center; gap: 6px;">
-                                                <button type="button" id="btnChangeFile" style="background: #F1F5F9; border: 1px solid #CBD5E1; color: #334155; font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <div class="flex items-center gap-1.5">
+                                                <button type="button" id="btnChangeFile" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">
+                                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                         <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
                                                     </svg>
                                                     Ganti
                                                 </button>
-                                                <button type="button" id="btnRemoveFile" style="background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <button type="button" id="btnRemoveFile" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer">
+                                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                                         <line x1="6" y1="6" x2="18" y2="18"></line>
                                                     </svg>
@@ -285,154 +289,162 @@
                                         </div>
 
                                         <!-- PRATINJAU DOKUMEN INTERAKTIF (PDF / TEKS) -->
-                                        <div id="interactivePreviewBox" style="display: none; margin-top: 14px; border-top: 1px solid #F1F5F9; padding-top: 12px;">
-                                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                                <span style="font-size: 11.5px; font-weight: 800; color: #475569; display: flex; align-items: center; gap: 6px;">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <div id="interactivePreviewBox" class="hidden mt-3 pt-3 border-t border-slate-100">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs font-black text-slate-600 flex items-center gap-1.5">
+                                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                                         <circle cx="12" cy="12" r="3"></circle>
                                                     </svg>
                                                     Pratinjau Dokumen
                                                 </span>
                                             </div>
-                                            <div id="docPreviewHolder" style="width: 100%; height: 460px; border-radius: 10px; overflow: hidden; background: #F8FAFC; border: 1.5px solid #E2E8F0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);"></div>
+                                            <div id="docPreviewHolder" class="w-full h-96 rounded-xl overflow-hidden bg-slate-50 border border-slate-200"></div>
                                         </div>
                                     </div>
 
-                                    <div id="fileUploadError" role="alert" style="display: none; margin-top: 8px; padding: 8px 12px; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; font-size: 12.5px; font-weight: 700; color: #B91C1C;"></div>
-                                    @error('file')<small style="color:#B91C1C;font-weight:700;display:block;margin-top:6px;">{{ $message }}</small>@enderror
+                                    <div id="fileUploadError" role="alert" class="hidden mt-2 p-2.5 rounded-xl text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200"></div>
+                                    @error('file')<small class="text-rose-600 font-bold block mt-1 text-xs">{{ $message }}</small>@enderror
                                 </div>
 
                                 <!-- KOLOM KANAN: CATATAN PENGUMPULAN & SUBMIT -->
-                                <div class="submission-col-right" style="display: flex; flex-direction: column; gap: 8px;">
-                                    <label for="note" style="display: block; font-size: 13.5px; font-weight: 800; color: #1E293B;">
+                                <div class="lg:col-span-5 flex flex-col gap-2">
+                                    <label for="note" class="block text-xs sm:text-sm font-black text-slate-800">
                                         Catatan Pengumpulan
                                     </label>
-                                    <textarea id="note" name="note" class="form-textarea" rows="6" maxlength="1000" placeholder="Tuliskan catatan atau keterangan pengumpulan bila diperlukan..." style="width: 100%; min-height: 140px; box-sizing: border-box; resize: vertical;">{{ old('note') }}</textarea>
+                                    <textarea id="note" name="note" rows="5" maxlength="1000"
+                                              placeholder="Tuliskan catatan atau keterangan pengumpulan bila diperlukan..."
+                                              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 transition resize-y min-h-[140px]">{{ old('note') }}</textarea>
 
-                                    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                                        <button type="submit" class="btn-primary-action" style="padding: 10px 24px; font-size: 13.5px;">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <div class="flex justify-end mt-2">
+                                        <button type="submit"
+                                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-xs shadow-sky-500/20 transition cursor-pointer">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
-                                            {{ $mySubmission ? 'Kumpulkan Ulang' : 'Kumpulkan Tugas' }}
+                                            <span>{{ $mySubmission ? 'Kumpulkan Ulang' : 'Kumpulkan Tugas' }}</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </form>
-                        @endif
-                    </div>
+                    @endif
                 </section>
             @else
-                <section class="feature-section" style="margin-top: 24px;">
-                    <div class="section-card">
-                        <div class="section-header">
-                            <div class="section-header-left">
-                                <div class="section-header-icon" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg>
-                                </div>
-                                <div class="section-header-text">
-                                    <h2>Pengumpulan Mahasiswa ({{ $submissions->count() }})</h2>
-                                    <p>Daftar seluruh mahasiswa yang telah mengirimkan berkas pengumpulan tugas ini.</p>
-                                </div>
+                <!-- Tabel Pengumpulan untuk Dosen / Admin -->
+                <section class="bg-white rounded-2xl border border-sky-100 shadow-xs p-5 sm:p-6 flex flex-col gap-5">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
                             </div>
-                            <span class="section-header-badge">Tabel Pengumpulan</span>
+                            <div>
+                                <h2 class="text-base sm:text-lg font-black text-slate-900 leading-snug">Pengumpulan Mahasiswa ({{ $submissions->count() }})</h2>
+                                <p class="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">Daftar seluruh mahasiswa yang telah mengirimkan berkas pengumpulan tugas ini.</p>
+                            </div>
                         </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black text-slate-600 bg-slate-100 border border-slate-200">
+                            Tabel Pengumpulan
+                        </span>
+                    </div>
 
-                        <div class="table-responsive">
-                            <table class="custom-dosen-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mahasiswa</th>
-                                        <th>Berkas</th>
-                                        <th>Waktu Pengumpulan</th>
-                                        <th>Nilai</th>
-                                        <th style="text-align: right;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="submissionShowTbody">
-                                    @forelse($submissions as $s)
-                                        @php
-                                            $name = $s->student->name;
-                                            $words = explode(' ', trim($name));
-                                            $initials = strtoupper(substr($words[0] ?? 'M', 0, 1) . substr($words[1] ?? '', 0, 1));
-                                            if (strlen($initials) === 1) $initials .= strtoupper(substr($words[0] ?? 'M', 1, 1));
-                                            $palette = [
-                                                ['bg' => 'rgba(3, 159, 250, 0.12)', 'color' => '#039FFA'],
-                                                ['bg' => 'rgba(249, 184, 4, 0.14)', 'color' => '#D97706'],
-                                                ['bg' => 'rgba(50, 179, 241, 0.14)', 'color' => '#0284C7'],
-                                                ['bg' => 'rgba(16, 185, 129, 0.14)', 'color' => '#10B981'],
-                                                ['bg' => 'rgba(249, 99, 5, 0.12)', 'color' => '#F96305'],
-                                            ];
-                                            $color = $palette[$s->user_id % 5];
-                                        @endphp
-                                        <tr>
-                                            <td>
-                                                <div class="student-cell">
-                                                    <div class="student-avatar" style="background: {{ $color['bg'] }}; color: {{ $color['color'] }}; font-weight: 800;">
-                                                        {{ $initials }}
-                                                    </div>
-                                                    <div class="student-meta">
-                                                        <span class="student-name">{{ $s->student->name }}</span>
-                                                        <span class="student-nim">{{ $s->student->nim_nip ?? ('NIM: 1024' . str_pad($s->user_id, 4, '0', STR_PAD_LEFT)) }}</span>
-                                                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-100">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs font-black uppercase tracking-wider">
+                                    <th class="px-4 sm:px-6 py-3.5">Mahasiswa</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Berkas</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Waktu Pengumpulan</th>
+                                    <th class="px-4 sm:px-6 py-3.5">Nilai</th>
+                                    <th class="px-4 sm:px-6 py-3.5 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissionShowTbody" class="divide-y divide-slate-100">
+                                @forelse($submissions as $s)
+                                    @php
+                                        $name = $s->student->name;
+                                        $words = explode(' ', trim($name));
+                                        $initials = strtoupper(substr($words[0] ?? 'M', 0, 1) . substr($words[1] ?? '', 0, 1));
+                                        if (strlen($initials) === 1) $initials .= strtoupper(substr($words[0] ?? 'M', 1, 1));
+                                        $palette = [
+                                            ['bg' => 'bg-sky-50', 'color' => 'text-sky-600'],
+                                            ['bg' => 'bg-amber-50', 'color' => 'text-amber-600'],
+                                            ['bg' => 'bg-cyan-50', 'color' => 'text-cyan-600'],
+                                            ['bg' => 'bg-emerald-50', 'color' => 'text-emerald-600'],
+                                            ['bg' => 'bg-orange-50', 'color' => 'text-orange-600'],
+                                        ];
+                                        $color = $palette[$s->user_id % 5];
+                                    @endphp
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-4 sm:px-6 py-3.5">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full {{ $color['bg'] }} {{ $color['color'] }} flex items-center justify-center text-xs font-black shrink-0">
+                                                    {{ $initials }}
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div style="display: flex; align-items: center; gap: 8px;">
-                                                    <span style="font-size: 16px;">📄</span>
-                                                    <div>
-                                                        <span style="font-weight: 700; color: #0F172A; display: block;">{{ $s->original_name }}</span>
-                                                        @if($s->file_size)
-                                                            <span style="font-size: 11px; color: #64748B;">{{ number_format($s->file_size / 1024, 1) }} KB</span>
-                                                        @endif
-                                                    </div>
+                                                <div>
+                                                    <span class="block font-extrabold text-slate-900 text-xs sm:text-sm">{{ $s->student->name }}</span>
+                                                    <span class="block text-[11px] font-mono text-slate-500 font-semibold">{{ $s->student->nim_nip ?? ('NIM: 1024' . str_pad($s->user_id, 4, '0', STR_PAD_LEFT)) }}</span>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span style="font-weight: 600; color: #334155;">
-                                                    {{ $s->submitted_at ? $s->submitted_at->format('d M Y, H:i') : '-' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-3.5">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-base">📄</span>
+                                                <div>
+                                                    <span class="font-bold text-slate-800 block text-xs sm:text-sm">{{ $s->original_name }}</span>
+                                                    @if($s->file_size)
+                                                        <span class="text-[11px] text-slate-500 font-semibold">{{ number_format($s->file_size / 1024, 1) }} KB</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-3.5 text-xs sm:text-sm">
+                                            <span class="font-bold text-slate-700">
+                                                {{ $s->submitted_at ? $s->submitted_at->format('d M Y, H:i') : '-' }}
+                                            </span>
+                                            @if($s->is_late)
+                                                <span class="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                                                    Terlambat
                                                 </span>
-                                                @if($s->is_late)
-                                                    <span class="badge-status badge-status-warning" style="margin-left: 6px; font-size: 10px;">Terlambat</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($s->grade)
-                                                    <span class="badge-status badge-status-active">{{ $s->grade->score }} / {{ $assignment->max_score }}</span>
-                                                @else
-                                                    <span style="color: #64748B; font-weight: 700;">{{ $s->grade?->score ?? '-' }}</span>
-                                                @endif
-                                            </td>
-                                            <td style="text-align: right;">
-                                                <a href="{{ route('submissions.show', $s) }}" class="btn-secondary-action" style="font-size: 11px; padding: 6px 14px;">
-                                                    Lihat &rarr;
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" style="text-align: center; padding: 36px 16px; color: #64748B; font-weight: 700;">
-                                                Belum ada pengumpulan.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-3.5">
+                                            @if($s->grade)
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                    {{ $s->grade->score }} / {{ $assignment->max_score }}
+                                                </span>
+                                            @else
+                                                <span class="text-slate-400 font-bold text-xs sm:text-sm">{{ $s->grade?->score ?? '-' }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-3.5 text-right">
+                                            <a href="{{ route('submissions.show', $s) }}"
+                                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-xs transition">
+                                                Lihat &rarr;
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center px-6 py-12 text-slate-400 text-xs sm:text-sm font-bold">
+                                            Belum ada pengumpulan.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
 
-                            {{-- Navigasi Pagination Laravel --}}
-                            @if ($submissions->hasPages())
-                                <div style="padding: 12px 20px; border-top: 1px solid #F1F5F9; background: #FAFAFA;">
-                                    {{ $submissions->links() }}
-                                </div>
-                            @endif
-                        </div>
+                        {{-- Navigasi Pagination Laravel --}}
+                        @if ($submissions->hasPages())
+                            <div class="px-4 sm:px-6 py-3 border-t border-slate-100 bg-slate-50/50">
+                                {{ $submissions->links() }}
+                            </div>
+                        @endif
                     </div>
                 </section>
             @endif
