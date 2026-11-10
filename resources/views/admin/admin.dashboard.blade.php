@@ -22,17 +22,17 @@
         <!-- Navbar Admin -->
         <x-navbar-admin />
 
-        <!-- Konten Utama Dashboard (Ukuran Proporsional & Padat) -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Dashboard Admin (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2 border-b border-slate-200/80">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Selamat Datang, Admin :)</h1>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Selamat Datang, Admin :)</h1>
                     </div>
                 </div>
-                <div class="inline-flex items-center gap-2.5 text-xs font-extrabold text-slate-600 bg-white px-4 py-2.5 rounded-xl border border-sky-100 shadow-sm w-fit self-start sm:self-auto">
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold text-slate-600 bg-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-sky-100 shadow-xs w-fit self-start sm:self-auto">
                     <svg class="w-4 h-4 text-[#039FFA]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>

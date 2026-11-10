@@ -28,8 +28,8 @@
         <!-- Navbar Khusus Dosen -->
         <x-navbar-dosen />
 
-        <!-- Konten Utama Kelola Mahasiswa -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Kelola Mahasiswa (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             {{-- Data ($courses, $registeredStudents, $selectedCode) disiapkan oleh Dosen\StudentController@index --}}
             @php
@@ -42,8 +42,8 @@
             <!-- Topbar Header -->
             <header class="flex items-center justify-between pb-2 border-b border-slate-200/80">
                 <div class="flex items-center gap-3">
-                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                        <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <span class="inline-block w-1.5 h-5 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
                         Pendaftaran Mahasiswa ke Mata Kuliah
                     </h1>
                 </div>

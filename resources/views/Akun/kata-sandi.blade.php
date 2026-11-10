@@ -32,9 +32,10 @@
             <x-layout />
         @endif
 
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col items-center justify-center box-border">
+        <!-- [RESPONSIVE-MOBILE] Form Keamanan & Kata Sandi (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col items-center justify-center box-border">
             <div class="w-full max-w-xl mx-auto">
-                <section class="bg-white rounded-3xl border border-sky-100 shadow-xl shadow-sky-950/5 p-6 sm:p-8 relative">
+                <section class="bg-white rounded-2xl sm:rounded-3xl border border-sky-100 shadow-xl shadow-sky-950/5 p-4 sm:p-8 relative">
                     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-sky-50 text-sky-700 border border-sky-200 mb-3">
                         <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>

@@ -34,22 +34,22 @@
         <!-- Navbar Khusus Dosen -->
         <x-navbar-dosen />
 
-        <!-- Konten Utama Rekap Nilai -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Rekap Nilai (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2 border-b border-slate-200/80">
                 <div class="flex items-center gap-3">
-                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                        <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <span class="inline-block w-1.5 h-5 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
                         Rekapitulasi Nilai
                     </h1>
                 </div>
 
-                <div class="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-xl border border-sky-100 shadow-xs self-start sm:self-auto">
-                    <span class="text-xs font-bold text-slate-500 shrink-0">Mata Kuliah:</span>
+                <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-sky-100 shadow-xs w-full sm:w-auto overflow-hidden">
+                    <span class="text-xs font-bold text-slate-500 shrink-0">MK:</span>
                     <select id="selectCurrentCourse"
-                            class="text-xs font-extrabold text-sky-700 bg-transparent border-none outline-none cursor-pointer focus:ring-0"
+                            class="text-xs font-extrabold text-sky-700 bg-transparent border-none outline-none cursor-pointer focus:ring-0 truncate w-full sm:w-auto"
                             onchange="if (this.value) window.location.href = this.value">
                         @foreach ($courses as $c)
                             <option value="{{ route('dosen.rekap.show', $c) }}" @selected($c->id === $course->id)>

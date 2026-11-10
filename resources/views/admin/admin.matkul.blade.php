@@ -27,19 +27,19 @@
         <!-- Navbar Admin -->
         <x-navbar-admin />
 
-        <!-- Konten Utama Manajemen Mata Kuliah -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Manajemen Mata Kuliah (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2 border-b border-slate-200/80">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Manajemen Mata Kuliah</h1>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Manajemen Mata Kuliah</h1>
                     </div>
                 </div>
                 <div>
                     @can('create', App\Models\Course::class)
-                        <button type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer" id="btnOpenAddMatkulModal">
+                        <button type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer" id="btnOpenAddMatkulModal">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -251,20 +251,20 @@
 
         </main>
 
-        <!-- MODAL FORM TAMBAH / EDIT MATA KULIAH -->
-        <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 transition-all duration-200 {{ ($errors->any() || $isEditing) ? 'active' : '' }}" id="matkulModalOverlay">
-            <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <!-- [RESPONSIVE-MOBILE] MODAL FORM TAMBAH / EDIT MATA KULIAH (Scrollable & Responsive) -->
+        <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 transition-all duration-200 {{ ($errors->any() || $isEditing) ? 'active' : '' }}" id="matkulModalOverlay">
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 <!-- Modal Header -->
-                <div class="px-6 py-4.5 bg-gradient-to-r from-sky-50 via-white to-amber-50/40 border-b border-slate-100 flex items-center justify-between">
+                <div class="px-5 sm:px-6 py-4 bg-gradient-to-r from-sky-50 via-white to-amber-50/40 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-sky-100/80 text-[#039FFA] shrink-0 border border-sky-200/60">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-sky-100/80 text-[#039FFA] shrink-0 border border-sky-200/60">
                             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
                         </div>
                         <div>
-                            <h3 id="formMkTitle" class="text-base font-black text-slate-900 m-0">
+                            <h3 id="formMkTitle" class="text-sm sm:text-base font-black text-slate-900 m-0">
                                 <span>{{ $isEditing ? 'Form Edit Mata Kuliah' : 'Form Tambah / Edit MK' }}</span>
                             </h3>
                         </div>
@@ -278,7 +278,7 @@
                 </div>
 
                 <!-- Modal Body -->
-                <div class="p-6">
+                <div class="p-5 sm:p-6 overflow-y-auto flex-1">
                     @if ($errors->any())
                         <div class="mb-4 text-xs font-bold px-3.5 py-2.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200">
                             ⚠️ {{ $errors->first() }}

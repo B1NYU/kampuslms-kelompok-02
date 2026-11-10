@@ -29,15 +29,15 @@
         <!-- 1. Panggil Komponen Layout/Sidebar -->
         <x-layout />
 
-        <!-- 2. Konten Utama Mata Kuliah -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Mata Kuliah (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
             <header class="flex items-center justify-between pb-2 border-b border-slate-200/80">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     <div class="flex flex-col gap-1">
-                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                            <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                            <span class="inline-block w-1.5 h-5 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
                             Mata Kuliah Saya
                         </h1>
                     </div>

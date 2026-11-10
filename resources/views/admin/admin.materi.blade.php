@@ -42,19 +42,19 @@
         <!-- Navbar Admin -->
         <x-navbar-admin />
 
-        <!-- Konten Utama Manajemen Materi -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Manajemen Materi (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2 border-b border-slate-200/80">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Manajemen Materi Perkuliahan</h1>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Manajemen Materi Perkuliahan</h1>
                     </div>
                 </div>
                 <div>
                     @can('create', [\App\Models\Material::class, null])
-                        <button type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer" id="btnOpenUploadMaterialModal">
+                        <button type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer" id="btnOpenUploadMaterialModal">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -338,13 +338,13 @@
         <x-footer />
     </div>
 
-    <!-- MODAL FORM UNGGAH MATERI -->
-    <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 transition-all duration-200" id="materialModalOverlay">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <!-- [RESPONSIVE-MOBILE] MODAL FORM UNGGAH MATERI (Scrollable & Responsive) -->
+    <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 transition-all duration-200" id="materialModalOverlay">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <!-- Modal Header -->
-            <div class="px-6 py-4.5 bg-gradient-to-r from-sky-50 via-white to-amber-50/40 border-b border-slate-100 flex items-center justify-between">
+            <div class="px-5 sm:px-6 py-4 bg-gradient-to-r from-sky-50 via-white to-amber-50/40 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-sky-100/80 text-[#039FFA] shrink-0 border border-sky-200/60">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-sky-100/80 text-[#039FFA] shrink-0 border border-sky-200/60">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="17 8 12 3 7 8"></polyline>
@@ -352,7 +352,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-base font-black text-slate-900 m-0">Publikasi Materi Perkuliahan</h3>
+                        <h3 class="text-sm sm:text-base font-black text-slate-900 m-0">Publikasi Materi Perkuliahan</h3>
                         <p class="text-xs font-semibold text-slate-500 m-0 mt-0.5">Unggah dokumen PDF, slide PPTX, atau tautan web</p>
                     </div>
                 </div>

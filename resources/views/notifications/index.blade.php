@@ -34,16 +34,17 @@
             <x-layout />
         @endif
 
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Notifikasi (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
-            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2 border-b border-slate-200/80">
                 <div class="flex flex-col gap-1 min-w-0">
-                    <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-sky-600">
+                    <div class="flex items-center gap-2 text-[11px] sm:text-xs font-black uppercase tracking-wider text-sky-600">
                         <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                         KOTAK MASUK
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
                         Notifikasi
                     </h1>
                     <p class="text-xs sm:text-sm font-bold text-slate-500">
