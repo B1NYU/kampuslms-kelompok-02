@@ -16,8 +16,8 @@
                 </div>
             </a>
 
-            <!-- Navigation Menu Mahasiswa -->
-            <ul class="flex items-center gap-1 sm:gap-2 list-none m-0 p-0 overflow-x-auto">
+            <!-- [RESPONSIVE-MOBILE] Navigation Menu Mahasiswa: Desktop/Tablet (md:flex) -->
+            <ul class="hidden md:flex items-center gap-1 sm:gap-2 list-none m-0 p-0">
                 <li>
                     <a href="{{ route('mahasiswa.dashboard') }}"
                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 whitespace-nowrap {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-sky-50 text-sky-600 font-black shadow-xs' : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/60' }}">
@@ -53,8 +53,8 @@
             </ul>
         </div>
 
-        <!-- Kanan: Profil Mahasiswa & Dropdown Menu -->
-        <div class="flex items-center gap-3 shrink-0">
+        <!-- Kanan: Profil Mahasiswa & Dropdown Menu + Hamburger Mobile -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
             <x-notification-bell />
 
             @php
@@ -63,15 +63,15 @@
                 $mhsInitials = strtoupper(mb_substr($mhsParts[0], 0, 1) . mb_substr($mhsParts[1] ?? '', 0, 1));
             @endphp
             <div class="relative">
-                <div class="flex items-center gap-2.5 bg-white pl-1.5 pr-3 py-1 rounded-full border border-sky-200/80 shadow-xs hover:border-sky-400 cursor-pointer select-none transition-all duration-150"
+                <div class="flex items-center gap-2 bg-white pl-1.5 pr-2.5 sm:pr-3 py-1 rounded-full border border-sky-200/80 shadow-xs hover:border-sky-400 cursor-pointer select-none transition-all duration-150"
                      id="mhsProfileTrigger"
                      title="Buka menu profil">
                     <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sky-500 to-sky-400 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-xs">
                         {{ $mhsInitials }}
                     </div>
-                    <div class="hidden sm:flex flex-col leading-tight">
-                        <span class="text-xs font-extrabold text-slate-800 leading-tight">{{ $mhsAuth?->name ?? 'Mahasiswa' }}</span>
-                        <span class="text-[10px] font-bold text-orange-500 leading-none mt-0.5">{{ $mhsAuth?->nim_nip ? 'NIM: ' . $mhsAuth->nim_nip : 'Mahasiswa Aktif' }}</span>
+                    <div class="hidden sm:flex flex-col leading-tight max-w-[110px] xl:max-w-[160px]">
+                        <span class="text-xs font-extrabold text-slate-800 leading-tight truncate">{{ $mhsAuth?->name ?? 'Mahasiswa' }}</span>
+                        <span class="text-[10px] font-bold text-orange-500 leading-none mt-0.5 truncate">{{ $mhsAuth?->nim_nip ? 'NIM: ' . $mhsAuth->nim_nip : 'Mahasiswa Aktif' }}</span>
                     </div>
                     <svg class="mhs-profile-chevron w-3 h-3 text-slate-400 ml-0.5 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
@@ -104,6 +104,66 @@
                         <span>Logout</span>
                     </a>
                 </div>
+            </div>
+
+            <!-- [RESPONSIVE-MOBILE] Tombol Hamburger Navigasi Mobile Mahasiswa -->
+            <button type="button" 
+                    id="mhsMobileMenuBtn" 
+                    class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 border border-slate-200/80 transition-all cursor-pointer focus:outline-none"
+                    aria-label="Buka menu navigasi mobile mahasiswa">
+                <svg id="mhsHamburgerIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+                <svg id="mhsCloseIcon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- [RESPONSIVE-MOBILE] Drawer Menu Navigasi Mahasiswa untuk Layar Mobile (< 768px) -->
+    <div id="mhsMobileDrawer" class="hidden md:hidden border-t border-sky-100 bg-white/95 backdrop-blur-md px-4 py-3 shadow-lg transition-all animate-in slide-in-from-top-2 duration-150">
+        <div class="flex flex-col gap-1 pb-2">
+            <a href="{{ route('mahasiswa.dashboard') }}"
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-sky-50 text-sky-600 font-black shadow-xs' : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/60 font-bold' }}">
+                <span class="p-1 rounded-lg {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-sky-100/80 text-sky-600' : 'bg-slate-100 text-slate-500' }}">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ route('mahasiswa.mata-kuliah.index') }}"
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 {{ request()->routeIs('mahasiswa.mata-kuliah.*') ? 'bg-sky-50 text-sky-600 font-black shadow-xs' : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/60 font-bold' }}">
+                <span class="p-1 rounded-lg {{ request()->routeIs('mahasiswa.mata-kuliah.*') ? 'bg-sky-100/80 text-sky-600' : 'bg-slate-100 text-slate-500' }}">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                </span>
+                <span>Mata Kuliah</span>
+            </a>
+            <a href="{{ route('mahasiswa.nilai') }}"
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 {{ request()->routeIs('mahasiswa.nilai') ? 'bg-sky-50 text-sky-600 font-black shadow-xs' : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50/60 font-bold' }}">
+                <span class="p-1 rounded-lg {{ request()->routeIs('mahasiswa.nilai') ? 'bg-sky-100/80 text-sky-600' : 'bg-slate-100 text-slate-500' }}">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                    </svg>
+                </span>
+                <span>Nilai Saya</span>
+            </a>
+        </div>
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-500">{{ $mhsAuth?->name ?? 'Mahasiswa' }}</span>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('akun.kata-sandi') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 py-1 px-2.5 rounded-lg bg-sky-50">
+                    Sandi
+                </a>
+                <button onclick="event.preventDefault(); document.getElementById('logout-form-mhs').submit();" class="text-xs font-bold text-red-600 hover:text-red-700 py-1 px-2.5 rounded-lg bg-red-50 cursor-pointer">
+                    Keluar
+                </button>
             </div>
         </div>
     </div>

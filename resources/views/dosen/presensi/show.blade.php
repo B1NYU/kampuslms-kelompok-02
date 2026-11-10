@@ -28,8 +28,8 @@
         <!-- 1. Navbar Dosen -->
         <x-navbar-dosen />
 
-        <!-- 2. Konten Utama Detail Presensi -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Detail Presensi (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Breadcrumb Navigation -->
             <div>

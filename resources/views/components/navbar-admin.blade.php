@@ -1,7 +1,8 @@
 <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-sky-100 shadow-sm">
-    <div class="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-9 h-16 flex items-center justify-between gap-3">
+    <!-- [RESPONSIVE-MOBILE] Container Navbar Admin Responsif & Anti-Tabrakan -->
+    <div class="w-full max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-6 xl:px-9 h-16 flex items-center justify-between gap-2 sm:gap-3">
         <!-- Kiri: Brand + Menu Navigasi Admin -->
-        <div class="flex items-center gap-4 lg:gap-6 min-w-0">
+        <div class="flex items-center gap-3 lg:gap-4 xl:gap-6 min-w-0">
             <!-- Brand Logo -->
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 shrink-0 text-decoration-none group">
                 <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="group-hover:scale-105 transition-transform duration-200">
@@ -32,34 +33,35 @@
 
                 @foreach ($navItems as $item)
                     <li>
+                        <!-- [RESPONSIVE-MOBILE] Nav item admin: teks rapi dan icon hidden pada lg, tampil di xl -->
                         <a href="{{ $item['route'] ? route($item['route']) : $item['url'] }}" 
-                           class="flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-[11.5px] xl:text-xs transition duration-150 whitespace-nowrap {{ $item['is_active'] ? 'bg-sky-50 text-[#039FFA] font-extrabold shadow-sm' : 'text-slate-600 hover:text-[#039FFA] hover:bg-sky-50/60 font-bold' }}">
+                           class="flex items-center gap-1 xl:gap-1.5 px-1.5 xl:px-2.5 py-1.5 rounded-lg text-[11px] xl:text-xs transition duration-150 whitespace-nowrap {{ $item['is_active'] ? 'bg-sky-50 text-[#039FFA] font-extrabold shadow-sm' : 'text-slate-600 hover:text-[#039FFA] hover:bg-sky-50/60 font-bold' }}">
                             @if ($item['icon'] === 'dashboard')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
                                 </svg>
                             @elseif ($item['icon'] === 'users')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
                             @elseif ($item['icon'] === 'book')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                                 </svg>
                             @elseif ($item['icon'] === 'check-circle')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline>
                                 </svg>
                             @elseif ($item['icon'] === 'file-text')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                                 </svg>
                             @elseif ($item['icon'] === 'calendar')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
                                 </svg>
                             @elseif ($item['icon'] === 'award')
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hidden xl:block w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                                 </svg>
                             @endif
@@ -70,8 +72,8 @@
             </ul>
         </div>
 
-        <!-- Kanan: Identitas Admin dengan Menu Dropdown Keluar -->
-        <div class="flex items-center gap-3 shrink-0">
+        <!-- Kanan: Identitas Admin dengan Menu Dropdown Keluar + Tombol Hamburger Mobile -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
             @php
                 $adminUser = auth()->user();
                 $adminName = $adminUser?->name ?? 'Super Administrator';
@@ -79,15 +81,15 @@
                 $initials = strtoupper(substr($words[0] ?? 'A', 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : 'D'));
             @endphp
             <div class="relative">
-                <div class="flex items-center gap-2.5 bg-white pl-1.5 pr-3 py-1 rounded-full border border-sky-200/80 shadow-sm hover:border-[#039FFA] cursor-pointer select-none transition-all duration-150" 
+                <div class="flex items-center gap-2 bg-white pl-1.5 pr-2.5 sm:pr-3 py-1 rounded-full border border-sky-200/80 shadow-sm hover:border-[#039FFA] cursor-pointer select-none transition-all duration-150" 
                      id="adminProfileTrigger" 
                      title="Buka menu profil">
                     <div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#039FFA] to-[#32B3F1] text-white flex items-center justify-center text-xs font-black shrink-0 shadow-sm">
                         {{ $initials }}
                     </div>
-                    <div class="hidden sm:flex flex-col leading-tight">
-                        <span class="text-xs font-extrabold text-slate-800 leading-tight">{{ $adminName }}</span>
-                        <span class="text-[10px] font-bold text-[#F96305] leading-none mt-0.5">Akses Penuh Sistem</span>
+                    <div class="hidden sm:flex flex-col leading-tight max-w-[100px] xl:max-w-[150px]">
+                        <span class="text-xs font-extrabold text-slate-800 leading-tight truncate">{{ $adminName }}</span>
+                        <span class="text-[10px] font-bold text-[#F96305] leading-none mt-0.5 truncate">Akses Penuh Sistem</span>
                     </div>
                     <svg class="admin-profile-chevron w-3 h-3 text-slate-400 ml-0.5 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
@@ -111,6 +113,71 @@
                     </a>
                 </div>
             </div>
+
+            <!-- [RESPONSIVE-MOBILE] Tombol Hamburger Navigasi Mobile Admin -->
+            <button type="button" 
+                    id="adminMobileMenuBtn" 
+                    class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-[#039FFA] border border-slate-200/80 transition-all cursor-pointer focus:outline-none"
+                    aria-label="Buka menu navigasi mobile">
+                <svg id="adminHamburgerIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+                <svg id="adminCloseIcon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- [RESPONSIVE-MOBILE] Drawer Menu Navigasi Admin untuk Layar Mobile & Tablet (< 1024px) -->
+    <div id="adminMobileDrawer" class="hidden lg:hidden border-t border-sky-100 bg-white/95 backdrop-blur-md px-4 py-3 shadow-lg transition-all animate-in slide-in-from-top-2 duration-150">
+        <div class="flex flex-col gap-1 pb-2">
+            @foreach ($navItems as $item)
+                <a href="{{ $item['route'] ? route($item['route']) : $item['url'] }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition duration-150 {{ $item['is_active'] ? 'bg-sky-50 text-[#039FFA] font-black shadow-xs' : 'text-slate-600 hover:text-[#039FFA] hover:bg-sky-50/60 font-bold' }}">
+                    <span class="p-1 rounded-lg {{ $item['is_active'] ? 'bg-sky-100/80 text-[#039FFA]' : 'bg-slate-100 text-slate-500' }}">
+                        @if ($item['icon'] === 'dashboard')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        @elseif ($item['icon'] === 'users')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        @elseif ($item['icon'] === 'book')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        @elseif ($item['icon'] === 'check-circle')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline>
+                            </svg>
+                        @elseif ($item['icon'] === 'file-text')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        @elseif ($item['icon'] === 'calendar')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        @elseif ($item['icon'] === 'award')
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                            </svg>
+                        @endif
+                    </span>
+                    <span>{{ $item['label'] }}</span>
+                </a>
+            @endforeach
+        </div>
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-500">{{ $adminName }}</span>
+            <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-xs font-bold text-red-600 hover:text-red-700 py-1 px-2.5 rounded-lg bg-red-50 cursor-pointer">
+                Keluar
+            </button>
         </div>
     </div>
 </nav>

@@ -28,19 +28,19 @@
         <!-- 1. Navbar Mahasiswa -->
         <x-layout />
 
-        <!-- 2. Konten Utama Presensi Mahasiswa -->
-        <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6 box-border">
+        <!-- [RESPONSIVE-MOBILE] Konten Utama Presensi Mahasiswa (Responsif Mobile & Desktop) -->
+        <main class="flex-1 w-full max-w-[1360px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col gap-4 sm:gap-6 box-border">
 
             <!-- Topbar Header -->
             <header class="flex items-center justify-between pb-2 border-b border-slate-200/80">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     <div class="flex flex-col gap-1">
-                        <span class="inline-flex items-center gap-1.5 w-fit text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border border-sky-400/30 bg-white text-sky-600">
+                        <span class="inline-flex items-center gap-1.5 w-fit text-[10px] sm:text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border border-sky-400/30 bg-white text-sky-600">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             PORTAL MAHASISWA &bull; PRESENSI
                         </span>
-                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                            <span class="inline-block w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                            <span class="inline-block w-1.5 h-5 sm:h-7 rounded-full bg-gradient-to-b from-sky-500 to-sky-400"></span>
                             Presensi Kehadiran Kelas
                         </h1>
                         <p class="text-xs sm:text-sm text-slate-500 font-semibold">
