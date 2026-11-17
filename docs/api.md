@@ -2,7 +2,7 @@
 
 - **Base URL:** `http://127.0.0.1:8000/api/v1` (`php artisan serve`)
 - **Autentikasi:** Bearer token Laravel Sanctum dari `POST /auth/login` (berlaku 12 jam)
-- **Header wajib:** `Accept: application/json`; tambahkan `Content-Type: application/json` untuk request ber-body
+- **Header wajib:** `Accept: application/json`; tambahkan `Content-Type: application/json` untuk request ber-body JSON. Unggah berkas (`POST /assignments/{assignment}/submissions`) memakai `multipart/form-data` (`curl -F`), bukan JSON
 - **Format sukses:** objek tunggal `{"data": {...}}`; koleksi `{"data": [...], "meta": {"current_page", "last_page", "total"}}`
 - **Format gagal:** selalu JSON `{"message": "..."}` (422 menambahkan `errors`)
 - Contoh `curl` memakai sintaks bash (Git Bash / WSL / Linux / macOS). Di terminal, simpan token ke variabel:
@@ -34,9 +34,17 @@ TOKEN=$(curl -s -X POST $BASE/auth/login -H "Accept: application/json" -H "Conte
 | GET | `/courses` | Login | 200 |
 | GET | `/courses/{course}` | Dosen pengampu, mahasiswa terdaftar, admin | 200 |
 | GET | `/courses/{course}/assignments` | Dosen pengampu, mahasiswa terdaftar, admin | 200 |
+| GET | `/courses/{course}/materials` | Dosen pengampu, mahasiswa terdaftar, admin | 200 |
 | POST | `/assignments` | Dosen pengampu MK tujuan | 201 |
 | PUT / PATCH | `/assignments/{assignment}` | Dosen pengampu | 200 |
 | DELETE | `/assignments/{assignment}` | Dosen pengampu | 204 |
+| GET | `/assignments/{assignment}/submissions` | Dosen pengampu | 200 |
+| POST | `/assignments/{assignment}/submissions` | Mahasiswa terdaftar | 201 |
+| PUT | `/submissions/{submission}/grade` | Dosen pengampu (MK `active`) | 201 (nilai pertama) / 200 (nilai ulang), sesuai kontrak spesifikasi |
+| GET | `/notifications` | Login (hanya milik sendiri) | 200 |
+| POST | `/notifications/{id}/read` | Login (hanya milik sendiri) | 200 |
+
+Total **15 endpoint** (9 awal + 6 tambahan).
 
 ## Kode status
 
@@ -44,8 +52,8 @@ TOKEN=$(curl -s -X POST $BASE/auth/login -H "Accept: application/json" -H "Conte
 |---|---|
 | 200 / 201 / 204 | Berhasil / berhasil membuat / berhasil tanpa isi |
 | 401 | Token tidak ada, salah, kedaluwarsa, atau sudah dicabut |
-| 403 | Sudah login tetapi tidak berhak (peran salah atau bukan pemilik data) |
-| 404 | Data tidak ditemukan |
+| 403 | Sudah login tetapi tidak berhak (peran salah, bukan pemilik data, atau syarat kebijakan tidak terpenuhi, misalnya tugas sudah dikumpulkan) |
+| 404 | Data tidak ditemukan. Khusus notifikasi, ID milik orang lain juga 404 (bukan 403) agar keberadaan ID tidak bocor |
 | 405 | Metode HTTP tidak didukung endpoint |
 | 409 | Konflik: tugas yang sudah punya pengumpulan tidak bisa dihapus |
 | 422 | Validasi gagal |
@@ -61,6 +69,9 @@ Otorisasi (403) selalu dicek **sebelum** validasi (422).
 - **Rate limiting:** `throttle:5,1` pada login (ditambah pembatas per identitas+IP), `throttle:60,1` pada endpoint terlindungi.
 - **Eager loading:** `with('lecturer:id,name')` dan `withCount`/filter submissions agar tidak ada N+1.
 - **Tugas draft** tidak terlihat dan tidak dihitung bagi mahasiswa.
+- **Pengumpulan:** `user_id` pengumpul selalu diambil dari token; input `user_id` dari klien diabaikan. Daftar pengumpulan hanya untuk dosen pengampu. `file_path` tidak pernah dikembalikan.
+- **Penilaian:** otorisasi `SubmissionPolicy@grade` dicek sebelum validasi; batas skor mengikuti `max_score` tugasnya.
+- **Notifikasi:** selalu lewat relasi milik pengguna login. Kolom `data` tidak dikembalikan mentah: hanya ID dan teks tampilan yang keluar (tanpa nilai maupun feedback).
 
 ---
 
@@ -226,12 +237,146 @@ curl -X DELETE $BASE/assignments/16 -H "Accept: application/json" -H "Authorizat
 **204** tanpa isi. **403** bukan dosen pengampu.
 **409** `{ "message": "Tugas tidak dapat dihapus karena sudah ada pengumpulan mahasiswa." }`
 
+## GET `/courses/{course}/materials`
+
+Daftar materi satu mata kuliah (metadata saja; berkas diunduh lewat route web yang dilindungi `MaterialPolicy@view`). Otorisasi `MaterialPolicy@viewAny`: admin, dosen pengampu (semua status MK), mahasiswa terdaftar (MK bukan `draft`). Urut per pertemuan (`session`), materi tanpa pertemuan di akhir.
+
+| Query | Tipe | Keterangan |
+|---|---|---|
+| `page`, `per_page` | integer | Seperti `/courses` |
+
+```bash
+curl "$BASE/courses/1/materials?per_page=2" -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
+```
+**200**
+```json
+{
+  "data": [
+    { "id": 1, "course_id": 1, "title": "Materi Pertemuan 1 - SI3576", "description": "Molestias ea aperiam ...", "type": "file",
+      "original_name": "pertemuan-1.pdf", "file_size": 601, "mime_type": "application/pdf", "external_url": null,
+      "uploader": { "id": 2, "name": "Dosen Demo" }, "created_at": "2026-11-17T17:25:18+08:00" },
+    { "id": 6, "course_id": 1, "title": "Referensi: Dokumentasi Laravel 12", "description": "In fugit qui ...", "type": "link",
+      "original_name": null, "file_size": null, "mime_type": null, "external_url": "https://laravel.com/docs/12.x",
+      "uploader": { "id": 2, "name": "Dosen Demo" }, "created_at": "2026-11-17T17:25:18+08:00" }
+  ],
+  "meta": { "current_page": 1, "last_page": 4, "total": 7 }
+}
+```
+**403** mahasiswa tidak terdaftar / MK `draft` bagi mahasiswa / dosen bukan pengampu. **404** MK tidak ada.
+
+## GET `/assignments/{assignment}/submissions`
+
+Hanya dosen pengampu mata kuliah tugas tersebut (sesuai kontrak). Route dibatasi `role:dosen`, lalu `SubmissionPolicy@viewAny` memastikan dosen itu pemilik MK-nya. Mahasiswa (termasuk pemilik pengumpulan) dan dosen lain mendapat 403; mahasiswa melihat pengumpulannya sendiri lewat halaman web.
+
+| Query | Tipe | Keterangan |
+|---|---|---|
+| `page`, `per_page` | integer | Seperti `/courses` |
+
+```bash
+curl "$BASE/assignments/1/submissions?per_page=1" -H "Accept: application/json" -H "Authorization: Bearer $TOKEN_DOSEN_A"
+```
+**200**
+```json
+{
+  "data": [
+    { "id": 2, "assignment_id": 1, "original_name": "earum-occaecati-veniam-suscipit.pdf", "file_size": 3810871, "note": null,
+      "submitted_at": "2026-10-29T14:39:34+08:00", "is_late": false,
+      "student": { "id": 7, "name": "Prof. Buddy Reichel", "nim_nip": "10252724" }, "grade": null }
+  ],
+  "meta": { "current_page": 1, "last_page": 16, "total": 16 }
+}
+```
+`grade` berisi objek nilai (lihat `PUT /submissions/{submission}/grade`) bila sudah dinilai.
+**403** mahasiswa, admin, atau dosen bukan pengampu. **404** tugas tidak ada.
+
+## POST `/assignments/{assignment}/submissions`
+
+Mengumpulkan jawaban. Hanya mahasiswa (dosen dan admin 403). Request berupa `multipart/form-data`. Otorisasi (403) dicek **sebelum** validasi (422).
+
+Syarat di `SubmissionPolicy@create` (semuanya 403 bila gagal): mahasiswa terdaftar, MK `active`, tugas `published`, belum pernah mengumpulkan (pengumpulan tidak dapat diubah), dan bila lewat batas waktu maka `allow_late` harus aktif. Keterlambatan dicatat di `is_late`.
+
+| Field | Tipe | Wajib | Keterangan |
+|---|---|---|---|
+| `file` | berkas | Ya | `pdf, doc, docx, zip, txt`, maks 10 MB (isi dan ekstensi dicek) |
+| `note` | string (maks 1000) | Tidak | |
+
+`user_id` **tidak** dibaca dari request: pengumpul selalu pemilik token.
+
+```bash
+curl -X POST $BASE/assignments/2/submissions -H "Accept: application/json" -H "Authorization: Bearer $TOKEN_MHS" \
+  -F "file=@jawaban.pdf" -F "note=Catatan saya"
+```
+**201**
+```json
+{ "data": { "id": 117, "assignment_id": 2, "original_name": "jawaban.pdf", "file_size": 14, "note": "Catatan saya",
+  "submitted_at": "2026-11-17T17:26:55+08:00", "is_late": false } }
+```
+**403** bukan mahasiswa, tidak terdaftar, tugas draft, batas waktu lewat tanpa `allow_late`, atau sudah mengumpulkan
+**409** dua permintaan serentak lolos bersamaan (pagar terakhir: unique `assignment_id` + `user_id`)
+**422** `{ "message": "Data yang diberikan tidak valid.", "errors": { "file": ["Pilih berkas jawaban yang akan dikumpulkan."] } }`
+
+## PUT `/submissions/{submission}/grade`
+
+Memberi nilai dan umpan balik. Otorisasi `SubmissionPolicy@grade`: hanya dosen pengampu, hanya MK `active`. Admin dan mahasiswa 403. Menilai ulang menimpa nilai sebelumnya (satu nilai per pengumpulan). Mahasiswa diberi notifikasi hanya bila nilai baru atau skor/feedback benar-benar berubah.
+
+| Field | Tipe | Wajib | Keterangan |
+|---|---|---|---|
+| `score` | number | Ya | 0 sampai `max_score` tugas tersebut |
+| `feedback` | string (maks 2000) | Ya | |
+
+```bash
+curl -X PUT $BASE/submissions/117/grade -H "Accept: application/json" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN_DOSEN_A" -d '{"score":88.5,"feedback":"Bagus sekali"}'
+```
+**201** (nilai pertama) atau **200** (nilai ulang)
+```json
+{ "data": { "id": 71, "submission_id": 117, "score": 88.5, "feedback": "Bagus sekali",
+  "graded_at": "2026-11-17T17:26:55+08:00", "grader": { "id": 2, "name": "Dosen Demo" } } }
+```
+**403** mahasiswa, admin, dosen bukan pengampu, atau MK tidak `active`
+**422** `{ "message": "Data yang diberikan tidak valid.", "errors": { "score": ["Nilai maksimal 100."] } }`
+
+## GET `/notifications`
+
+Notifikasi milik pengguna yang sedang login, terbaru dulu. Bukan data orang lain, karena query lewat relasi `user->notifications()`.
+
+| Query | Tipe | Keterangan |
+|---|---|---|
+| `filter` | `semua` atau `belum` | Default `semua`; `belum` = belum dibaca |
+| `page`, `per_page` | integer | Seperti `/courses` |
+
+```bash
+curl "$BASE/notifications?filter=belum&per_page=2" -H "Accept: application/json" -H "Authorization: Bearer $TOKEN_MHS"
+```
+**200** (`meta.unread_count` = total belum dibaca di seluruh halaman)
+```json
+{
+  "data": [
+    { "id": "385fc7ed-a435-405a-b9e2-39757a266096", "kind": "grade_received", "message": "Nilai tugas \"Tugas Quo vitae qui\" diperbarui.",
+      "course": "Occaecati recusandae voluptatum", "assignment_id": 2, "submission_id": 117,
+      "is_read": false, "read_at": null, "created_at": "2026-11-17T17:26:55+08:00" }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "total": 2, "unread_count": 2 }
+}
+```
+`assignment_id` dan `submission_id` bernilai `null` bila tidak relevan; klien membentuk tautan sendiri dari ID itu. **422** `filter` bukan `semua`/`belum`.
+
+## POST `/notifications/{id}/read`
+
+Menandai satu notifikasi milik sendiri sebagai dibaca. Idempoten: memanggil ulang tetap 200.
+
+```bash
+curl -X POST $BASE/notifications/385fc7ed-a435-405a-b9e2-39757a266096/read -H "Accept: application/json" -H "Authorization: Bearer $TOKEN_MHS"
+```
+**200** objek notifikasi seperti di atas dengan `"is_read": true` dan `read_at` terisi.
+**404** `{ "message": "Sumber daya tidak ditemukan." }` bila ID tidak ada, bukan UUID, **atau milik orang lain** (sengaja 404, bukan 403).
+
 ---
 
 ## Pengujian
 
 - **Skrip curl (server sungguhan):** `bash scripts/test-api.sh`. Login otomatis, empat kondisi otorisasi per endpoint, plus cek user enumeration dan kebocoran `password`. Hasil terakhir: **42 lulus, 0 gagal**.
-- **PHPUnit:** `php artisan test` (termasuk `tests/Feature/ApiV1Test.php`: 401/403/404/422/429, N+1, draft tersembunyi, token dicabut). Hasil terakhir: **50 lulus**.
+- **PHPUnit:** `php artisan test` (termasuk `tests/Feature/ApiV1Test.php`: 401/403/404/422/429, N+1, draft tersembunyi, token dicabut). Hasil terakhir: seluruh suite **177 lulus**. Enam endpoint tambahan diuji di `tests/Feature/ApiV1EndpointBaruTest.php` (30 tes: 401, 403/404, IDOR, validasi, N+1); skrip curl di atas belum memuat keenam endpoint itu.
 
 ### Matriks otorisasi
 
@@ -242,3 +387,9 @@ curl -X DELETE $BASE/assignments/16 -H "Accept: application/json" -H "Authorizat
 | `POST /assignments` | 401 | 403 | 403 | 201 |
 | `PUT/PATCH /assignments/{id}` | 401 | 403 | 403 | 200 |
 | `DELETE /assignments/{id}` | 401 | 403 | 403 | 204 |
+| `GET /courses/{id}/materials` | 401 | 403 | 403 | 200 |
+| `GET /assignments/{id}/submissions` | 401 | 403 | 403 | 200 |
+| `POST /assignments/{id}/submissions` | 401 | 403 (dosen) | 403 (mahasiswa tidak terdaftar) | 201 |
+| `PUT /submissions/{id}/grade` | 401 | 403 | 403 | 201 / 200 |
+| `GET /notifications` | 401 | n/a (semua peran login) | hanya milik sendiri | 200 |
+| `POST /notifications/{id}/read` | 401 | n/a (semua peran login) | **404** (milik orang lain) | 200 |
