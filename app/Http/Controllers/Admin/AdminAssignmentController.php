@@ -119,7 +119,7 @@ class AdminAssignmentController extends Controller
         return $request->validate([
             'course_id'    => ['required', 'exists:courses,id'],
             'title'        => ['required', 'string', 'max:255'],
-            'session'      => ['required', 'integer', 'between:1,16'], // <-- Ditambahkan di sini
+            'session'      => ['nullable', 'integer', 'between:1,16'], // Opsional (pertemuan 1-16)
             'instructions' => ['required', 'string'],
             'due_at'       => ['required', 'date'],
             'max_score'    => ['required', 'integer', 'min:1', 'max:100'],
