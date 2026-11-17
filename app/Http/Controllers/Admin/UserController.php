@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+
 
 class UserController extends Controller
 {
@@ -24,8 +28,8 @@ class UserController extends Controller
                 $like = '%' . $search . '%';
                 $q->where(function ($sq) use ($like) {
                     $sq->where('name', 'like', $like)
-                       ->orWhere('nim_nip', 'like', $like)
-                       ->orWhere('email', 'like', $like);
+                        ->orWhere('nim_nip', 'like', $like)
+                        ->orWhere('email', 'like', $like);
                 });
             })
             ->orderByRaw("CASE WHEN role = 'admin' THEN 1 WHEN role = 'dosen' THEN 2 ELSE 3 END, id ASC")
@@ -43,87 +47,105 @@ class UserController extends Controller
         );
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'nim_nip'  => ['required', 'string', 'max:50', 'unique:users,nim_nip'],
-            'email'    => ['nullable', 'email', 'max:255', 'unique:users,email'],
-            'role'     => ['required', Rule::in(self::ROLES)],
-            'password' => ['required', 'string', 'min:6'],
-            'status'   => ['required', Rule::in(['aktif', 'nonaktif'])],
-        ]);
+        $data = $request->validated();
 
-        $user = new User();
-        $user->name     = $validated['name'];
-        $user->nim_nip  = $validated['nim_nip'];
-        $user->email    = $validated['email'] ?? null;
-        $user->password = Hash::make($validated['password']);
-        $user->role = $validated['role'];
-        $user->save();
+        $user = DB::transaction(function () use ($data) {
+            $user = new User;
+            $user->name = $data['name'];
+            $user->nim_nip = $data['nim_nip'];
+            $user->email = $data['email'];
+            $user->password = $data['password']; // di-hash oleh cast 'hashed'
+            $user->role = $data['role'];      // diisi eksplisit: 'role' tidak ada di $fillable
+            $user->save();
 
-        if ($validated['status'] === 'nonaktif') {
-            $user->delete();
-        }
+            if ($data['status'] === 'nonaktif') {
+                $user->delete();
+            }
+
+            return $user;
+        });
 
         return response()->json([
             'message' => 'Pengguna berhasil ditambahkan.',
-            'data'    => $this->transform($user),
+            'data' => $this->transform($user),
         ], 201);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'nim_nip'  => ['required', 'string', 'max:50', Rule::unique('users', 'nim_nip')->ignore($user->id)],
-            'email'    => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'role'     => ['required', Rule::in(self::ROLES)],
-            'password' => ['nullable', 'string', 'min:6'],
-            'status'   => ['required', Rule::in(['aktif', 'nonaktif'])],
-        ]);
+        $data = $request->validated();
 
-        $user->name    = $validated['name'];
-        $user->nim_nip = $validated['nim_nip'];
-        $user->email   = $validated['email'] ?? null;
-        $user->role = $validated['role'];
+        DB::transaction(function () use ($data, $user) {
+            $this->kunciBarisAdmin();
+            $user->refresh();
 
-        if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }
+            // Dicek ULANG di dalam kunci: dua admin yang bekerja bersamaan tidak boleh
+            // sama-sama lolos dan menyisakan nol admin.
+            Gate::authorize('changeRole', [$user, $data['role']]);
 
-        $user->save();
+            $menonaktifkan = $data['status'] === 'nonaktif' && ! $user->trashed();
+            if ($menonaktifkan) {
+                Gate::authorize('deactivate', $user);
+            }
 
-        if ($validated['status'] === 'nonaktif' && !$user->trashed()) {
-            $user->delete();
-        } elseif ($validated['status'] === 'aktif' && $user->trashed()) {
-            $user->restore();
-        }
+            $user->name = $data['name'];
+            $user->nim_nip = $data['nim_nip'];
+            $user->email = $data['email'];
+            $user->role = $data['role'];
+
+            if (! empty($data['password'])) {
+                $user->password = $data['password'];
+            }
+
+            $user->save();
+
+            if ($menonaktifkan) {
+                $user->tokens()->delete(); // token API ikut dicabut
+                $user->delete();
+            } elseif ($data['status'] === 'aktif' && $user->trashed()) {
+                $user->restore();
+            }
+        });
 
         return response()->json([
             'message' => 'Pengguna berhasil diperbarui.',
-            'data'    => $this->transform($user->fresh()),
+            'data' => $this->transform($user->fresh()),
         ]);
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user): JsonResponse
     {
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            $this->kunciBarisAdmin();
+            $user->refresh();
+
+            Gate::authorize('delete', $user);
+
+            $user->tokens()->delete();
+            $user->delete();
+        });
 
         return response()->json([
             'message' => 'Pengguna berhasil dihapus.',
         ]);
     }
 
+    private function kunciBarisAdmin(): void
+    {
+        User::withTrashed()->where('role', 'admin')->lockForUpdate()->pluck('id');
+    }
+
     private function transform(User $user): array
     {
         return [
-            'id'      => $user->id,
-            'name'    => $user->name,
+            'id' => $user->id,
+            'name' => $user->name,
             'nim_nip' => $user->nim_nip,
-            'email'   => $user->email,
-            'role'    => $user->role,
-            'status'  => $user->trashed() ? 'nonaktif' : 'aktif',
+            'email' => $user->email,
+            'role' => $user->role,
+            'status' => $user->trashed() ? 'nonaktif' : 'aktif',
         ];
     }
 }
