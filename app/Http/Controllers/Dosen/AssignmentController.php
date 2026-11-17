@@ -120,7 +120,7 @@ class AssignmentController extends Controller
         ]);
 
         return $request->validate([
-            'session'      => ['required', 'integer', 'between:1,16'],
+            'session'      => ['nullable', 'integer', 'between:1,16'],
             'title'        => ['required', 'string', 'max:255'],
             'instructions' => ['required', 'string'],
             'due_at'       => ['required', 'date'],

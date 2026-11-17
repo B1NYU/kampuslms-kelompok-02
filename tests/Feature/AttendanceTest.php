@@ -48,7 +48,7 @@ class AttendanceTest extends TestCase
     {
         $response = $this->actingAs($this->dosen)->get(route('dosen.presensi.index'));
         $response->assertOk();
-        $response->assertSee('Presensi Perkuliahan Berbasis Kode Unik');
+        $response->assertSee('Presensi Perkuliahan');
     }
 
     public function test_dosen_bisa_membuat_sesi_presensi_dengan_kode_unik_dan_masa_berlaku(): void

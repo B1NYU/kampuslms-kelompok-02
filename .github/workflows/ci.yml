@@ -30,11 +30,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check that .env is not committed
+        run: |
+          if [ -f .env ] || git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "Error: .env file must not be committed to the repository!"
+            exit 1
+          fi
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
-          extensions: mbstring, dom, fileinfo, mysql, pdo_mysql
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, mysql, pdo_mysql, sqlite3, pdo_sqlite
           coverage: none
 
       - name: Copy environment file
@@ -69,3 +76,6 @@ jobs:
 
       - name: Test migration refresh
         run: php artisan migrate:refresh
+
+      - name: Run test suite
+        run: php artisan test
