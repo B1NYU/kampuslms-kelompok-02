@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\DB;
  * untuk menampilkan empat angka). Sekarang dihitung di database lewat COUNT.
  *
  * Yang di-cache (10 menit, satu kunci per dosen):
- *   - jumlah mahasiswa unik, jumlah materi, jumlah tugas.
- *     Basi beberapa menit tidak merugikan siapa pun, dan dibersihkan otomatis
- *     setiap kali datanya berubah (lihat forgetForCourse / forgetForLecturer).
+ *   - daftar mata kuliah, ID mata kuliah, jumlah mahasiswa unik, jumlah materi,
+ *     jumlah tugas. Dibersihkan otomatis saat data berubah (lihat forgetForCourse /
+ *     forgetForLecturer dan hook Course::saved / deleted).
  *
  * Yang SENGAJA tidak di-cache:
  *   - "Perlu dinilai". Dosen baru saja memberi nilai lalu melihat angkanya
@@ -41,25 +41,51 @@ class DosenDashboardStats
      */
     public static function for(?User $dosen): array
     {
-        $courses = self::courses($dosen);
-        $courseIds = $courses->pluck('id')->all();
+        $ambil = function () use ($dosen): array {
+            $courses = self::courses($dosen);
+            $ids = $courses->pluck('id')->all();
+            $hitung = self::hitung($ids);
+
+            return [
+                'courses'     => $courses->map(fn ($c) => $c->only(['id', 'code', 'name', 'sks']))->all(),
+                'courseIds'   => $ids,
+                'students'    => $hitung['students'],
+                'materials'   => $hitung['materials'],
+                'assignments' => $hitung['assignments'],
+            ];
+        };
 
         // Ada pengguna login: cache per dosen. Tanpa pengguna: hitung langsung.
-        $stats = $dosen
+        $data = $dosen
             ? Cache::remember(
                 self::key($dosen->id),
                 now()->addMinutes(self::TTL_MENIT),
-                fn () => self::hitung($courseIds)
+                $ambil
             )
-            : self::hitung($courseIds);
+            : $ambil();
+
+        $hasValidCache = is_array($data)
+            && array_key_exists('courses', $data)
+            && array_key_exists('courseIds', $data)
+            && array_key_exists('students', $data)
+            && array_key_exists('materials', $data)
+            && array_key_exists('assignments', $data);
+
+        if (! $hasValidCache) {
+            $data = $ambil();
+
+            if ($dosen) {
+                Cache::put(self::key($dosen->id), $data, now()->addMinutes(self::TTL_MENIT));
+            }
+        }
 
         return [
-            'courses'          => $courses,
-            'totalStudents'    => $stats['students'],
-            'totalMaterials'   => $stats['materials'],
-            'totalAssignments' => $stats['assignments'],
+            'courses'          => collect($data['courses'])->map(fn ($c) => (object) $c),
+            'totalStudents'    => $data['students'],
+            'totalMaterials'   => $data['materials'],
+            'totalAssignments' => $data['assignments'],
             // Tidak di-cache: lihat catatan di atas class.
-            'pendingGrading'   => self::perluDinilai($courseIds),
+            'pendingGrading'   => self::perluDinilai($data['courseIds']),
         ];
     }
 
@@ -84,28 +110,23 @@ class DosenDashboardStats
     }
 
     /**
-     * Daftar mata kuliah untuk dashboard. Aturan pemilihannya sama dengan
-     * versi di Blade sebelumnya, hanya saja tanpa memuat relasi apa pun.
+     * Daftar mata kuliah yang diampu dosen untuk dashboard.
+     * Tidak pernah jatuh ke mata kuliah milik dosen lain.
      */
     private static function courses(?User $dosen): Collection
     {
         $kolom = ['courses.id', 'courses.code', 'courses.name', 'courses.sks'];
-        $courses = collect();
 
-        if ($dosen && $dosen->role === 'dosen') {
-            $courses = $dosen->taughtCourses()->where('status', 'active')->get($kolom);
-
-            if ($courses->isEmpty()) {
-                $courses = $dosen->taughtCourses()->get($kolom);
-            }
+        // Bukan dosen atau belum login: kembalikan koleksi kosong.
+        if (! $dosen || $dosen->role !== 'dosen') {
+            return collect();
         }
 
-        if ($courses->isEmpty()) {
-            $courses = Course::where('status', 'active')->get($kolom);
-        }
+        $courses = $dosen->taughtCourses()->where('status', 'active')->get($kolom);
 
+        // Fallback aman: hanya MK milik dosen itu sendiri (misalnya semua masih draft).
         if ($courses->isEmpty()) {
-            $courses = Course::get($kolom);
+            $courses = $dosen->taughtCourses()->get($kolom);
         }
 
         return $courses;
