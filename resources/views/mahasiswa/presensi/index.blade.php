@@ -186,7 +186,7 @@
                         Riwayat Kehadiran Anda
                     </h2>
                     <span class="text-xs font-bold text-slate-500">
-                        Total: {{ $attendanceHistory->count() }} Kali Presensi
+                        Total: {{ method_exists($attendanceHistory, 'total') ? $attendanceHistory->total() : $attendanceHistory->count() }} Kali Presensi
                     </span>
                 </div>
 

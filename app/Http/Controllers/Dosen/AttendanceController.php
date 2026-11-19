@@ -34,7 +34,7 @@ class AttendanceController extends Controller
         }
 
         $sessionsQuery = AttendanceSession::whereIn('course_id', $courses->pluck('id'))
-            ->with(['course', 'attendances'])
+            ->with('course')
             ->withCount('attendances')
             ->orderByDesc('created_at');
 
@@ -63,12 +63,13 @@ class AttendanceController extends Controller
         $data = $request->validate([
             'course_id'        => ['required', 'integer', 'exists:courses,id'],
             'title'            => ['required', 'string', 'max:255'],
-            'code'             => ['nullable', 'string', 'max:16', 'alpha_num', 'unique:attendance_sessions,code'],
+            'code'             => ['nullable', 'string', 'min:6', 'max:16', 'alpha_num', 'unique:attendance_sessions,code'],
             'duration_minutes' => ['required', 'integer', 'min:1', 'max:1440'],
             'description'      => ['nullable', 'string', 'max:1000'],
         ], [
             'course_id.required'        => 'Mata kuliah wajib dipilih.',
             'title.required'            => 'Judul atau topik pertemuan wajib diisi.',
+            'code.min'                  => 'Kode unik presensi minimal terdiri dari 6 karakter.',
             'code.unique'               => 'Kode unik presensi sudah digunakan. Silakan gunakan kode lain atau kosongkan untuk otomatis.',
             'duration_minutes.required' => 'Masa berlaku wajib ditentukan.',
             'duration_minutes.min'      => 'Masa berlaku minimal 1 menit.',

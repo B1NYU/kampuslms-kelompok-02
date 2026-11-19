@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\AttendanceSession;
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -38,16 +39,21 @@ class AttendanceController extends Controller
             ->orderBy('expires_at')
             ->get();
 
-        // ID sesi yang sudah dihadiri mahasiswa
-        $attendedSessionIds = Attendance::where('user_id', $student->id)
-            ->pluck('attendance_session_id')
-            ->toArray();
-
-        // Riwayat kehadiran mahasiswa
+        // Riwayat kehadiran mahasiswa (paginasi 15 per halaman)
         $attendanceHistory = Attendance::where('user_id', $student->id)
             ->with(['session.course.lecturer'])
             ->orderByDesc('attended_at')
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
+
+        // ID sesi aktif yang sudah dihadiri mahasiswa (hanya query sesi aktif saat ini)
+        $activeSessionIds = $activeSessions->pluck('id');
+        $attendedSessionIds = $activeSessionIds->isNotEmpty()
+            ? Attendance::where('user_id', $student->id)
+                ->whereIn('attendance_session_id', $activeSessionIds)
+                ->pluck('attendance_session_id')
+                ->toArray()
+            : [];
 
         return view('mahasiswa.presensi.index', compact(
             'enrolledCourses',
@@ -80,52 +86,10 @@ class AttendanceController extends Controller
             ->with('course')
             ->first();
 
-        if (! $session) {
+        if ($errorMessage = $this->verifyAttendance($session, $student, $mata_kuliah)) {
             return redirect($redirectUrl)
                 ->withInput()
-                ->withErrors(['code' => 'Kode presensi tidak ditemukan. Mohon periksa kembali kode yang diberikan oleh dosen.']);
-        }
-
-        // VALIDASI KRUSIAL: Sesi presensi WAJIB milik mata kuliah yang sedang dibuka ini!
-        if ((int) $session->course_id !== (int) $mata_kuliah->id) {
-            return redirect($redirectUrl)
-                ->withInput()
-                ->withErrors([
-                    'code' => "Kode presensi ini bukan untuk mata kuliah {$mata_kuliah->name} ({$mata_kuliah->code}). Anda hanya dapat melakukan presensi untuk mata kuliah ini pada halaman yang bersangkutan.",
-                ]);
-        }
-
-        // Cek status keaktifan sesi
-        if (! $session->is_active) {
-            return redirect($redirectUrl)
-                ->withInput()
-                ->withErrors(['code' => "Sesi presensi '{$session->title}' telah ditutup oleh dosen pengampu."]);
-        }
-
-        // Cek apakah belum dimulai
-        if ($session->start_time && now()->lt($session->start_time)) {
-            return redirect($redirectUrl)
-                ->withInput()
-                ->withErrors(['code' => "Sesi presensi '{$session->title}' belum dibuka (dimulai pada {$session->start_time->format('d/m/Y H:i')})."]);
-        }
-
-        // Cek masa berlaku (kedaluwarsa)
-        if ($session->isExpired()) {
-            return redirect($redirectUrl)
-                ->withInput()
-                ->withErrors(['code' => "Masa berlaku kode presensi untuk '{$session->title}' telah kedaluwarsa pada {$session->expires_at->format('H:i')}. Presensi tidak dapat dilakukan lagi."]);
-        }
-
-        // Cek apakah mahasiswa sudah melakukan presensi sebelumnya
-        $existing = Attendance::where('attendance_session_id', $session->id)
-            ->where('user_id', $student->id)
-            ->first();
-
-        if ($existing) {
-            $waktu = $existing->attended_at ? $existing->attended_at->format('d M Y H:i') : '-';
-            return redirect($redirectUrl)
-                ->withInput()
-                ->withErrors(['code' => "Anda sudah melakukan presensi pada sesi '{$session->title}' ({$session->course->code}) pada {$waktu} WIB dengan status " . strtoupper($existing->status) . "."]);
+                ->withErrors(['code' => $errorMessage]);
         }
 
         // Simpan presensi mahasiswa
@@ -155,65 +119,17 @@ class AttendanceController extends Controller
 
         $student = $request->user();
         $code = strtoupper(trim($data['code']));
+        $targetCourse = ! empty($data['course_id']) ? Course::find($data['course_id']) : null;
 
         // Cari sesi presensi berdasarkan kode unik
         $session = AttendanceSession::where('code', $code)
             ->with('course')
             ->first();
 
-        if (! $session) {
+        if ($errorMessage = $this->verifyAttendance($session, $student, $targetCourse)) {
             return back()
                 ->withInput()
-                ->withErrors(['code' => 'Kode presensi tidak ditemukan. Mohon periksa kembali kode yang diberikan oleh dosen.']);
-        }
-
-        // Jika course_id disertakan, pastikan kode cocok dengan mata kuliah tersebut
-        if (! empty($data['course_id']) && (int) $session->course_id !== (int) $data['course_id']) {
-            $targetCourse = Course::find($data['course_id']);
-            $targetName = $targetCourse ? "{$targetCourse->name} ({$targetCourse->code})" : 'mata kuliah yang dibuka';
-            return back()
-                ->withInput()
-                ->withErrors(['code' => "Kode presensi ini bukan untuk {$targetName}. Anda hanya dapat melakukan presensi pada halaman mata kuliah yang sesuai."]);
-        }
-
-        // Cek apakah mahasiswa terdaftar pada mata kuliah yang bersangkutan
-        if (! $session->course->isEnrolledBy($student)) {
-            return back()
-                ->withInput()
-                ->withErrors(['code' => "Anda tidak terdaftar sebagai peserta pada mata kuliah {$session->course->code} - {$session->course->name}."]);
-        }
-
-        // Cek status keaktifan sesi
-        if (! $session->is_active) {
-            return back()
-                ->withInput()
-                ->withErrors(['code' => "Sesi presensi '{$session->title}' telah ditutup oleh dosen pengampu."]);
-        }
-
-        // Cek apakah belum dimulai
-        if ($session->start_time && now()->lt($session->start_time)) {
-            return back()
-                ->withInput()
-                ->withErrors(['code' => "Sesi presensi '{$session->title}' belum dibuka (dimulai pada {$session->start_time->format('d/m/Y H:i')})."]);
-        }
-
-        // Cek masa berlaku (kedaluwarsa)
-        if ($session->isExpired()) {
-            return back()
-                ->withInput()
-                ->withErrors(['code' => "Masa berlaku kode presensi untuk '{$session->title}' telah kedaluwarsa pada {$session->expires_at->format('H:i')}. Presensi tidak dapat dilakukan lagi."]);
-        }
-
-        // Cek apakah mahasiswa sudah melakukan presensi sebelumnya
-        $existing = Attendance::where('attendance_session_id', $session->id)
-            ->where('user_id', $student->id)
-            ->first();
-
-        if ($existing) {
-            $waktu = $existing->attended_at ? $existing->attended_at->format('d M Y H:i') : '-';
-            return back()
-                ->withInput()
-                ->withErrors(['code' => "Anda sudah melakukan presensi pada sesi '{$session->title}' ({$session->course->code}) pada {$waktu} WIB dengan status " . strtoupper($existing->status) . "."]);
+                ->withErrors(['code' => $errorMessage]);
         }
 
         // Simpan presensi mahasiswa
@@ -228,5 +144,53 @@ class AttendanceController extends Controller
         return redirect()
             ->route('mahasiswa.presensi.index')
             ->with('success', "Presensi berhasil! Anda tercatat HADIR pada mata kuliah {$session->course->code} - {$session->course->name} ({$session->title}) pada " . now()->format('H:i') . ' WIB.');
+    }
+
+    /**
+     * Verifikasi kelayakan presensi mahasiswa ke suatu sesi.
+     * Mengembalikan pesan error jika tidak memenuhi syarat, atau null jika valid.
+     */
+    private function verifyAttendance(?AttendanceSession $session, User $student, ?Course $expectedCourse = null): ?string
+    {
+        if (! $session) {
+            return 'Kode presensi tidak ditemukan. Mohon periksa kembali kode yang diberikan oleh dosen.';
+        }
+
+        // Jika dipanggil dari halaman MK tertentu, pastikan sesi milik MK tersebut
+        if ($expectedCourse && (int) $session->course_id !== (int) $expectedCourse->id) {
+            return 'Kode presensi tidak valid untuk mata kuliah ini.';
+        }
+
+        // Pastikan mahasiswa terdaftar pada mata kuliah yang bersangkutan tanpa membocorkan nama/kode MK lain
+        if (! $session->course || ! $session->course->isEnrolledBy($student)) {
+            return 'Kode presensi tidak valid atau Anda tidak terdaftar pada mata kuliah ini.';
+        }
+
+        // Cek status keaktifan sesi
+        if (! $session->is_active) {
+            return "Sesi presensi '{$session->title}' telah ditutup oleh dosen pengampu.";
+        }
+
+        // Cek apakah belum dimulai
+        if ($session->start_time && now()->lt($session->start_time)) {
+            return "Sesi presensi '{$session->title}' belum dibuka (dimulai pada {$session->start_time->format('d/m/Y H:i')}).";
+        }
+
+        // Cek masa berlaku (kedaluwarsa)
+        if ($session->isExpired()) {
+            return "Masa berlaku kode presensi untuk '{$session->title}' telah kedaluwarsa pada {$session->expires_at->format('H:i')}. Presensi tidak dapat dilakukan lagi.";
+        }
+
+        // Cek apakah mahasiswa sudah melakukan presensi sebelumnya
+        $existing = Attendance::where('attendance_session_id', $session->id)
+            ->where('user_id', $student->id)
+            ->first();
+
+        if ($existing) {
+            $waktu = $existing->attended_at ? $existing->attended_at->format('d M Y H:i') : '-';
+            return "Anda sudah melakukan presensi pada sesi '{$session->title}' ini sebelumnya pada {$waktu} WIB dengan status " . strtoupper($existing->status) . ".";
+        }
+
+        return null;
     }
 }
