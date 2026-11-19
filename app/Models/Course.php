@@ -44,6 +44,20 @@ class Course extends Model
         static::deleted(fn (Course $course) => DosenDashboardStats::forgetForLecturer($course->lecturer_id));
     }
 
+    public function enroll(User $student): void
+    {
+        $this->students()->attach($student->id, ['enrolled_at' => now()]);
+        DosenDashboardStats::forgetForLecturer($this->lecturer_id);
+    }
+
+    public function unenroll(User $student): int
+    {
+        $removed = $this->students()->detach($student->id);
+        DosenDashboardStats::forgetForLecturer($this->lecturer_id);
+
+        return $removed;
+    }
+
     /** Apakah $user dosen pengampu mata kuliah ini? (murni fakta relasi, bukan aturan akses) */
     public function isTaughtBy(User $user): bool
     {
