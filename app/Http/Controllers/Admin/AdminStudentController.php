@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\DosenDashboardStats;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -19,40 +20,28 @@ class AdminStudentController extends Controller
      */
     public function index(Request $request): View
     {
-        // Eager load agar tidak N+1: 1 query MK, 1 query dosen, 1 query mahasiswa.
-        $courses = Course::with(['lecturer', 'students'])
-            ->withCount('students')
-            ->orderBy('code')
-            ->get();
+        $courses = Course::with('lecturer')->withCount('students')->orderBy('code')->get();
+        $activeCourses = $courses->where('status', 'active');
+        $coursesById = $courses->keyBy('id');
 
         $mahasiswaList = User::where('role', 'mahasiswa')
             ->orderBy('name')
             ->get(['id', 'name', 'nim_nip']);
 
-        // Filter MK yang sedang aktif (?mk=KODE), default semua.
         $selectedCode = $request->query('mk', 'all');
 
-        $enrollmentsList = collect();
-        foreach ($courses as $course) {
-            if ($selectedCode !== 'all' && $course->code !== $selectedCode) {
-                continue;
-            }
-            foreach ($course->students as $student) {
-                $enrollmentsList->push(['course' => $course, 'student' => $student]);
-            }
-        }
-
-        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page');
-        $perPage = 10;
-        $items = $enrollmentsList->slice(($page - 1) * $perPage, $perPage)->values();
-        $allEnrollments = new \Illuminate\Pagination\LengthAwarePaginator($items, $enrollmentsList->count(), $perPage, $page, [
-            'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
-            'query' => $request->query(),
-        ]);
+        $rows = DB::table('course_user')
+            ->join('users', 'users.id', '=', 'course_user.user_id')
+            ->join('courses', 'courses.id', '=', 'course_user.course_id')
+            ->whereNull('users.deleted_at')
+            ->when($selectedCode !== 'all', fn ($q) => $q->where('courses.code', $selectedCode))
+            ->orderBy('courses.code')->orderBy('users.name')
+            ->select('course_user.course_id', 'course_user.enrolled_at', 'users.id as student_id', 'users.name', 'users.nim_nip')
+            ->paginate(10)->withQueryString();
 
         return view()->file(
             resource_path('views/admin/admin.pendaftaran.blade.php'),
-            compact('courses', 'mahasiswaList', 'selectedCode', 'allEnrollments')
+            compact('courses', 'activeCourses', 'coursesById', 'mahasiswaList', 'selectedCode', 'rows')
         );
     }
 

@@ -75,11 +75,6 @@
                 </div>
             @endif
 
-            @php
-                // Hanya MK aktif yang bisa dipilih untuk pendaftaran baru.
-                $activeCourses = $courses->where('status', 'active');
-            @endphp
-
             <!-- Card Utama: Tabel Pendaftaran -->
             <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
 
@@ -87,7 +82,7 @@
                 <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
                         <span class="text-xs sm:text-sm font-bold text-slate-500">
-                            Total <strong id="enrollCount" class="font-black text-slate-900">{{ $allEnrollments->count() }}</strong> Pendaftaran Aktif
+                            Total <strong id="enrollCount" class="font-black text-slate-900">{{ $rows->total() }}</strong> Pendaftaran
                         </span>
                     </div>
 
@@ -108,7 +103,7 @@
                 <div class="filter-mk-container px-4 sm:px-5 py-3 border-b border-slate-100/80 flex flex-wrap gap-2 items-center bg-slate-50/40">
                     <button type="button" class="btn-filter-mk {{ $selectedCode === 'all' ? 'active' : '' }} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200/80 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-mk="all">
                         <span>Semua MK</span>
-                        <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600">{{ $allEnrollments->count() }}</span>
+                        <span class="px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600">{{ $rows->total() }}</span>
                     </button>
                     @foreach ($courses as $c)
                         <button type="button" class="btn-filter-mk {{ $selectedCode === $c->code ? 'active' : '' }} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200/80 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer" data-mk="{{ $c->code }}">
@@ -130,35 +125,37 @@
                             </tr>
                         </thead>
                         <tbody id="enrollTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm font-semibold">
-                            @forelse ($allEnrollments as $e)
+                            @forelse ($rows as $row)
                             @php
-                                $mhs   = $e['student'];
-                                $mk    = $e['course'];
-                                $inits = collect(explode(' ', $mhs->name))->map(fn ($w) => mb_substr($w, 0, 1))->join('');
+                                $mk = $coursesById->get($row->course_id);
+                                $mkCode = $mk?->code ?? '';
+                                $mkName = $mk?->name ?? '-';
+                                $lecturerName = $mk?->lecturer?->name ?? 'Belum ada dosen';
+                                $inits = collect(explode(' ', $row->name))->map(fn ($w) => mb_substr($w, 0, 1))->join('');
                                 $inits = strtoupper(mb_substr($inits, 0, 2));
-                                $tgl   = $mhs->pivot->enrolled_at
-                                    ? \Illuminate\Support\Carbon::parse($mhs->pivot->enrolled_at)->translatedFormat('d M Y')
+                                $tgl = $row->enrolled_at
+                                    ? \Illuminate\Support\Carbon::parse($row->enrolled_at)->translatedFormat('d M Y')
                                     : '-';
                             @endphp
-                            <tr data-mk="{{ $mk->code }}" class="hover:bg-slate-50/80 transition-colors">
+                            <tr data-mk="{{ $mkCode }}" class="hover:bg-slate-50/80 transition-colors">
                                 <td class="py-3.5 px-5">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border bg-emerald-50 text-emerald-600 border-emerald-100">
                                             {{ $inits }}
                                         </div>
                                         <div class="flex flex-col min-w-0">
-                                            <span class="font-bold text-slate-900 text-sm leading-snug">{{ $mhs->name }}</span>
-                                            <span class="text-[11px] font-semibold text-slate-500">{{ $mhs->nim_nip }}</span>
+                                            <span class="font-bold text-slate-900 text-sm leading-snug">{{ $row->name }}</span>
+                                            <span class="text-[11px] font-semibold text-slate-500">{{ $row->nim_nip }}</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="py-3.5 px-5">
                                     <div class="flex flex-col min-w-0">
                                         <div class="font-bold text-slate-900 text-sm flex items-center gap-2">
-                                            <span class="font-mono text-xs px-2 py-0.5 rounded-md bg-sky-50 text-[#039FFA] border border-sky-200/60">{{ $mk->code }}</span>
-                                            <span>{{ $mk->name }}</span>
+                                            <span class="font-mono text-xs px-2 py-0.5 rounded-md bg-sky-50 text-[#039FFA] border border-sky-200/60">{{ $mkCode }}</span>
+                                            <span>{{ $mkName }}</span>
                                         </div>
-                                        <small class="text-[11px] font-medium text-slate-400 mt-0.5">Dosen: {{ $mk->lecturer?->name ?? 'Belum ada dosen' }}</small>
+                                        <small class="text-[11px] font-medium text-slate-400 mt-0.5">Dosen: {{ $lecturerName }}</small>
                                     </div>
                                 </td>
                                 <td class="py-3.5 px-5">
@@ -166,19 +163,21 @@
                                 </td>
                                 <td class="py-3.5 px-5 text-right">
                                     <div class="inline-flex items-center justify-end">
-                                        @can('manageEnrollment', $mk)
-                                            <form method="POST" action="{{ route('admin.pendaftaran.destroy', [$mk, $mhs]) }}" class="inline-block m-0"
-                                                  onsubmit="return confirm('Batalkan pendaftaran {{ e($mhs->name) }} dari {{ e($mk->code) }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="p-2 rounded-xl border border-slate-200/80 bg-white text-slate-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/60 shadow-xs transition-all cursor-pointer" title="Batalkan pendaftaran">
-                                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        @endcan
+                                        @if ($mk)
+                                            @can('manageEnrollment', $mk)
+                                                <form method="POST" action="{{ route('admin.pendaftaran.destroy', [$row->course_id, $row->student_id]) }}" class="inline-block m-0"
+                                                      onsubmit="return confirm('Batalkan pendaftaran {{ e($row->name) }} dari {{ e($mkCode) }}?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="p-2 rounded-xl border border-slate-200/80 bg-white text-slate-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/60 shadow-xs transition-all cursor-pointer" title="Batalkan pendaftaran">
+                                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endcan
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -201,9 +200,9 @@
                 </div>
 
                 {{-- Navigasi Pagination Laravel --}}
-                @if ($allEnrollments->hasPages())
+                @if ($rows->hasPages())
                     <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between">
-                        {{ $allEnrollments->links() }}
+                        {{ $rows->links() }}
                     </div>
                 @endif
 
@@ -211,7 +210,7 @@
                 <div class="p-4 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
                     <div class="flex items-center gap-1.5 font-bold text-slate-700">
                         <span>Total:</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black">{{ $allEnrollments->total() }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-900 text-xs font-black">{{ $rows->total() }}</span>
                         <span>mahasiswa terdaftar</span>
                     </div>
                 </div>
