@@ -82,7 +82,9 @@ Route::middleware('auth')->group(function () {
             // Kepemilikan (terdaftar atau tidak) dicek di controller.
             Route::get('/{mata_kuliah}', [MahasiswaCourseController::class, 'show'])->name('show');
             // Presensi hanya dapat dilakukan pada halaman mata kuliah yang bersangkutan
-            Route::post('/{mata_kuliah}/presensi', [MahasiswaAttendanceController::class, 'storeForCourse'])->name('presensi.store');
+            Route::post('/{mata_kuliah}/presensi', [MahasiswaAttendanceController::class, 'storeForCourse'])
+                ->middleware('throttle:10,1')
+                ->name('presensi.store');
         });
 
         // Rekap nilai milik sendiri, lintas mata kuliah (disaring per mahasiswa di controller).
@@ -93,7 +95,9 @@ Route::middleware('auth')->group(function () {
 
         // Presensi Kelas Mahasiswa diarahkan ke mata kuliah
         Route::get('/presensi', fn () => redirect()->route('mahasiswa.mata-kuliah.index')->with('info', 'Presensi dilakukan langsung pada halaman mata kuliah yang Anda ikuti.'))->name('presensi.index');
-        Route::post('/presensi', [MahasiswaAttendanceController::class, 'store'])->name('presensi.store');
+        Route::post('/presensi', [MahasiswaAttendanceController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('presensi.store');
 
         // Unduh materi mata kuliah yang diikuti (pake role:mahasiswa,dosen,admin agar dosen & admin bisa akses jika dipanggil)
         Route::get('/materi/{material}/unduh', [MaterialController::class, 'download'])
