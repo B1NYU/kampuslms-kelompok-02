@@ -40,19 +40,45 @@ class RekapNilaiService
             ->paginate($perPage)
             ->withQueryString();
 
-        // Pengumpulan + nilai, hanya milik mahasiswa pada halaman ini dan tugas yang ditampilkan.
-        $submissions = Submission::query()
+        // Hitung statistik agregat dari SELURUH mahasiswa di kelas (bukan hanya halaman aktif).
+        $allStudentIds = $course->students()
+            ->where('users.role', 'mahasiswa')
+            ->pluck('users.id');
+
+        $assignmentsById = $assignments->keyBy('id');
+
+        $allSubmissions = Submission::query()
             ->whereIn('assignment_id', $assignments->pluck('id'))
-            ->whereIn('user_id', $students->pluck('id'))
+            ->whereIn('user_id', $allStudentIds)
             ->with('grade:id,submission_id,score')
-            ->get(['id', 'assignment_id', 'user_id', 'is_late'])
-            ->keyBy(fn ($s) => $s->user_id . '-' . $s->assignment_id);
+            ->get(['id', 'assignment_id', 'user_id', 'is_late']);
 
         $gradedCells = 0;
         $waitingCells = 0;
         $sumPercentAll = 0.0;
 
-        $rows = $students->through(function ($student) use ($assignments, $submissions, &$gradedCells, &$waitingCells, &$sumPercentAll) {
+        foreach ($allSubmissions as $sub) {
+            if (! $sub->grade) {
+                $waitingCells++;
+                continue;
+            }
+
+            $assignment = $assignmentsById->get($sub->assignment_id);
+            $maxScore = $assignment ? (float) $assignment->max_score : 0.0;
+            $score = (float) $sub->grade->score;
+            $percent = $maxScore > 0 ? ($score / $maxScore) * 100 : 0.0;
+
+            $gradedCells++;
+            $sumPercentAll += $percent;
+        }
+
+        // Pengumpulan + nilai untuk merender baris tabel pada halaman aktif saja.
+        $pageStudentIds = $students->pluck('id')->flip();
+        $submissions = $allSubmissions
+            ->filter(fn ($s) => $pageStudentIds->has($s->user_id))
+            ->keyBy(fn ($s) => $s->user_id . '-' . $s->assignment_id);
+
+        $rows = $students->through(function ($student) use ($assignments, $submissions) {
             $cells = [];
             $graded = 0;
             $submitted = 0;
@@ -69,7 +95,6 @@ class RekapNilaiService
                 $submitted++;
 
                 if (! $sub->grade) {
-                    $waitingCells++;
                     $cells[] = [
                         'state'         => 'waiting',
                         'late'          => (bool) $sub->is_late,
@@ -82,9 +107,7 @@ class RekapNilaiService
                 $percent = $assignment->max_score > 0 ? $score / $assignment->max_score * 100 : 0;
 
                 $graded++;
-                $gradedCells++;
                 $sumPercent += $percent;
-                $sumPercentAll += $percent;
 
                 $cells[] = [
                     'state'         => 'graded',
