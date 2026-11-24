@@ -198,7 +198,14 @@ class ApiV1EndpointBaruTest extends TestCase
 
     public function test_daftar_pengumpulan_tugas_draft_tetap_terbuka_bagi_dosen_pengampu(): void
     {
-        $this->getJson(self::BASE . "/assignments/{$this->draft->id}/submissions", $this->as($this->dosenA))->assertOk();
+        $s = Submission::factory()->count(2)->create(['assignment_id' => $this->draft->id]);
+
+        $res = $this->getJson(self::BASE . "/assignments/{$this->draft->id}/submissions", $this->as($this->dosenA))
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.total', 2);
+
+        $this->assertEqualsCanonicalizing($s->pluck('id')->all(), collect($res->json('data'))->pluck('id')->all());
     }
 
     // ============================================================ POST /assignments/{id}/submissions
