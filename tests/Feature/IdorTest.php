@@ -204,11 +204,19 @@ class IdorTest extends TestCase
 
     public function test_dosen_lain_tidak_bisa_mengubah_atau_menghapus_tugas(): void
     {
+        $judulAsli = $this->assignment->title;
+        $instruksiAsli = $this->assignment->instructions;
+
         $this->actingAs($this->dosenLain)->get(route('dosen.assignments.edit', $this->assignment))->assertForbidden();
-        $this->actingAs($this->dosenLain)->put(route('dosen.assignments.update', $this->assignment), $this->payload())->assertForbidden();
+        $this->actingAs($this->dosenLain)->put(route('dosen.assignments.update', $this->assignment), $this->payload(['title' => 'Diretas PUT']))->assertForbidden();
+        $this->actingAs($this->dosenLain)->patch(route('dosen.assignments.update', $this->assignment), $this->payload(['title' => 'Diretas PATCH']))->assertForbidden();
         $this->actingAs($this->dosenLain)->delete(route('dosen.assignments.destroy', $this->assignment))->assertForbidden();
 
-        $this->assertDatabaseHas('assignments', ['id' => $this->assignment->id]);
+        $this->assertDatabaseHas('assignments', [
+            'id' => $this->assignment->id,
+            'title' => $judulAsli,
+            'instructions' => $instruksiAsli,
+        ]);
     }
 
     public function test_tugas_yang_sudah_ada_pengumpulan_tidak_bisa_dihapus(): void
