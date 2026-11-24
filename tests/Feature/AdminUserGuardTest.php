@@ -217,4 +217,45 @@ class AdminUserGuardTest extends TestCase
         $this->assertSame('mahasiswa', $target->fresh()->role);
         $this->assertNotSoftDeleted($target);
     }
+
+    public function test_dosen_tidak_bisa_eskalasi_role_menjadi_admin_lewat_endpoint_admin(): void
+    {
+        $dosen = User::factory()->dosen()->create();
+        $target = User::factory()->mahasiswa()->create();
+
+        // Eskalasi diri sendiri menjadi admin.
+        $this->actingAs($dosen)
+            ->putJson(route('admin.pengguna.update', $dosen), $this->data([
+                'name' => $dosen->name, 'nim_nip' => $dosen->nim_nip, 'email' => $dosen->email,
+                'password' => null, 'role' => 'admin', 'status' => 'aktif',
+            ]))
+            ->assertForbidden();
+
+        // Eskalasi akun pengguna lain menjadi admin, tambah akun, dan hapus akun.
+        $this->actingAs($dosen)
+            ->putJson(route('admin.pengguna.update', $target), $this->data(['role' => 'admin']))
+            ->assertForbidden();
+        $this->actingAs($dosen)
+            ->postJson('/admin/pengguna', $this->data(['role' => 'admin']))
+            ->assertForbidden();
+        $this->actingAs($dosen)
+            ->deleteJson(route('admin.pengguna.destroy', $target))
+            ->assertForbidden();
+
+        $this->assertSame('dosen', $dosen->fresh()->role);
+        $this->assertSame('mahasiswa', $target->fresh()->role);
+        $this->assertNotSoftDeleted($target);
+        $this->assertDatabaseMissing('users', ['nim_nip' => 'UJI-001']);
+    }
+
+    public function test_policy_menolak_non_admin_mengubah_pengguna_atau_peran(): void
+    {
+        $dosen = User::factory()->dosen()->create();
+        $mhs = User::factory()->mahasiswa()->create();
+
+        $this->assertTrue(Gate::forUser($dosen)->denies('update', $dosen));
+        $this->assertTrue(Gate::forUser($dosen)->denies('changeRole', [$dosen, 'admin']));
+        $this->assertTrue(Gate::forUser($mhs)->denies('update', $mhs));
+        $this->assertTrue(Gate::forUser($mhs)->denies('changeRole', [$mhs, 'admin']));
+    }
 }

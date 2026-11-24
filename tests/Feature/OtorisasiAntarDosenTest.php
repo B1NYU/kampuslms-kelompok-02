@@ -5,9 +5,12 @@ namespace Tests\Feature;
 use App\Models\Assignment;
 use App\Models\AttendanceSession;
 use App\Models\Course;
+use App\Models\Grade;
 use App\Models\Material;
+use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -193,6 +196,124 @@ class OtorisasiAntarDosenTest extends TestCase
         $this->assertDatabaseMissing('course_user', [
             'course_id' => $this->course->id, 'user_id' => $this->mhs->id,
         ]);
+    }
+
+    public function test_dosen_pengampu_tidak_bisa_mengeluarkan_mahasiswa_dari_mata_kuliah_archived(): void
+    {
+        $this->course->update(['status' => 'archived']);
+
+        $this->actingAs($this->dosen)
+            ->delete(route('dosen.mahasiswa.destroy', [$this->course, $this->mhs]))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('course_user', [
+            'course_id' => $this->course->id, 'user_id' => $this->mhs->id,
+        ]);
+    }
+
+    // ================================================== PENILAIAN (baris 11 keamanan.md)
+
+    private function buatPengumpulan(): Submission
+    {
+        $assignment = Assignment::factory()->active()->create([
+            'course_id' => $this->course->id, 'created_by' => $this->dosen->id,
+        ]);
+
+        return Submission::factory()->create([
+            'assignment_id' => $assignment->id, 'user_id' => $this->mhs->id,
+        ]);
+    }
+
+    public function test_dosen_lain_tidak_bisa_memberi_atau_mengubah_nilai_tugas_kelas_dosen_lain(): void
+    {
+        Notification::fake();
+        $submission = $this->buatPengumpulan();
+
+        // Belum ada nilai: dosen lain mencoba memberi nilai (JSON & form biasa) + body kosong (403 sebelum 422).
+        $this->actingAs($this->dosenLain)
+            ->putJson(route('dosen.penilaian.update', $submission), ['score' => 95, 'feedback' => 'Sisipan'])
+            ->assertForbidden();
+        $this->actingAs($this->dosenLain)
+            ->put(route('dosen.penilaian.update', $submission), ['score' => 95, 'feedback' => 'Sisipan'])
+            ->assertForbidden();
+        $this->actingAs($this->dosenLain)
+            ->putJson(route('dosen.penilaian.update', $submission), [])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('grades', ['submission_id' => $submission->id]);
+
+        // Sudah ada nilai: dosen lain tidak boleh mengubah nilai atau feedback yang sudah ada.
+        Grade::factory()->create([
+            'submission_id' => $submission->id, 'graded_by' => $this->dosen->id,
+            'score' => 80, 'feedback' => 'Feedback Asli',
+        ]);
+
+        $this->actingAs($this->dosenLain)
+            ->putJson(route('dosen.penilaian.update', $submission), ['score' => 10, 'feedback' => 'Diretas'])
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('grades', [
+            'submission_id' => $submission->id, 'graded_by' => $this->dosen->id,
+            'score' => 80, 'feedback' => 'Feedback Asli',
+        ]);
+    }
+
+    public function test_dosen_pengampu_bisa_memberi_dan_mengubah_nilai_pada_mk_aktif(): void
+    {
+        Notification::fake();
+        $submission = $this->buatPengumpulan();
+
+        $this->actingAs($this->dosen)
+            ->putJson(route('dosen.penilaian.update', $submission), ['score' => 88, 'feedback' => 'Kerja bagus'])
+            ->assertOk()
+            ->assertJsonPath('grade.score', 88);
+
+        $this->assertDatabaseHas('grades', [
+            'submission_id' => $submission->id, 'graded_by' => $this->dosen->id,
+            'score' => 88, 'feedback' => 'Kerja bagus',
+        ]);
+
+        // Mengubah nilai yang sudah ada (regrade).
+        $this->actingAs($this->dosen)
+            ->putJson(route('dosen.penilaian.update', $submission), ['score' => 92, 'feedback' => 'Revisi sangat baik'])
+            ->assertOk()
+            ->assertJsonPath('grade.score', 92);
+
+        $this->assertDatabaseHas('grades', [
+            'submission_id' => $submission->id, 'graded_by' => $this->dosen->id,
+            'score' => 92, 'feedback' => 'Revisi sangat baik',
+        ]);
+    }
+
+    public function test_dosen_pengampu_tidak_bisa_menilai_tugas_pada_mk_tidak_aktif(): void
+    {
+        Notification::fake();
+        $submission = $this->buatPengumpulan();
+
+        foreach (['draft', 'archived'] as $status) {
+            $this->course->update(['status' => $status]);
+
+            $this->actingAs($this->dosen)
+                ->putJson(route('dosen.penilaian.update', $submission), ['score' => 85, 'feedback' => 'Coba nilai'])
+                ->assertForbidden();
+        }
+
+        $this->assertDatabaseMissing('grades', ['submission_id' => $submission->id]);
+    }
+
+    public function test_mahasiswa_dan_admin_tidak_bisa_menilai_tugas_lewat_endpoint_dosen(): void
+    {
+        Notification::fake();
+        $submission = $this->buatPengumpulan();
+
+        $this->actingAs($this->mhs)
+            ->putJson(route('dosen.penilaian.update', $submission), ['score' => 100, 'feedback' => 'Nilai sendiri'])
+            ->assertForbidden();
+        $this->actingAs($this->admin)
+            ->putJson(route('dosen.penilaian.update', $submission), ['score' => 100, 'feedback' => 'Nilai admin'])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('grades', ['submission_id' => $submission->id]);
     }
 
     // ================================================================ REKAP NILAI
