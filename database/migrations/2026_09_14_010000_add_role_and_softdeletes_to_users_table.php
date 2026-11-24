@@ -23,6 +23,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropIndex(['role']);
+            $table->dropUnique(['nim_nip']); // perbaikan bug: rollback gagal karena index unik tidak di-drop dulu
             $table->dropColumn(['role', 'nim_nip', 'deleted_at']);
         });
     }
