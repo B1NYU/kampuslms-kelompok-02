@@ -89,6 +89,14 @@ class IdorTest extends TestCase
         $this->actingAs($this->dosenLain)->get(route('submissions.show', $this->subSiti))->assertForbidden();
     }
 
+    public function test_mahasiswa_tidak_bisa_mengunduh_submission_orang_lain(): void
+    {
+        Storage::fake('local');
+        $this->actingAs($this->budi)->get(route('submissions.download', $this->subSiti))->assertForbidden();
+        $this->actingAs($this->outsider)->get(route('submissions.download', $this->subBudi))->assertForbidden();
+        $this->actingAs($this->dosenLain)->get(route('submissions.download', $this->subSiti))->assertForbidden();
+    }
+
     public function test_id_yang_tidak_ada_mendapat_404_dan_tamu_diarahkan_ke_login(): void
     {
         $this->actingAs($this->budi)->get('/submissions/999999')->assertNotFound();
