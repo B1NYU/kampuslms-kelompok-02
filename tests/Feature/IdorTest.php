@@ -63,7 +63,10 @@ class IdorTest extends TestCase
 
     public function test_mahasiswa_bisa_melihat_submission_sendiri(): void
     {
-        $this->actingAs($this->budi)->get(route('submissions.show', $this->subBudi))->assertOk();
+        $this->actingAs($this->budi)->get(route('submissions.show', $this->subBudi))
+            ->assertOk()
+            ->assertSee('jawaban-budi.pdf')
+            ->assertDontSee('jawaban-siti-RAHASIA.pdf');
     }
 
     public function test_mahasiswa_tidak_bisa_melihat_submission_orang_lain(): void
@@ -75,8 +78,10 @@ class IdorTest extends TestCase
 
     public function test_dosen_pengampu_dan_admin_boleh_melihat_submission(): void
     {
-        $this->actingAs($this->dosen)->get(route('submissions.show', $this->subSiti))->assertOk();
-        $this->actingAs($this->admin)->get(route('submissions.show', $this->subSiti))->assertOk();
+        $this->actingAs($this->dosen)->get(route('submissions.show', $this->subSiti))
+            ->assertOk()->assertSee('jawaban-siti-RAHASIA.pdf');
+        $this->actingAs($this->admin)->get(route('submissions.show', $this->subSiti))
+            ->assertOk()->assertSee('jawaban-siti-RAHASIA.pdf');
     }
 
     public function test_dosen_lain_tidak_boleh_melihat_submission(): void
